@@ -1,0 +1,151 @@
+{
+  "bio": {
+    "name": "আতাউল্লাহ্ মুহাম্মাদ বিন মাগরিব",
+    "englishName": "magrib",
+    "title": "প্রোফেশনাল প্রোডাক্ট ফটো এডিটর",
+    "degree": "বিএসসি ইন ইলেকট্রিক্যাল অ্যান্ড ইলেকট্রনিক ইঞ্জিনিয়ারিং (EEE)",
+    "degreeShort": "B.Sc. in EEE",
+    "profileImage": "/images/uploads/upload-1782085165246-535186413.png",
+    "profileImage2": "/images/uploads/upload-1782899937406-108779598.jpeg",
+    "experienceYears": "১০+",
+    "completedProjects": "১০০০+",
+    "happyClients": "১০০০+",
+    "aboutBengali": "আমি মাগরিব, একজন ইলেকট্রিক্যাল অ্যান্ড ইলেকট্রনিক্স ইঞ্জিনিয়ার এবং প্রফেশনাল ফ্রিল্যান্সার। আমি আমার একাডেমিক EEE ইঞ্জিনিয়ারিং দক্ষতার পাশাপাশি দীর্ঘ ১০ বছর ধরে ফ্রিল্যান্সিংয়ে প্রোফেশনাল প্রোডাক্ট ফটো এডিটিং ও গ্রাফিক্স ডিজাইনের কাজ করে আসছি। আমি ই-কমার্স প্রোডাক্টের হাই-এন্ড রিটাচিং, ব্যাকগ্রাউন্ড রিমুভাল, এবং কালার কারেকশনে স্পেশালিস্ট। এই পর্যন্ত আমি ১০০০+ প্রজেক্ট সফলভাবে সম্পন্ন করেছি।",
+    "aboutEnglish": "I am magrib, an Electrical and Electronic Engineer and professional freelancer. Alongside my academic EEE background, I have 10+ years of professional freelance experience in Product Photo Editing and Graphic Design. I specialize in high-end e-commerce product retouching, background removal, and color correction, having successfully completed 1000+ projects."
+  },
+  "socialLinks": {
+    "email": "mdmagribrajbd@gmail.com",
+    "phone": "+8801751095560",
+    "whatsapp": "8801751095560",
+    "github": "https://github.com/magrib",
+    "linkedin": "https://www.facebook.com/magrib.freelancer/",
+    "facebook": "https://www.facebook.com/magrib.freelancer/"
+  },
+  "contactInfo": {
+    "address": "ঢাকা, বাংলাদেশ",
+    "city": "ঢাকা",
+    "country": "বাংলাদেশ"
+  },
+  "skills": [
+    {
+      "category": "ফটো এডিটিং ও ভিজ্যুয়ালাইজেশন",
+      "items": [
+        {
+          "name": "প্রোডাক্ট ফটো এডিটিং (Product Photo Editing)",
+          "level": 95
+        },
+        {
+          "name": "প্রোডাক্ট ভিজ্যুয়ালাইজেশন (Product Visualization)",
+          "level": 90
+        },
+        {
+          "name": "প্রোডাক্ট ফটো অপটিমাইজেশন (Product Photo Optimization)",
+          "level": 92
+        }
+      ]
+    },
+    {
+      "category": "ফটোগ্রাফি ও অ্যানিমেশন",
+      "items": [
+        {
+          "name": "প্রোডাক্ট ফটোগ্রাফি (Product Photography)",
+          "level": 85
+        },
+        {
+          "name": "প্রোডাক্ট অ্যানিমেশন (Product Animation)",
+          "level": 80
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "id": "iot-embedded",
+      "title": "আইওটি ও এমবেডেড সিস্টেম",
+      "icon": "cpu",
+      "description": "ESP32, Arduino বা Raspberry Pi ব্যবহার করে কাস্টম স্মার্ট ডিভাইস এবং সেন্সর নেটওয়ার্ক প্রোটোটাইপিং।"
+    },
+    {
+      "id": "pcb-design",
+      "title": "পিসিবি ডিজাইন ও হার্ডওয়্যার",
+      "icon": "layers",
+      "description": "Altium Designer বা EasyEDA দিয়ে ইন্ডাস্ট্রিয়াল গ্রেড ডাবল-লেয়ার ও মাল্টি-লেয়ার পিসিবি স্কিম্যাটিক ও লেআউট তৈরি।"
+    },
+    {
+      "id": "iot-dashboards",
+      "title": "স্মার্ট মনিটরিং ড্যাশবোর্ড",
+      "icon": "layout",
+      "description": "Node.js, WebSockets এবং MQTT প্রোটোকল ব্যবহার করে রিয়েল-টাইম ডেটা ভিজ্যুয়ালাইজেশন ও কন্ট্রোল প্যানেল তৈরি।"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "title": "স্মার্ট হোম অটোমেশন সিস্টেম",
+      "category": "iot",
+      "description": "ESP32 এবং WebSockets ব্যবহার করে তৈরি একটি স্বয়ংক্রিয় কন্ট্রোল সিস্টেম, যা মোবাইলের মাধ্যমে ঘরের লাইট, ফ্যান এবং তাপমাত্রা পর্যবেক্ষণ করতে পারে।",
+      "image": "/images/project1.png",
+      "gallery": [
+        "/images/project1.png"
+      ],
+      "videoUrl": "",
+      "tools": [
+        "ESP32",
+        "WebSockets",
+        "Node.js",
+        "Vanilla CSS"
+      ],
+      "link": "https://github.com/tahmid-eee/smart-home"
+    },
+    {
+      "id": 2,
+      "title": "ইন্ডাস্ট্রিয়াল ডাটা লগার পিসিবি",
+      "category": "pcb",
+      "description": "বিভিন্ন ইন্ডাস্ট্রিয়াল সেন্সর থেকে আরএস-৪৮৫ (RS-485) এবং মডবাস (Modbus) প্রোটোকলের মাধ্যমে তথ্য রিড করে ক্লাউডে পাঠানোর জন্য একটি কাস্টম পিসিবি লেআউট ডিজাইন।",
+      "image": "/images/project2.png",
+      "gallery": [
+        "/images/project2.png"
+      ],
+      "videoUrl": "",
+      "tools": [
+        "Altium",
+        "RS-485",
+        "STM32",
+        "Modbus"
+      ],
+      "link": "#"
+    },
+    {
+      "id": 3,
+      "title": "কৃষি জমিতে স্বয়ংক্রিয় সেচ ও আর্দ্রতা পরিমাপক",
+      "category": "iot",
+      "description": "মাটির আর্দ্রতা সেন্সর এবং ওয়াটার পাম্প রিলে মডিউলের মাধ্যমে অটোমেটিক ও রিমোট কন্ট্রোলড ইরিগেশন প্রজেক্ট।",
+      "image": "/images/project3.png",
+      "gallery": [
+        "/images/project3.png"
+      ],
+      "videoUrl": "",
+      "tools": [
+        "Arduino",
+        "ESP8266",
+        "Firebase",
+        "Web UI"
+      ],
+      "link": "https://github.com/tahmid-eee/smart-irrigation"
+    }
+  ],
+  "experience": [
+    {
+      "role": "প্রফেশনাল ফ্রিল্যান্সার (IoT & EEE)",
+      "company": "Upwork & Fiverr",
+      "period": "২০২৩ - বর্তমান",
+      "description": "বিশ্বের বিভিন্ন দেশের ক্লায়েন্টদের জন্য কাস্টম আইওটি প্রোটোটাইপ, ফার্মওয়্যার কোডিং এবং পিসিবি ডিজাইন সফলভাবে সম্পন্ন করা।"
+    },
+    {
+      "role": "জুনিয়র হার্ডওয়্যার ইঞ্জিনিয়ার",
+      "company": "টেকট্রনিক্স সলিউশনস",
+      "period": "২০২২ - ২০২৩",
+      "description": "এমবেডেড কন্ট্রোলার প্রোগ্রামিং এবং সেন্সর ক্যালিব্রেশনের কাজে নিয়োজিত ছিলাম।"
+    }
+  ]
+}
