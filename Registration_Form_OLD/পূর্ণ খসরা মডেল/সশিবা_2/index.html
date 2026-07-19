@@ -25,13 +25,19 @@
             <div class="dropdown">
               <div id="nav-teacher" class="nav-link">শিক্ষক বাতায়ন</div>
               <div class="dropdown-content">
-                <a href="javascript:void(0)" onclick="openPortal('lesson')"
+                <a
+                  href="javascript:void(0)"
+                  onclick="openPortal('lesson')"
                   >লেসন প্ল্যান</a
                 >
-                <a href="javascript:void(0)" onclick="openPortal('question')"
+                <a
+                  href="javascript:void(0)"
+                  onclick="openPortal('question')"
                   >পরীক্ষা তৈরি</a
                 >
-                <a href="javascript:void(0)" onclick="openPortal('question')"
+                <a
+                  href="javascript:void(0)"
+                  onclick="openPortal('question')"
                   >উত্তরপত্র</a
                 >
                 <a
@@ -136,12 +142,7 @@
           >
             🌙
           </div>
-          <button
-            class="btn-orange text-sm shadow-sm"
-            onclick="openSignupModal()"
-          >
-            সাইন আপ ➔
-          </button>
+          <button class="btn-orange text-sm shadow-sm" onclick="openSignupModal()">সাইন আপ ➔</button>
         </div>
       </div>
     </nav>
@@ -195,7 +196,10 @@
       <div
         class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl w-full mx-auto pb-20"
       >
-        <div class="feature-card" onclick="openPortal('question')">
+        <div
+          class="feature-card"
+          onclick="openPortal('question')"
+        >
           <h3>১ মিনিটে প্রশ্নপত্র</h3>
           <p>
             সকল বিষয়ের মানসম্মত প্রশ্নপত্র তৈরি করুন মাত্র ১ মিনিটে। সহজ
@@ -204,7 +208,10 @@
           <div class="footer-link">বিস্তারিত দেখুন ➔</div>
         </div>
 
-        <div class="feature-card" onclick="openPortal('question')">
+        <div
+          class="feature-card"
+          onclick="openPortal('question')"
+        >
           <h3>১ মিনিটে উত্তরপত্র</h3>
           <p>
             প্রশ্নপত্রের সাথে সাথে উত্তরপত্রও তৈরি হবে স্বয়ংক্রিয়ভাবে। সময়
@@ -213,7 +220,10 @@
           <div class="footer-link">বিস্তারিত দেখুন ➔</div>
         </div>
 
-        <div class="feature-card" onclick="openPortal('lesson')">
+        <div
+          class="feature-card"
+          onclick="openPortal('lesson')"
+        >
           <h3>লেসন প্ল্যান</h3>
           <p>
             আধুনিক কারিকুলাম অনুযায়ী প্রতিটি ক্লাসের জন্য স্মার্ট লেসন প্ল্যান
@@ -252,43 +262,23 @@
 
     <!-- EMBEDDED IFRAME PORTALS -->
     <section id="iframe-page" class="hidden">
-      <iframe
-        id="portal-iframe"
-        src="about:blank"
-        class="w-full h-full border-none"
-      ></iframe>
+      <iframe id="portal-iframe" src="about:blank" class="w-full h-full border-none"></iframe>
     </section>
 
     <!-- SIGN UP MODAL -->
-    <div
-      id="signup-modal"
-      class="fixed inset-0 z-[200] hidden items-center justify-center p-4"
-    >
+    <div id="signup-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
       <!-- Modal Overlay Background with Glassmorphism -->
-      <div
-        class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
-        onclick="closeSignupModal()"
-      ></div>
-
+      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeSignupModal()"></div>
+      
       <!-- Modal Content Box -->
-      <div
-        id="signup-modal-content"
-        class="relative w-full max-w-5xl h-[85vh] bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col transform scale-95 opacity-0 transition-all duration-300 ease-out"
-      >
+      <div id="signup-modal-content" class="relative w-full max-w-5xl h-[85vh] bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col transform scale-95 opacity-0 transition-all duration-300 ease-out">
         <!-- Close Button -->
-        <button
-          class="absolute top-4 right-4 z-50 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold shadow-md transition-colors"
-          onclick="closeSignupModal()"
-        >
+        <button class="absolute top-4 right-4 z-50 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold shadow-md transition-colors" onclick="closeSignupModal()">
           ✕
         </button>
-
+        
         <!-- Iframe to load registration form -->
-        <iframe
-          src="about:blank"
-          id="signup-iframe"
-          class="w-full h-full border-none"
-        ></iframe>
+        <iframe src="about:blank" id="signup-iframe" class="w-full h-full border-none"></iframe>
       </div>
     </div>
 
