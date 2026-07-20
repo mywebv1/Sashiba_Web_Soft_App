@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduOS Presentation Architect PRO</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Hind+Siliguri:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- ১. বাম সাইডবার (Main Navigation) -->
+      <aside class="sidebar">
+        <div class="logo">E<span>OS</span></div>
+        <nav>
+          <a href="#" class="nav-item active"
+            ><i class="fas fa-magic"></i> নিউ প্রেজেন্টেশন</a
+          >
+          <a href="#" class="nav-item"
+            ><i class="fas fa-folder"></i> লাইব্রেরি</a
+          >
+          <a href="#" class="nav-item"
+            ><i class="fas fa-chart-line"></i> রিপোর্ট</a
+          >
+          <a href="#" class="nav-item"><i class="fas fa-cog"></i> সেটিংস</a>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="avatar">T</div>
+            <span>শিক্ষক প্রোফাইল</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ২. মেইন কন্টেন্ট এরিয়া -->
+      <main class="main-content">
+        <!-- টপবার -->
+        <header class="topbar">
+          <div class="breadcrumb">
+            আর্কিটেক্ট / <span>নতুন ডিজিটাল পাঠ</span>
+          </div>
+          <button class="btn-generate" id="btnGenerate">
+            <i class="fas fa-sparkles"></i> প্রেজেন্টেশন জেনারেট করুন
+          </button>
+        </header>
+
+        <div class="workspace">
+          <!-- বাম প্যানেল: কনফিগারেশন ড্রয়ার (সব অপশন এখানে) -->
+          <aside class="config-panel scrollable">
+            <!-- কার্ড ১: প্রতিষ্ঠানের তথ্য -->
+            <div class="pro-card active">
+              <div class="card-header" onclick="toggleCard(this)">
+                <span><i class="fas fa-university"></i> প্রতিষ্ঠানের তথ্য</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="card-body">
+                <select class="pro-select">
+                  <option disabled selected>বোর্ড নির্বাচন করুন</option>
+                  <option>NCTB</option>
+                  <option>মাদ্রাসা</option>
+                  <option>কারিগরি</option>
+                </select>
+                <input
+                  type="text"
+                  class="pro-input"
+                  placeholder="প্রতিষ্ঠানের নাম"
+                />
+                <input type="text" class="pro-input" placeholder="ঠিকানা" />
+                <div class="grid-row">
+                  <input type="text" class="pro-input" placeholder="কোড" />
+                  <input
+                    type="text"
+                    class="pro-input"
+                    placeholder="প্রতিষ্ঠা সাল"
+                  />
+                </div>
+                <p class="label-sm">প্রতিষ্ঠানের ধরন:</p>
+                <div class="checkbox-grid">
+                  <label class="pro-check"
+                    ><input type="checkbox" /> প্রাথমিক</label
+                  >
+                  <label class="pro-check"
+                    ><input type="checkbox" /> উচ্চ বিদ্যালয়</label
+                  >
+                  <label class="pro-check"
+                    ><input type="checkbox" /> মহাবিদ্যালয়</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- কার্ড ২: একাডেমিক তথ্য -->
+            <div class="pro-card">
+              <div class="card-header" onclick="toggleCard(this)">
+                <span><i class="fas fa-graduation-cap"></i> একাডেমিক তথ্য</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="card-body">
+                <div class="grid-row">
+                  <select class="pro-select">
+                    <option>শ্রেণি</option>
+                  </select>
+                  <select class="pro-select">
+                    <option>শাখা</option>
+                  </select>
+                </div>
+                <div class="grid-row">
+                  <select class="pro-select">
+                    <option>বিষয়</option>
+                  </select>
+                  <select class="pro-select">
+                    <option>অধ্যায়</option>
+                  </select>
+                </div>
+                <p class="label-sm">আলোচ্য বিষয় (টপিকস):</p>
+                <div class="topic-list">
+                  <label class="pro-check"
+                    ><input type="checkbox" checked /> মূল ধারণা ও সংজ্ঞা</label
+                  >
+                  <label class="pro-check"
+                    ><input type="checkbox" /> বাস্তব জীবনের প্রয়োগ</label
+                  >
+                  <label class="pro-check"
+                    ><input type="checkbox" /> গাণিতিক সমস্যা</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- কার্ড ৩: ডিজাইন ও থিম -->
+            <div class="pro-card">
+              <div class="card-header" onclick="toggleCard(this)">
+                <span><i class="fas fa-palette"></i> ডিজাইন ও থিম</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="card-body">
+                <div class="checkbox-grid">
+                  <label class="pro-check"
+                    ><input type="radio" name="theme" checked /> 🎨
+                    Modern</label
+                  >
+                  <label class="pro-check"
+                    ><input type="radio" name="theme" /> ✨ Minimal</label
+                  >
+                  <label class="pro-check"
+                    ><input type="radio" name="theme" /> 🧒 Kids</label
+                  >
+                  <label class="pro-check"
+                    ><input type="radio" name="theme" /> 🔬 STEM</label
+                  >
+                  <label class="pro-check"
+                    ><input type="radio" name="theme" /> 🌙 Dark</label
+                  >
+                </div>
+                <p class="label-sm mt-3">সাবজেক্ট থিম:</p>
+                <div class="checkbox-grid">
+                  <label class="pro-check"
+                    ><input type="radio" name="sub" /> 📐 Math</label
+                  >
+                  <label class="pro-check"
+                    ><input type="radio" name="sub" /> 🧪 Science</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- কার্ড ৪: ভিজ্যুয়াল কন্টেন্ট -->
+            <div class="pro-card">
+              <div class="card-header" onclick="toggleCard(this)">
+                <span><i class="fas fa-images"></i> ভিজ্যুয়াল কন্টেন্ট</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="card-body checkbox-grid">
+                <label class="pro-check"
+                  ><input type="checkbox" checked /> 🖼️ Images</label
+                >
+                <label class="pro-check"
+                  ><input type="checkbox" checked /> 🎨 Icons</label
+                >
+                <label class="pro-check"
+                  ><input type="checkbox" /> 📊 Charts</label
+                >
+                <label class="pro-check"
+                  ><input type="checkbox" /> 📐 Diagrams</label
+                >
+                <label class="pro-check"
+                  ><input type="checkbox" /> 🧬 3D Models</label
+                >
+                <label class="pro-check"
+                  ><input type="checkbox" /> 🎥 Videos</label
+                >
+              </div>
+            </div>
+
+            <!-- কার্ড ৫: স্লাইড সিকোয়েন্স -->
+            <div class="pro-card">
+              <div class="card-header" onclick="toggleCard(this)">
+                <span><i class="fas fa-list-ol"></i> স্লাইড সিকোয়েন্স</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="card-body checkbox-grid">
+                <label class="pro-check"
+                  ><input type="checkbox" checked /> Cover</label
+                >
+                <label class="pro-check"
+                  ><input type="checkbox" checked /> Outcomes</label
+                >
+                <label class="pro-check"
+                  ><input type="checkbox" checked /> Content</label
+                >
+                <label class="pro-check"
+                  ><input type="checkbox" checked /> Quiz</label
+                >
+                <label class="pro-check"
+                  ><input type="checkbox" checked /> Homework</label
+                >
+              </div>
+            </div>
+
+            <!-- কার্ড ৬: এআই সেটিংস (PRO) -->
+            <div class="pro-card">
+              <div class="card-header" onclick="toggleCard(this)">
+                <span><i class="fas fa-robot"></i> এআই সেটিংস (PRO)</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="card-body">
+                <label class="pro-check mb-2"
+                  ><input type="checkbox" checked /> 📝 Auto Speaker
+                  Notes</label
+                >
+                <label class="pro-check mb-2"
+                  ><input type="checkbox" checked /> ❓ Auto Question
+                  Bank</label
+                >
+                <label class="pro-check mb-2"
+                  ><input type="checkbox" /> 🎯 Bloom's Taxonomy</label
+                >
+                <label class="pro-check mb-2"
+                  ><input type="checkbox" /> 🌍 Auto Translate</label
+                >
+              </div>
+            </div>
+          </aside>
+
+          <!-- স্টেজ (মাঝখানে স্লাইড প্রিভিউ) -->
+          <section class="stage">
+            <div class="slide-container" id="slideViewport">
+              <canvas id="drawingCanvas"></canvas>
+              <div id="slideRenderer" class="slide-content">
+                <div class="welcome">
+                  <i class="fas fa-magic-wand-sparkles"></i>
+                  <h2>আপনার ডিজিটাল পাঠ প্রস্তুত করুন</h2>
+                  <p>বামের অপশনগুলো পূর্ণ করে জেনারেট বাটনে ক্লিক করুন</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- স্লাইড নেভিগেশন -->
+            <div class="slide-controls">
+              <button onclick="changeSlide(-1)">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <div class="indicator">
+                <span id="curr">০</span> / <span id="total">০</span>
+              </div>
+              <button onclick="changeSlide(1)">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- এআই প্রসেসিং ওভারলে -->
+    <div id="aiOverlay" class="overlay hidden">
+      <div class="ai-loader-card">
+        <div class="spinner"></div>
+        <h3 id="aiStatus">এআই কারিকুলাম বিশ্লেষণ করছে...</h3>
+        <div class="progress-bar"><div id="progressFill"></div></div>
+        <div id="pct">0%</div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
