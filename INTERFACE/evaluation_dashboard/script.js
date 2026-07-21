@@ -1030,30 +1030,26 @@ function renderReportCard(id) {
     <div class="report-card-container">
       <div class="report-card" id="printable-report">
         
-        <!-- মেডেল ব্যাজসহ প্রিমিয়াম হেডার -->
+        <!-- মেডেল ব্যাজসহ প্রিমিয়াম সেন্টার্ড হেডার -->
         <div class="report-pro-header">
            <!-- ডানে মেডেল ব্যাজ -->
            <div class="header-medal-container">
               <div class="medal-ribbon"></div>
               <div class="medal-circle">
-                 <div class="medal-inner"></div>
+                 <span class="medal-brand-text">সশিবা</span>
               </div>
               <i class="fa-solid fa-star star-1"></i>
               <i class="fa-solid fa-star star-2"></i>
               <i class="fa-solid fa-star star-3"></i>
            </div>
 
-           <div class="pro-header-content">
-              <div class="school-brand">
-                 <div class="school-logo-alt">${settings.school.charAt(0)}</div>
-                 <div>
-                    <h1 class="school-name-v3">${settings.school}</h1>
-                    <p class="school-location-v3">শ্রেণি: ${clsName} | শাখা: ${secName} | শিক্ষাবর্ষ: ${settings.year}</p>
-                 </div>
+           <div class="pro-header-center">
+              <div class="school-brand-centered">
+                 <h1 class="school-name-v3">${settings.school}</h1>
+                 <p class="school-location-v3">শ্রেণি: ${clsName} | শাখা: ${secName} | শিক্ষাবর্ষ: ${settings.year}</p>
               </div>
-              <div class="report-main-title">
+              <div class="report-main-title-centered">
                  <strong>অ্যাকাডেমিক ট্রান্সক্রিপ্ট</strong>
-                 <span>শিক্ষাবর্ষ: ${settings.year}</span>
               </div>
            </div>
         </div>

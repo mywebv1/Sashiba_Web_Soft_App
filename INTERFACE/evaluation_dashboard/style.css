@@ -331,37 +331,70 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 /* Report Card Itself */
 .report-card-container{padding:16px;}
 .report-card{max-width:700px;margin:0 auto;background:white;color:#0f172a;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12);border:1px solid #e2e8f0;}
-/* ১. মেডেল এবং প্রিমিয়াম হেডার */
+/* ১. মেডেল এবং প্রিমিয়াম সেন্টার্ড হেডার */
 .report-pro-header {
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-    padding: 28px 30px !important;
+    padding: 24px 20px 18px !important;
     color: white !important;
     position: relative;
     overflow: hidden;
     border-top: 5px solid #fbbf24;
+    text-align: center;
 }
 
-.pro-header-content {
+.pro-header-center {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     position: relative;
     z-index: 10;
 }
 
-.school-brand {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+.school-brand-centered {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.school-name-v3 {
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.3px;
+    color: #ffffff !important;
+}
+
+.school-location-v3 {
+    font-size: 12px !important;
+    opacity: 0.85;
+    color: #cbd5e1 !important;
+    margin: 0;
+}
+
+.report-main-title-centered {
+    margin-top: 6px;
+}
+
+.report-main-title-centered strong {
+    font-size: 20px;
+    color: #fbbf24;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 900;
+    background: rgba(251, 191, 36, 0.12);
+    padding: 4px 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    display: inline-block;
 }
 
 /* ২. সিএসএস দিয়ে তৈরি মেডেল ব্যাজ */
 .header-medal-container {
     position: absolute;
-    right: 30px;
-    top: 15px;
-    width: 70px;
-    height: 90px;
+    right: 25px;
+    top: 12px;
+    width: 65px;
+    height: 85px;
     z-index: 5;
     display: flex;
     justify-content: center;
@@ -369,9 +402,9 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 
 .medal-ribbon {
     position: absolute;
-    top: 35px;
-    width: 34px;
-    height: 45px;
+    top: 32px;
+    width: 32px;
+    height: 42px;
     background: #e11d48;
     clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 80%, 0% 100%);
 }
@@ -389,11 +422,12 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-.medal-inner {
-    width: 34px;
-    height: 34px;
-    border: 1px solid rgba(255,255,255,0.4);
-    border-radius: 50%;
+.medal-brand-text {
+    font-size: 11px;
+    font-weight: 900;
+    color: #1e293b;
+    letter-spacing: -0.2px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4);
 }
 
 .header-medal-container i {
