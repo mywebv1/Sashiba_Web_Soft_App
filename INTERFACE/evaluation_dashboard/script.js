@@ -1055,18 +1055,26 @@ function renderReportCard(id) {
           <div class="summary-cell"><div class="summary-value">${grade.gp}</div><div class="summary-label">গ্রেড পয়েন্ট</div></div>
         </div>
         <div class="report-progress-bars">
-          <h4>বিষয়ভিত্তিক পারফরম্যান্স গ্রাফ</h4>
-          <div class="modern-progress-grid">
-            ${subjs.map(sub=>{
-              const sc=s.scores?.[sub]||0;
+          <h4 class="section-modern-title"><i class="fa-solid fa-bolt" style="color:#4f46e5;margin-right:6px;"></i> বিষয়ভিত্তিক পারফরম্যান্স ড্যাশবোর্ড</h4>
+          <div class="modern-subject-matrix">
+            ${subjs.map(sub => {
+              const sc = s.scores?.[sub] || 0;
+              let status = sc >= 80 ? 'সেরা' : sc >= 60 ? 'সন্তোষজনক' : 'উন্নতি প্রয়োজন';
+              let statusClass = sc >= 80 ? 'st-excellent' : sc >= 60 ? 'st-good' : 'st-warn';
               return `
-                <div class="m-prog-card">
-                  <div class="m-prog-info">
-                    <span>${sub}</span>
-                    <strong>${sc}%</strong>
+                <div class="matrix-card ${statusClass}">
+                  <div class="card-left">
+                    <span class="m-sub-name">${sub}</span>
+                    <span class="m-sub-status">${status}</span>
                   </div>
-                  <div class="m-prog-track">
-                    <div class="m-prog-fill" style="width:${sc}%"></div>
+                  <div class="card-right">
+                     <div class="score-circle">
+                        <svg viewBox="0 0 36 36" class="circular-chart">
+                          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                          <path class="circle" stroke-dasharray="${sc}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="percentage">${sc}</div>
+                     </div>
                   </div>
                 </div>`;
             }).join('')}
