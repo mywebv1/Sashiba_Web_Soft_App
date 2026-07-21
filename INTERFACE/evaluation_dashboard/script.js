@@ -1414,26 +1414,34 @@ function showToast(msg,type=''){
 // ═══════════════════════════════════════════════════════
 //  ১৫. INIT
 // ═══════════════════════════════════════════════════════
-window.addEventListener('load',()=>{
-  loadFromStorage();
-  try{
-    const th=localStorage.getItem('sashiba_eval_theme')||localStorage.getItem('sashiba_theme');
-    if(th==='dark'){
+function initDashboard() {
+  try {
+    loadFromStorage();
+    const th = localStorage.getItem('sashiba_eval_theme') || localStorage.getItem('sashiba_theme');
+    if (th === 'dark') {
       document.body.classList.add('dark-mode');
-      const btn=document.getElementById('dark-mode-btn');
-      if(btn) btn.innerHTML='<i class="fa-solid fa-sun"></i>';
+      const btn = document.getElementById('dark-mode-btn');
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-sun"></i>';
     }
-  }catch(e){}
-  window.addEventListener('message',e=>{
-    if(e.data?.type==='THEME_CHANGE'){
-      if(e.data.theme==='dark') document.body.classList.add('dark-mode');
+  } catch (e) {}
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'THEME_CHANGE') {
+      if (e.data.theme === 'dark') document.body.classList.add('dark-mode');
       else document.body.classList.remove('dark-mode');
     }
   });
+
   renderStudentTable();
   refreshReportSelector();
   refreshFeedbackSelector();
   refreshRubricStudentSelect();
   renderSavedRubrics();
   showSection('students');
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDashboard);
+} else {
+  initDashboard();
+}
