@@ -458,20 +458,6 @@ function generateAIFeedback() {
   document.getElementById('feedback-meta').textContent = `AI জেনারেটেড • ${new Date().toLocaleString('bn-BD')}`;
 }
 
-    if(type==='guardian') return `Dear Guardian of ${s.name},\n\nWe are pleased to share the academic progress of your child.\n\nResults:\n${subjs.map(sub=>`• ${sub}: ${s.scores?.[sub]||0}/100`).join('\n')}\n\nTotal: ${total}/${maxTotal} | Grade: ${grade.grade}\n\nYour child shows strength in ${strongSub}. Please encourage practice in ${weakSub} at home.\n\nThank you for your continued support.\n\n— ${settings.teacherName}, ${settings.school}`;
-    return `Improvement Plan for ${s.name}:\n\n1. Focus on ${weakSub} — practice daily for 20–30 minutes.\n2. Review past mistakes in tests.\n3. Maintain homework consistency.\n4. Seek help when stuck — do not hesitate to ask the teacher.\n5. Goal: Improve by at least 10% in the next assessment.`;
-  }
-
-  // Bengali versions
-  if(type==='general') return `শিক্ষার্থী: ${s.name} (রোল: ${s.roll})\n\nপারফরম্যান্স সারসংক্ষেপ:\n• মোট: ${total}/${maxTotal} | গড়: ${avg}%\n• গ্রেড: ${grade.grade} | অবস্থান: ${cat.label}\n\nশক্তিশালী দিক: ${strongSub} বিষয়ে ভালো দক্ষতা দেখিয়েছে (${s.scores?.[strongSub]||0}/১০০)। এই ধারা অব্যাহত রাখতে হবে।\n\nউন্নতির সুযোগ: ${weakSub} বিষয়ে আরও মনোযোগ প্রয়োজন (${s.scores?.[weakSub]||0}/১০০)। প্রতিদিন নিয়মিত অনুশীলন করলে দ্রুত উন্নতি হবে।\n\nশিক্ষকের মন্তব্য: ${s.remarks || 'নিয়মিত পড়াশোনা অব্যাহত রাখুন এবং ক্লাসে মনোযোগী হন।'}`;
-
-  if(type==='motivational') return `প্রিয় ${s.name},\n\nতুমি এই মূল্যায়নে ${pct}% নম্বর পেয়েছ — এটি তোমার পরিশ্রমের ফল। ${strongSub} বিষয়ে তুমি সত্যিই দুর্দান্ত! \n\n${pct<80?`${weakSub} বিষয়টিতে আরেকটু মনোযোগ দিলেই তুমি আরও ভালো ফলাফল করতে পারবে। হাল ছেড়ো না — তুমি পারবেই!`:'তুমি সত্যিকারের মেধাবী। এই অসাধারণ ফলাফলের জন্য অভিনন্দন! এভাবেই এগিয়ে যাও।'}\n\nতোমার জন্য শুভকামনা রইল! 🌟`;
-
-  if(type==='guardian') return `শ্রদ্ধেয় অভিভাবক,\n\nআপনার সন্তান ${s.name} (রোল: ${s.roll}) এর একাডেমিক অগ্রগতি জানাতে পারছি।\n\nফলাফল:\n${subjs.map(sub=>`• ${sub}: ${s.scores?.[sub]||0}/১০০`).join('\n')}\n\nমোট: ${total}/${maxTotal} | গ্রেড: ${grade.grade} | গড়: ${pct}%\n\nআপনার সন্তান ${strongSub} বিষয়ে খুব ভালো করছে। বাড়িতে ${weakSub} বিষয়ে সহায়তা করলে সে আরও ভালো ফলাফল করতে পারবে।\n\nআপনার সহযোগিতার জন্য আন্তরিক ধন্যবাদ।\n\n— ${settings.teacherName}\n${settings.school}`;
-
-  return `${s.name} এর উন্নতি পরিকল্পনা:\n\n১. ${weakSub} বিষয়ে প্রতিদিন ২০–৩০ মিনিট অনুশীলন করতে হবে।\n২. পূর্ববর্তী পরীক্ষার ভুলগুলো বারবার দেখতে হবে।\n৩. নিয়মিত হোমওয়ার্ক সম্পন্ন করতে হবে।\n৪. যেকোনো সমস্যায় শিক্ষকের সাহায্য নিতে দ্বিধা করবে না।\n৫. লক্ষ্য: পরবর্তী মূল্যায়নে কমপক্ষে ১০% উন্নতি।\n\nবিশেষ মনোযোগ দরকার: ${weakSub} (বর্তমান: ${s.scores?.[weakSub]||0}%)`;
-}
-
 function typewriterEffect(el, text, speed=12) {
   let i = 0;
   const timer = setInterval(()=>{
