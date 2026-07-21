@@ -2167,3 +2167,207 @@ body.dark-mode .slide-bullet-card {
   transform: scale(1.02);
 }
 
+
+
+/* ==========================================
+   [১১] স্মার্ট হোয়াইটবোর্ড ও ইমেজ এডিটর
+   ========================================== */
+.whiteboard-wrapper {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  margin-top: 10px;
+}
+
+.whiteboard-toolbar {
+  height: 42px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  z-index: 20;
+  user-select: none;
+}
+
+.wb-tools-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wb-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.wb-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.wb-btn.active {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+
+.wb-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-left: 1px solid var(--border);
+  padding-left: 6px;
+  margin-left: 2px;
+}
+
+.wb-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.15);
+  transition: transform 0.1s ease;
+}
+
+.wb-color-dot.active {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 3px var(--primary);
+}
+
+.whiteboard-canvas-area {
+  position: relative;
+  flex-grow: 1;
+  width: 100%;
+  height: calc(100% - 42px);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* Base style for elements that can be dragged */
+.wb-element {
+  position: absolute;
+  cursor: move;
+  user-select: none;
+  z-index: 5;
+}
+
+.wb-element.selected {
+  outline: 2px dashed var(--primary);
+  outline-offset: 2px;
+}
+
+/* Image container inside whiteboard */
+.wb-image-container {
+  display: inline-block;
+  pointer-events: auto;
+}
+
+.wb-image-el {
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Text box annotations */
+.wb-text-box {
+  min-width: 50px;
+  min-height: 24px;
+  padding: 2px 4px;
+  font-size: 15px;
+  font-weight: bold;
+  word-break: break-word;
+  outline: none;
+  border: 1px transparent dashed;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  pointer-events: auto;
+  user-select: text;
+}
+
+.wb-text-box:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Shape annotations */
+.wb-shape {
+  min-width: 15px;
+  min-height: 15px;
+  border-style: solid;
+  pointer-events: auto;
+}
+
+.wb-shape-rect {
+  border-width: 3px;
+  background: transparent;
+}
+
+.wb-shape-circle {
+  border-width: 3px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.wb-shape-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: bold;
+  border: none !important;
+  background: transparent;
+}
+
+/* Resize handle */
+.wb-resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--primary);
+  border: 1px solid var(--white);
+  bottom: -4px;
+  right: -4px;
+  cursor: se-resize;
+  display: none;
+  z-index: 10;
+}
+
+.wb-element.selected .wb-resize-handle {
+  display: block;
+}
+
+/* Drawing Canvas overlay */
+.wb-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 8;
+  pointer-events: none;
+}
+
+/* Presenter viewport height override */
+.presenter-slide-frame .whiteboard-wrapper {
+  height: 480px;
+  margin-top: 15px;
+}

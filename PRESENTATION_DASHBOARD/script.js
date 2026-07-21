@@ -1282,11 +1282,53 @@ function renderActiveCanvas() {
   let visualComponentHtml = "";
   const selectedVisuals = Array.from(document.querySelectorAll(".vis-check:checked")).map((cb) => cb.value);
 
-  // Custom Image Rendering or Default Visual Components
+  // Custom Image rendering with Whiteboard Editor OR Default Visual Components
   if (slide.image && slide.showImage !== false) {
     visualComponentHtml = `
-      <div class="visual-component-box slide-image-container ${imgAnimClass}" style="text-align: center;">
-        <img src="${slide.image}" class="slide-image-el" style="max-width: 100%; max-height: 230px; border-radius: 8px; box-shadow: var(--shadow-md); object-fit: contain; display: inline-block;" alt="Slide Image">
+      <div class="whiteboard-wrapper ${imgAnimClass}" id="wb_wrapper_${slide.id}">
+        <!-- Whiteboard Toolbar -->
+        <div class="whiteboard-toolbar">
+          <div class="wb-tools-group">
+            <button class="wb-btn active" onclick="setWbTool(this, 'select')" title="ছবির অবজেক্ট বা শেপ সিলেক্ট ও মুভ করুন"><i class="fa-solid fa-arrows-up-down-left-right"></i> মুভ</button>
+            <button class="wb-btn" onclick="setWbTool(this, 'pen')" title="পেন দিয়ে ড্রয়িং করুন"><i class="fa-solid fa-pen"></i> পেন</button>
+            <button class="wb-btn" onclick="setWbTool(this, 'eraser')" title="ড্রয়িং মুছুন"><i class="fa-solid fa-eraser"></i> ইরেজার</button>
+            <button class="wb-btn" onclick="addWbText()" title="Draggable টেক্সট বক্স যোগ করুন"><i class="fa-solid fa-font"></i> টেক্সট</button>
+            <button class="wb-btn" onclick="addWbShape('rect')" title="আয়তক্ষেত্র যোগ করুন"><i class="fa-regular fa-square"></i> আয়ত</button>
+            <button class="wb-btn" onclick="addWbShape('circle')" title="বৃত্ত যোগ করুন"><i class="fa-regular fa-circle"></i> বৃত্ত</button>
+            <button class="wb-btn" onclick="addWbShape('arrow')" title="তীরচিহ্ন যোগ করুন"><i class="fa-solid fa-arrow-right"></i> তীর</button>
+          </div>
+          <div class="wb-tools-group" style="gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px;">
+              <span>সাইজ:</span>
+              <input type="range" class="wb-img-size-slider" min="20" max="150" value="${slide.imageWidth || 60}" style="width: 50px; height:4px; cursor:pointer;" oninput="updateWbImageSize(this.value)">
+            </div>
+            <div class="wb-color-picker">
+              <span class="wb-color-dot active" style="background:#ef4444;" onclick="setWbColor(this, '#ef4444')"></span>
+              <span class="wb-color-dot" style="background:#3b82f6;" onclick="setWbColor(this, '#3b82f6')"></span>
+              <span class="wb-color-dot" style="background:#10b981;" onclick="setWbColor(this, '#10b981')"></span>
+              <span class="wb-color-dot" style="background:#f59e0b;" onclick="setWbColor(this, '#f59e0b')"></span>
+              <span class="wb-color-dot" style="background:#0f172a;" onclick="setWbColor(this, '#0f172a')"></span>
+            </div>
+            <button class="wb-btn" onclick="clearWbDrawing()" style="color: var(--danger); font-weight:bold; padding: 2px 6px;"><i class="fa-solid fa-trash-can"></i> রিসেট</button>
+          </div>
+        </div>
+
+        <!-- Canvas and Element Area -->
+        <div class="whiteboard-canvas-area" id="wb_canvas_area">
+          <!-- Image Element (Draggable/Resizable) -->
+          <div class="wb-element wb-image-container" id="wb_image_container" style="left: ${slide.imageX || 20}%; top: ${slide.imageY || 10}%; width: ${slide.imageWidth || 60}%;">
+            <img src="${slide.image}" class="wb-image-el" style="width: 100%; display: block;" alt="Slide Image">
+            <div class="wb-resize-handle"></div>
+          </div>
+
+          <!-- Drawing Canvas Overlay -->
+          <canvas class="wb-canvas" id="wb_canvas"></canvas>
+
+          <!-- Annotations container for shapes and text boxes -->
+          <div class="wb-annotations-layer" id="wb_annotations_layer" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:9;">
+            <!-- Saved annotations loaded here -->
+          </div>
+        </div>
       </div>
     `;
   } else {
@@ -1439,6 +1481,11 @@ function renderActiveCanvas() {
     ${bodyContentHtml}
     ${teacherNotesHtml}
   `;
+
+  // Init whiteboard if image is visible
+  if (slide.image && slide.showImage !== false) {
+    initWhiteboard(slide, false);
+  }
 }
 
 
@@ -1464,6 +1511,23 @@ function onCanvasContentEdit(event, field, index) {
   syncEditorForm();
   renderThumbnails();
 }
+
+// হোয়াইটবোর্ড গ্লোবাল ভ্যারিয়েবলসমূহ
+let wbActiveTool = 'select'; // select, pen, eraser
+let wbActiveColor = '#ef4444';
+let wbBrushSize = 3;
+let wbIsDrawing = false;
+let wbLastX = 0;
+let wbLastY = 0;
+let wbActiveElement = null; // element being dragged/resized
+let wbIsDragging = false;
+let wbIsResizing = false;
+let wbDragStartX = 0;
+let wbDragStartY = 0;
+let wbElementStartX = 0;
+let wbElementStartY = 0;
+let wbElementStartWidth = 0;
+let wbElementStartHeight = 0;
 
 function syncEditorForm() {
   if (slides.length === 0) return;
@@ -1551,6 +1615,13 @@ function handleImageUpload(event) {
     slide.showImage = true;
     slide.isCustomized = true;
 
+    // Reset default whiteboard coordinates for new image
+    slide.imageX = 20;
+    slide.imageY = 10;
+    slide.imageWidth = 60;
+    delete slide.canvasDrawing;
+    slide.annotations = [];
+
     // Update preview
     const previewArea = document.getElementById("imagePreviewArea");
     const previewImg = document.getElementById("editImagePreview");
@@ -1582,6 +1653,13 @@ function applyPresetImage() {
   slide.showImage = true;
   slide.isCustomized = true;
 
+  // Reset default whiteboard coordinates
+  slide.imageX = 20;
+  slide.imageY = 10;
+  slide.imageWidth = 60;
+  delete slide.canvasDrawing;
+  slide.annotations = [];
+
   // Clear file input
   const fileInput = document.getElementById("editImageFile");
   if (fileInput) fileInput.value = "";
@@ -1603,6 +1681,9 @@ function removeSlideImage() {
   delete slide.image;
   slide.showImage = false;
   slide.isCustomized = true;
+  
+  delete slide.canvasDrawing;
+  slide.annotations = [];
 
   // Clear inputs
   const fileInput = document.getElementById("editImageFile");
@@ -1619,6 +1700,400 @@ function removeSlideImage() {
 
 function replayCanvasAnimations() {
   renderActiveCanvas();
+}
+
+// =================== হোয়াইটবোর্ড ইন্টারেক্টিভ ফাংশনসমূহ ===================
+
+function initWhiteboard(slide, isPresenter) {
+  const canvas = document.getElementById("wb_canvas");
+  const area = document.getElementById("wb_canvas_area");
+  const wrapper = document.getElementById("wb_image_container");
+  const annotLayer = document.getElementById("wb_annotations_layer");
+  if (!canvas || !area) return;
+
+  // সেটআপ ক্যানভাস রেজোলিউশন
+  setTimeout(() => {
+    const rect = area.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    const ctx = canvas.getContext("2d");
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // লোড ক্যানভাস ড্রয়িং (PNG)
+    if (slide.canvasDrawing) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.src = slide.canvasDrawing;
+    }
+
+    // লোড কাস্টম টেক্সট এবং শেপ অ্যানোটেশন
+    if (annotLayer && slide.annotations) {
+      annotLayer.innerHTML = "";
+      slide.annotations.forEach((ann, index) => {
+        const el = document.createElement("div");
+        el.className = `wb-element ${ann.type === 'text' ? 'wb-text-box' : 'wb-shape wb-shape-' + ann.type}`;
+        el.style.left = `${ann.x}%`;
+        el.style.top = `${ann.y}%`;
+        el.style.width = ann.width ? `${ann.width}%` : 'auto';
+        el.style.height = ann.height ? `${ann.height}%` : 'auto';
+        el.style.color = ann.color || '#ef4444';
+        el.style.borderColor = ann.color || '#ef4444';
+        el.dataset.id = ann.id || `ann_${index}`;
+
+        if (ann.type === 'text') {
+          el.contentEditable = !isPresenter;
+          el.innerText = ann.text || 'টেক্সট';
+          el.style.color = ann.color || '#ef4444';
+          el.onblur = () => saveWhiteboardState(slide);
+        } else if (ann.type === 'arrow') {
+          el.innerHTML = `<i class="fa-solid fa-arrow-right-long"></i>`;
+        }
+
+        // রিলিজ হ্যান্ডেল
+        if (!isPresenter) {
+          const handle = document.createElement("div");
+          handle.className = "wb-resize-handle";
+          el.appendChild(handle);
+        }
+
+        annotLayer.appendChild(el);
+        if (!isPresenter) {
+          makeElementInteractable(el, slide);
+        }
+      });
+    }
+
+    if (!isPresenter) {
+      makeElementInteractable(wrapper, slide);
+    }
+  }, 100);
+
+  updateWbPointerEvents();
+
+  // মাউস ও টাচ ইভেন্টস যুক্তকরণ
+  canvas.addEventListener("mousedown", (e) => startDrawing(e, canvas));
+  canvas.addEventListener("mousemove", (e) => draw(e, canvas, slide));
+  canvas.addEventListener("mouseup", () => stopDrawing(slide));
+  canvas.addEventListener("mouseout", () => stopDrawing(slide));
+
+  canvas.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const mouseEvent = new MouseEvent("mousedown", {
+      clientX: t.clientX,
+      clientY: t.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    const mouseEvent = new MouseEvent("mousemove", {
+      clientX: t.clientX,
+      clientY: t.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener("touchend", () => {
+    const mouseEvent = new MouseEvent("mouseup", {});
+    canvas.dispatchEvent(mouseEvent);
+  });
+}
+
+function makeElementInteractable(el, slide) {
+  if (!el) return;
+
+  const handle = el.querySelector(".wb-resize-handle");
+
+  // ড্র্যাগিং ইভেন্ট লিসেনার
+  el.addEventListener("mousedown", (e) => {
+    if (wbActiveTool !== 'select') return;
+    if (e.target === handle) return;
+    if (el.contentEditable === "true" && document.activeElement === el) return;
+
+    wbActiveElement = el;
+    wbIsDragging = true;
+    wbDragStartX = e.clientX;
+    wbDragStartY = e.clientY;
+
+    const area = document.getElementById("wb_canvas_area");
+    const areaRect = area.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+
+    wbElementStartX = ((elRect.left - areaRect.left) / areaRect.width) * 100;
+    wbElementStartY = ((elRect.top - areaRect.top) / areaRect.height) * 100;
+
+    document.querySelectorAll(".wb-element").forEach(item => item.classList.remove("selected"));
+    el.classList.add("selected");
+
+    e.stopPropagation();
+    e.preventDefault();
+  });
+
+  // সাইজ পরিবর্তন ইভেন্ট লিসেনার
+  if (handle) {
+    handle.addEventListener("mousedown", (e) => {
+      wbActiveElement = el;
+      wbIsResizing = true;
+      wbDragStartX = e.clientX;
+      wbDragStartY = e.clientY;
+
+      const area = document.getElementById("wb_canvas_area");
+      const areaRect = area.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+
+      wbElementStartWidth = (elRect.width / areaRect.width) * 100;
+      wbElementStartHeight = (elRect.height / areaRect.height) * 100;
+
+      e.stopPropagation();
+      e.preventDefault();
+    });
+  }
+
+  // গ্লোবাল ড্র্যাগ লিসেনার
+  if (!window.wbListenersAttached) {
+    window.wbListenersAttached = true;
+    
+    document.addEventListener("mousemove", (e) => {
+      if (!wbActiveElement) return;
+
+      const area = document.getElementById("wb_canvas_area");
+      if (!area) return;
+      const areaRect = area.getBoundingClientRect();
+
+      if (wbIsDragging) {
+        const dx = ((e.clientX - wbDragStartX) / areaRect.width) * 100;
+        const dy = ((e.clientY - wbDragStartY) / areaRect.height) * 100;
+
+        let newX = wbElementStartX + dx;
+        let newY = wbElementStartY + dy;
+
+        newX = Math.max(0, Math.min(95, newX));
+        newY = Math.max(0, Math.min(95, newY));
+
+        wbActiveElement.style.left = `${newX}%`;
+        wbActiveElement.style.top = `${newY}%`;
+      } else if (wbIsResizing) {
+        const dx = ((e.clientX - wbDragStartX) / areaRect.width) * 100;
+        const dy = ((e.clientY - wbDragStartY) / areaRect.height) * 100;
+
+        const newW = Math.max(5, wbElementStartWidth + dx);
+        const newH = Math.max(5, wbElementStartHeight + dy);
+
+        wbActiveElement.style.width = `${newW}%`;
+        if (!wbActiveElement.classList.contains("wb-image-container")) {
+          wbActiveElement.style.height = `${newH}%`;
+        }
+      }
+    });
+
+    document.addEventListener("mouseup", () => {
+      if (wbActiveElement) {
+        const currentSlide = slides[activeSlideIndex];
+        saveWhiteboardState(currentSlide);
+        wbActiveElement = null;
+        wbIsDragging = false;
+        wbIsResizing = false;
+      }
+    });
+  }
+}
+
+function startDrawing(e, canvas) {
+  if (wbActiveTool !== 'pen' && wbActiveTool !== 'eraser') return;
+  wbIsDrawing = true;
+  const rect = canvas.getBoundingClientRect();
+  wbLastX = e.clientX - rect.left;
+  wbLastY = e.clientY - rect.top;
+}
+
+function draw(e, canvas, slide) {
+  if (!wbIsDrawing || (wbActiveTool !== 'pen' && wbActiveTool !== 'eraser')) return;
+  const ctx = canvas.getContext("2d");
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  ctx.beginPath();
+  ctx.moveTo(wbLastX, wbLastY);
+  ctx.lineTo(x, y);
+
+  if (wbActiveTool === 'pen') {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = wbActiveColor;
+    ctx.lineWidth = wbBrushSize;
+  } else if (wbActiveTool === 'eraser') {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineWidth = wbBrushSize * 5;
+  }
+
+  ctx.stroke();
+  wbLastX = x;
+  wbLastY = y;
+}
+
+function stopDrawing(slide) {
+  if (wbIsDrawing) {
+    wbIsDrawing = false;
+    saveWhiteboardState(slide);
+  }
+}
+
+function saveWhiteboardState(slide) {
+  if (!slide) return;
+
+  const canvas = document.getElementById("wb_canvas");
+  const wrapper = document.getElementById("wb_image_container");
+  const annotLayer = document.getElementById("wb_annotations_layer");
+
+  // ক্যানভাস ড্রয়িং সংরক্ষণ
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    const blank = document.createElement('canvas');
+    blank.width = canvas.width;
+    blank.height = canvas.height;
+    if (canvas.toDataURL() === blank.toDataURL()) {
+      delete slide.canvasDrawing;
+    } else {
+      slide.canvasDrawing = canvas.toDataURL();
+    }
+  }
+
+  // কাস্টম ইমেজ সাইজ ও পজিশন সংরক্ষণ
+  if (wrapper) {
+    slide.imageX = parseFloat(wrapper.style.left) || 20;
+    slide.imageY = parseFloat(wrapper.style.top) || 10;
+    slide.imageWidth = parseFloat(wrapper.style.width) || 60;
+  }
+
+  // কাস্টম টেক্সট ও শেপসমূহ সংরক্ষণ
+  if (annotLayer) {
+    const annList = [];
+    const elements = annotLayer.querySelectorAll(".wb-element");
+    elements.forEach((el, index) => {
+      const type = el.classList.contains("wb-text-box") ? "text" : 
+                   el.classList.contains("wb-shape-rect") ? "rect" :
+                   el.classList.contains("wb-shape-circle") ? "circle" : "arrow";
+
+      const annObj = {
+        id: el.dataset.id || `ann_${index}_${Date.now()}`,
+        type: type,
+        x: parseFloat(el.style.left) || 40,
+        y: parseFloat(el.style.top) || 40,
+        width: parseFloat(el.style.width) || 15,
+        height: parseFloat(el.style.height) || 10,
+        color: el.style.color || el.style.borderColor || '#ef4444',
+      };
+
+      if (type === "text") {
+        annObj.text = el.innerText;
+      }
+      annList.push(annObj);
+    });
+
+    slide.annotations = annList;
+  }
+
+  slide.isCustomized = true;
+
+  // স্লাইডার সিনক্রোনাইজেশন
+  const sizeSlider = document.querySelector(".wb-img-size-slider");
+  if (sizeSlider && wrapper) {
+    sizeSlider.value = parseFloat(wrapper.style.width);
+  }
+}
+
+function setWbTool(btn, tool) {
+  wbActiveTool = tool;
+  document.querySelectorAll(".wb-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  updateWbPointerEvents();
+}
+
+function updateWbPointerEvents() {
+  const canvas = document.getElementById("wb_canvas");
+  if (!canvas) return;
+
+  if (wbActiveTool === 'pen' || wbActiveTool === 'eraser') {
+    canvas.style.pointerEvents = 'auto';
+    canvas.style.cursor = wbActiveTool === 'eraser' ? 'crosshair' : 'pencil';
+  } else {
+    canvas.style.pointerEvents = 'none';
+    canvas.style.cursor = 'default';
+  }
+}
+
+function setWbColor(dot, color) {
+  wbActiveColor = color;
+  document.querySelectorAll(".wb-color-dot").forEach(d => d.classList.remove("active"));
+  if (dot) dot.classList.add("active");
+}
+
+function addWbText() {
+  const slide = slides[activeSlideIndex];
+  if (!slide) return;
+
+  if (!slide.annotations) slide.annotations = [];
+  slide.annotations.push({
+    id: `ann_txt_${Date.now()}`,
+    type: 'text',
+    x: 40,
+    y: 40,
+    width: 20,
+    height: 8,
+    color: wbActiveColor,
+    text: 'নতুন টেক্সট'
+  });
+  
+  renderActiveCanvas();
+}
+
+function addWbShape(type) {
+  const slide = slides[activeSlideIndex];
+  if (!slide) return;
+
+  if (!slide.annotations) slide.annotations = [];
+  slide.annotations.push({
+    id: `ann_shp_${Date.now()}`,
+    type: type,
+    x: 45,
+    y: 45,
+    width: type === 'arrow' ? 8 : 15,
+    height: type === 'arrow' ? 8 : 12,
+    color: wbActiveColor
+  });
+
+  renderActiveCanvas();
+}
+
+function updateWbImageSize(val) {
+  const wrapper = document.getElementById("wb_image_container");
+  if (wrapper) {
+    wrapper.style.width = `${val}%`;
+    const slide = slides[activeSlideIndex];
+    saveWhiteboardState(slide);
+  }
+}
+
+function clearWbDrawing() {
+  if (confirm("আপনি কি নিশ্চিতভাবে এই স্লাইডের সব ক্যানভাস অঙ্কন ও অবজেক্ট মুছে ফেলতে চান?")) {
+    const slide = slides[activeSlideIndex];
+    if (slide) {
+      delete slide.canvasDrawing;
+      slide.annotations = [];
+      slide.imageX = 20;
+      slide.imageY = 10;
+      slide.imageWidth = 60;
+      renderActiveCanvas();
+    }
+  }
 }
 
 
@@ -1757,11 +2232,53 @@ function renderPresenterSlide() {
   let visualComponentHtml = "";
   const selectedVisuals = Array.from(document.querySelectorAll(".vis-check:checked")).map((cb) => cb.value);
 
-  // Custom Image Rendering or Default Visual Components
+  // Custom Image rendering with Whiteboard Editor in Fullscreen slideshow mode
   if (slide.image && slide.showImage !== false) {
     visualComponentHtml = `
-      <div class="visual-component-box slide-image-container ${imgAnimClass}" style="padding: 20px; margin-top: 15px; text-align: center;">
-        <img src="${slide.image}" class="slide-image-el" style="max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: var(--shadow-md); object-fit: contain;" alt="Slide Image">
+      <div class="whiteboard-wrapper ${imgAnimClass}" id="wb_wrapper_${slide.id}">
+        <!-- Whiteboard Toolbar (Fullscreen layout) -->
+        <div class="whiteboard-toolbar">
+          <div class="wb-tools-group">
+            <button class="wb-btn active" onclick="setWbTool(this, 'select')" title="মুভ অবজেক্ট"><i class="fa-solid fa-arrows-up-down-left-right"></i> মুভ</button>
+            <button class="wb-btn" onclick="setWbTool(this, 'pen')" title="পেন"><i class="fa-solid fa-pen"></i> পেন</button>
+            <button class="wb-btn" onclick="setWbTool(this, 'eraser')" title="ইরেজার"><i class="fa-solid fa-eraser"></i> ইরেজার</button>
+            <button class="wb-btn" onclick="addWbText()" title="টেক্সট"><i class="fa-solid fa-font"></i> টেক্সট</button>
+            <button class="wb-btn" onclick="addWbShape('rect')" title="আয়তক্ষেত্র"><i class="fa-regular fa-square"></i> আয়ত</button>
+            <button class="wb-btn" onclick="addWbShape('circle')" title="বৃত্ত"><i class="fa-regular fa-circle"></i> বৃত্ত</button>
+            <button class="wb-btn" onclick="addWbShape('arrow')" title="তীর"><i class="fa-solid fa-arrow-right"></i> তীর</button>
+          </div>
+          <div class="wb-tools-group" style="gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px;">
+              <span>সাইজ:</span>
+              <input type="range" class="wb-img-size-slider" min="20" max="150" value="${slide.imageWidth || 60}" style="width: 50px; height:4px; cursor:pointer;" oninput="updateWbImageSize(this.value)">
+            </div>
+            <div class="wb-color-picker">
+              <span class="wb-color-dot active" style="background:#ef4444;" onclick="setWbColor(this, '#ef4444')"></span>
+              <span class="wb-color-dot" style="background:#3b82f6;" onclick="setWbColor(this, '#3b82f6')"></span>
+              <span class="wb-color-dot" style="background:#10b981;" onclick="setWbColor(this, '#10b981')"></span>
+              <span class="wb-color-dot" style="background:#f59e0b;" onclick="setWbColor(this, '#f59e0b')"></span>
+              <span class="wb-color-dot" style="background:#0f172a;" onclick="setWbColor(this, '#0f172a')"></span>
+            </div>
+            <button class="wb-btn" onclick="clearWbDrawing()" style="color: var(--danger); font-weight:bold; padding: 2px 6px;"><i class="fa-solid fa-trash-can"></i> রিসেট</button>
+          </div>
+        </div>
+
+        <!-- Canvas and Element Area -->
+        <div class="whiteboard-canvas-area" id="wb_canvas_area">
+          <!-- Image Element (Draggable/Resizable) -->
+          <div class="wb-element wb-image-container" id="wb_image_container" style="left: ${slide.imageX || 20}%; top: ${slide.imageY || 10}%; width: ${slide.imageWidth || 60}%;">
+            <img src="${slide.image}" class="wb-image-el" style="width: 100%; display: block;" alt="Slide Image">
+            <div class="wb-resize-handle"></div>
+          </div>
+
+          <!-- Drawing Canvas Overlay -->
+          <canvas class="wb-canvas" id="wb_canvas"></canvas>
+
+          <!-- Annotations container for shapes and text boxes -->
+          <div class="wb-annotations-layer" id="wb_annotations_layer" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:9;">
+            <!-- Saved annotations loaded here -->
+          </div>
+        </div>
       </div>
     `;
   } else {
@@ -1780,7 +2297,7 @@ function renderPresenterSlide() {
       const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
       const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
       visualInner = `
-        <strong style="font-size:15px; display:block; margin-bottom:10px;"><i class="fa-solid fa-users-gear"></i> স্মার্ট শিক্ষার্থী গ্রুপিং:</strong>
+        <strong style="font-size:15px; display:block; margin-bottom:10px;"><i class="fa-solid fa-users-gear"></i> スマート শিক্ষার্থী গ্রুপিং:</strong>
         <table class="slide-data-table" style="font-size: 15px;">
           <thead>
             <tr><th>গ্রুপ</th><th>রোল নম্বর</th><th>কার্যক্রম</th></tr>
@@ -1912,6 +2429,11 @@ function renderPresenterSlide() {
     <h1 class="${titleAnimClass}" style="font-size: 36px; font-weight: 700; margin: 15px 0 25px 0;">${slide.title}</h1>
     ${bodyContentHtml}
   `;
+
+  // Init whiteboard interactive in presentation mode too!
+  if (slide.image && slide.showImage !== false) {
+    initWhiteboard(slide, false); // Keep false to allow drawing/erasing live on screen!
+  }
 }
 
 
