@@ -290,24 +290,16 @@ function renderAllAvgBars(s) {
 function renderWeakStrongTopics(s) {
   const subjs = settings.subjects;
   const scored = subjs.map(sub => ({ sub, val: s.scores?.[sub] || 0 }));
-  const sorted = [...scored].sort((a,b) => a.val - b.val);
 
-  // Absolute thresholds: weak < 65, strong ≥ 80
-  const WEAK_THR = 65;
-  const STRONG_THR = 80;
-  let weakList = scored.filter(x => x.val < WEAK_THR).sort((a,b) => a.val - b.val);
-  let strongList = scored.filter(x => x.val >= STRONG_THR).sort((a,b) => b.val - a.val);
-
-  // Fallback: if everyone is above threshold, show bottom 3 as "relative" weak
-  if(weakList.length === 0) weakList = sorted.slice(0, Math.min(3, Math.ceil(sorted.length/3)));
-  // Fallback: if no one is strong, show top 3
-  if(strongList.length === 0) strongList = sorted.slice(-Math.min(3, Math.ceil(sorted.length/3))).reverse();
+  // Strict User Rule: < 80 is weak, >= 80 is strong
+  const weakList = scored.filter(x => x.val < 80).sort((a,b) => a.val - b.val);
+  const strongList = scored.filter(x => x.val >= 80).sort((a,b) => b.val - a.val);
 
   const weakEl = document.getElementById('weak-topics-list');
   const strongEl = document.getElementById('strong-topics-list');
 
   if(weakEl) weakEl.innerHTML = weakList.length === 0
-    ? `<div style="color:var(--success);font-size:13px;padding:12px;font-weight:600;"><i class="fa-solid fa-check-circle" style="margin-right:6px;"></i>সব বিষয়ে ভালো!</div>`
+    ? `<div style="color:var(--success);font-size:13px;padding:12px;font-weight:600;"><i class="fa-solid fa-check-circle" style="margin-right:6px;"></i>সব বিষয়ে ৮০+ (সব বিষয়েই চমৎকার)!</div>`
     : weakList.map(({sub,val}) => `
     <div class="topic-item weak">
       <div class="topic-name">${sub}</div>
@@ -319,7 +311,7 @@ function renderWeakStrongTopics(s) {
   `).join('');
 
   if(strongEl) strongEl.innerHTML = strongList.length === 0
-    ? `<div style="color:var(--text-muted);font-size:13px;padding:12px;">কোনো শক্তিশালী বিষয় পাওয়া যায়নি</div>`
+    ? `<div style="color:var(--danger);font-size:13px;padding:12px;font-weight:600;"><i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i>কোনো বিষয়ে ৮০+ পাওয়া যায়নি</div>`
     : strongList.map(({sub,val}) => `
     <div class="topic-item strong">
       <div class="topic-name">${sub}</div>
