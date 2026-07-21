@@ -62,6 +62,11 @@ function calcTotals(student) {
   const pct = maxTotal ? Math.round((total / maxTotal) * 100) : 0;
   return { total, maxTotal, avg: avg.toFixed(1), pct };
 }
+function toBnNum(num) {
+  const bn = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+  return String(num).replace(/\d/g, d => bn[d]);
+}
+
 function getPosition(sid) {
   return [...students].sort((a,b)=>calcTotals(b).pct-calcTotals(a).pct).findIndex(s=>s.id===sid)+1;
 }
