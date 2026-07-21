@@ -1811,13 +1811,15 @@ function makeElementInteractable(el, slide) {
   if (!el) return;
 
   const handle = el.querySelector(".wb-resize-handle");
+  let clickTime = 0;
 
   // ড্র্যাগিং ইভেন্ট লিসেনার
   el.addEventListener("mousedown", (e) => {
     if (wbActiveTool !== 'select') return;
     if (e.target === handle) return;
-    if (el.contentEditable === "true" && document.activeElement === el) return;
+    if (document.activeElement === el) return; // Allow normal caret movement / editing when focused
 
+    clickTime = Date.now();
     wbActiveElement = el;
     wbIsDragging = true;
     wbDragStartX = e.clientX;
@@ -1834,7 +1836,42 @@ function makeElementInteractable(el, slide) {
     el.classList.add("selected");
 
     e.stopPropagation();
+    
+    // For contenteditable elements, we call preventDefault to stop default dragging behavior,
+    // but we will manually focus on mouseup if it was a quick click.
     e.preventDefault();
+  });
+
+  // mouseup for focusing contenteditable text box on short clicks
+  el.addEventListener("mouseup", (e) => {
+    if (wbActiveTool !== 'select') return;
+    if (document.activeElement === el) return;
+
+    const dragDuration = Date.now() - clickTime;
+    if (dragDuration < 250 && el.contentEditable === "true") {
+      el.focus();
+      // Select all text if it is default
+      if (el.innerText === 'নতুন টেক্সট') {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  });
+
+  // ডাবল ক্লিক করলে টেক্সট ফোকাস হবে
+  el.addEventListener("dblclick", (e) => {
+    if (el.contentEditable === "true") {
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      e.stopPropagation();
+    }
   });
 
   // সাইজ পরিবর্তন ইভেন্ট লিসেনার

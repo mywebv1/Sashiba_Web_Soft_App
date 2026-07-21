@@ -2355,6 +2355,47 @@ body.dark-mode .slide-bullet-card {
   display: block;
 }
 
+/* Delete button for selected items */
+.wb-delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 18px;
+  height: 18px;
+  background: var(--white);
+  color: #ef4444;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  z-index: 12;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  border: 1px solid #cbd5e1;
+}
+
+.wb-delete-btn:hover {
+  background: #fee2e2;
+}
+
+.wb-element.selected .wb-delete-btn {
+  display: flex;
+}
+
+/* Editing state for text boxes */
+.wb-text-box.editing {
+  cursor: text !important;
+  user-select: text !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  outline: 1.5px solid var(--primary) !important;
+}
+
+.wb-text-box.editing .wb-resize-handle,
+.wb-text-box.editing .wb-delete-btn {
+  display: none !important;
+}
+
 /* Drawing Canvas overlay */
 .wb-canvas {
   position: absolute;
