@@ -2958,21 +2958,21 @@ function downloadAsPowerPointPPTX() {
     slides.forEach((slideObj, index) => {
       let slide = pptx.addSlide();
       
-      // ১. ব্যাকগ্রাউন্ড কালার ঠিক করা
+      // ১. ব্যাকগ্রাউন্ড কালার ম্যাপিং
       let bgFill = 'FFFFFF'; 
       if (slideObj.bg === 'bg-blue') bgFill = '1E3A8A';
       else if (slideObj.bg === 'bg-emerald') bgFill = '065F46';
       else if (slideObj.bg === 'bg-dark') bgFill = '0F172A';
-      else if (slideObj.type === "Cover") bgFill = '3730A3'; // আপনার স্ক্রিনশটের নীল কালার
+      else if (slideObj.type === "Cover") bgFill = '3730A3';
       
       slide.background = { fill: bgFill };
 
-      // ২. টেক্সট কালার নির্ধারণ (সাদা ব্যাকগ্রাউন্ডে কালো লেখা, ডার্ক ব্যাকগ্রাউন্ডে সাদা লেখা)
+      // ২. টেক্সট কালার নির্ধারণ
       let isDark = (bgFill !== 'FFFFFF');
       let textColor = isDark ? 'FFFFFF' : '1E293B';
 
       if (slideObj.type === "Cover") {
-        // কভার স্লাইড লজিক
+        // কভার স্লাইড শিরোনাম
         slide.addText(slideObj.title || "শ্রেণি ও বিষয়", {
           x: 0.5, y: 1.5, w: 9, h: 1, fontSize: 40, bold: true, color: textColor, align: 'left'
         });
@@ -2984,31 +2984,35 @@ function downloadAsPowerPointPPTX() {
             });
         }
       } else {
-        // ৩. কন্টেন্ট স্লাইড (হেডার)
-        slide.addRect({ x: 0, y: 0, w: '100%', h: 0.7, fill: '4F46E5' });
+        // ৩. কন্টেন্ট স্লাইড হেডার (সংশোধিত অংশ: addShape ব্যবহার করা হয়েছে)
+        slide.addShape(pptx.ShapeType.rect, { 
+            x: 0, y: 0, w: '100%', h: 0.7, 
+            fill: { color: '4F46E5' } 
+        });
+
         slide.addText(slideObj.title || "আলোচ্য বিষয়", {
           x: 0.4, y: 0.1, w: 9, h: 0.5, fontSize: 24, bold: true, color: 'FFFFFF'
         });
 
-        // ৪. ইমেজ থাকলে তা যোগ করা (সবচেয়ে কমন এরর এখানেই হয়)
+        // ৪. ইমেজ হ্যান্ডেলিং
         let hasImage = (slideObj.image && slideObj.showImage !== false);
         
         if (hasImage) {
           try {
             let imgData = slideObj.image;
             if (imgData.includes("base64,")) {
-              imgData = imgData.split("base64,")[1]; // সঠিক Base64 ফরম্যাট নেওয়া
+              imgData = imgData.split("base64,")[1];
             }
             slide.addImage({ data: imgData, x: 5.5, y: 1.2, w: 4, h: 3 });
           } catch (e) {
-            console.log("Image skip due to error: ", e);
+            console.log("Image Error: ", e);
           }
         }
 
-        // ৫. টেক্সট বা বুলেট পয়েন্ট যোগ করা
+        // ৫. টেক্সট বা বুলেট পয়েন্ট
         let bullets = Array.isArray(slideObj.bullets) ? slideObj.bullets : [];
         let bulletY = 1.2;
-        let bulletWidth = hasImage ? 4.5 : 9; // ইমেজ থাকলে লেখা বামে চাপে যাবে
+        let bulletWidth = hasImage ? 4.5 : 9;
 
         bullets.forEach((text) => {
           slide.addText(text, {
@@ -3020,12 +3024,13 @@ function downloadAsPowerPointPPTX() {
     });
 
     // ৬. ফাইল সেভ
-    pptx.writeFile({ fileName: `Smart_Class_${new Date().getTime()}.pptx` })
+    pptx.writeFile({ fileName: `Presentation_${new Date().getTime()}.pptx` })
       .catch(err => {
         alert("ডাউনলোড এরর: " + err);
       });
 
   } catch (err) {
+    console.error(err);
     alert("পিপিটি তৈরি করা যাচ্ছে না: " + err.message);
   }
 }
