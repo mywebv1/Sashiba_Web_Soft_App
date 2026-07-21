@@ -841,16 +841,33 @@ function previewStudentPhoto(e) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function(evt) {
-    document.getElementById('m-photo-base64').value = evt.target.result;
+    const photoBase64 = evt.target.result;
+    document.getElementById('m-photo-base64').value = photoBase64;
+    
+    // If uploading directly from report card, save immediately & refresh
+    if (window._directPhotoStudentId) {
+      const idx = students.findIndex(s => s.id === window._directPhotoStudentId);
+      if (idx !== -1) {
+        students[idx].photo = photoBase64;
+        saveToStorage();
+        renderReportCard(window._directPhotoStudentId);
+        renderStudentTable();
+        showToast('শিক্ষার্থীর ছবি সফলভাবে আপডেট হয়েছে!', 'success');
+      }
+      window._directPhotoStudentId = null;
+    }
   };
   reader.readAsDataURL(file);
 }
 
 function triggerStudentPhotoUpload(id) {
-  openEditModal(id);
-  setTimeout(() => {
-    document.getElementById('m-photo')?.focus();
-  }, 200);
+  window._directPhotoStudentId = id;
+  const directInput = document.getElementById('direct-report-photo-input');
+  if (directInput) {
+    directInput.click();
+  } else {
+    openEditModal(id);
+  }
 }
 
 function openAddStudentModal() {
