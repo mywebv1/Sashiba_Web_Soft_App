@@ -2998,8 +2998,7 @@ function downloadAsPowerPointPPTX() {
           });
           
           if (slideObj.bullets && slideObj.bullets.length > 0) {
-            let bulletText = slideObj.bullets.join("
-");
+            let bulletText = slideObj.bullets.join("\n");
             slide.addText(bulletText, {
               x: 0.5, y: 3.8, w: 12.33, h: 2, fontSize: 18, color: 'C7D2FE', align: 'left'
             });
