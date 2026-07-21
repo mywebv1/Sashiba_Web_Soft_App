@@ -758,42 +758,66 @@
                 </div>
 
                 <!-- অ্যানিমেশন সেটিংস -->
-                <div class="editor-title" style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
-                  <i class="fa-solid fa-wand-magic-sparkles"></i>
-                  <span>অ্যানিমেশন সেটআপ</span>
+                <div class="editor-title" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+                  <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i>
+                  <span>অ্যানিমেশন এবং প্রবেশদ্বার ইফেক্ট</span>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                  <div class="editor-field">
-                    <label style="font-size: 11px;">শিরোনাম:</label>
-                    <select id="editTitleAnim" class="form-select" onchange="updateActiveSlideFromEditor()">
-                      <option value="none">নেই (None)</option>
-                      <option value="fade-in">ফেড ইন (Fade In)</option>
-                      <option value="slide-up">স্লাইড আপ (Slide Up)</option>
-                      <option value="slide-left">বাম থেকে ডান</option>
-                      <option value="zoom-in">জুম ইন (Zoom In)</option>
-                      <option value="bounce">বাউন্স (Bounce)</option>
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">
+                  স্লাইড প্লে করার সময় উপাদানগুলো কীভাবে স্ক্রিনে প্রবেশ করবে তা নির্ধারণ করুন:
+                </p>
+
+                <div class="animation-settings-card" style="background: rgba(79, 70, 229, 0.04); padding: 12px; border-radius: 10px; border: 1px solid rgba(79, 70, 229, 0.12); display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                  <div class="anim-control-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                      <i class="fa-solid fa-heading" style="color: var(--primary); font-size: 13px; width: 16px;"></i>
+                      <div>
+                        <strong style="font-size: 12px; display: block; color: var(--text-dark);">স্লাইড শিরোনাম</strong>
+                        <span style="font-size: 10px; color: var(--text-muted); display: block;">টাইটেল প্রবেশের ইফেক্ট</span>
+                      </div>
+                    </div>
+                    <select id="editTitleAnim" class="form-select" style="width: 140px; font-size: 12px; font-weight: 600; padding: 4px 8px; height: 32px;" onchange="updateActiveSlideFromEditor()">
+                      <option value="none">❌ কোনো ইফেক্ট নেই</option>
+                      <option value="fade-in">✨ ফেড ইন (ধীরে প্রকাশ)</option>
+                      <option value="slide-up">⬆️ স্লাইড আপ (নিচ থেকে)</option>
+                      <option value="slide-left">➡️ স্লাইড রাইট (বাম থেকে)</option>
+                      <option value="zoom-in">🔍 জুম ইন (ছোট থেকে বড়)</option>
+                      <option value="bounce">🏀 বাউন্স (স্প্রিং ইফেক্ট)</option>
                     </select>
                   </div>
-                  <div class="editor-field">
-                    <label style="font-size: 11px;">পয়েন্ট/বক্স:</label>
-                    <select id="editContentAnim" class="form-select" onchange="updateActiveSlideFromEditor()">
-                      <option value="none">নেই (None)</option>
-                      <option value="fade-in">ফেড ইন (Fade In)</option>
-                      <option value="slide-up">স্লাইড আপ (Slide Up)</option>
-                      <option value="slide-left">বাম থেকে ডান</option>
-                      <option value="zoom-in">জুম ইন (Zoom In)</option>
-                      <option value="bounce">বাউন্স (Bounce)</option>
+
+                  <div class="anim-control-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px dashed rgba(79, 70, 229, 0.15); padding-top: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                      <i class="fa-solid fa-list-ul" style="color: var(--primary); font-size: 13px; width: 16px;"></i>
+                      <div>
+                        <strong style="font-size: 12px; display: block; color: var(--text-dark);">পয়েন্ট / বক্সসমূহ</strong>
+                        <span style="font-size: 10px; color: var(--text-muted); display: block;">লেখার বিবরণ ও লিস্ট ইফেক্ট</span>
+                      </div>
+                    </div>
+                    <select id="editContentAnim" class="form-select" style="width: 140px; font-size: 12px; font-weight: 600; padding: 4px 8px; height: 32px;" onchange="updateActiveSlideFromEditor()">
+                      <option value="none">❌ কোনো ইফেক্ট নেই</option>
+                      <option value="fade-in">✨ ফেড ইন (ধীরে প্রকাশ)</option>
+                      <option value="slide-up">⬆️ স্লাইড আপ (নিচ থেকে)</option>
+                      <option value="slide-left">➡️ স্লাইড রাইট (বাম থেকে)</option>
+                      <option value="zoom-in">🔍 জুম ইন (ছোট থেকে বড়)</option>
+                      <option value="bounce">🏀 বাউন্স (স্প্রিং ইফেক্ট)</option>
                     </select>
                   </div>
-                  <div class="editor-field">
-                    <label style="font-size: 11px;">ছবি/ভিজ্যুয়াল:</label>
-                    <select id="editImageAnim" class="form-select" onchange="updateActiveSlideFromEditor()">
-                      <option value="none">নেই (None)</option>
-                      <option value="fade-in">ফেড ইন (Fade In)</option>
-                      <option value="slide-up">স্লাইড আপ (Slide Up)</option>
-                      <option value="slide-left">বাম থেকে ডান</option>
-                      <option value="zoom-in">জুম ইন (Zoom In)</option>
-                      <option value="bounce">বাউন্স (Bounce)</option>
+
+                  <div class="anim-control-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px dashed rgba(79, 70, 229, 0.15); padding-top: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                      <i class="fa-regular fa-image" style="color: var(--primary); font-size: 13px; width: 16px;"></i>
+                      <div>
+                        <strong style="font-size: 12px; display: block; color: var(--text-dark);">ছবি ও হোয়াইটবোর্ড</strong>
+                        <span style="font-size: 10px; color: var(--text-muted); display: block;">মিডিয়া প্রবেশের ইফেক্ট</span>
+                      </div>
+                    </div>
+                    <select id="editImageAnim" class="form-select" style="width: 140px; font-size: 12px; font-weight: 600; padding: 4px 8px; height: 32px;" onchange="updateActiveSlideFromEditor()">
+                      <option value="none">❌ কোনো ইফেক্ট নেই</option>
+                      <option value="fade-in">✨ ফেড ইন (ধীরে প্রকাশ)</option>
+                      <option value="slide-up">⬆️ স্লাইড আপ (নিচ থেকে)</option>
+                      <option value="slide-left">➡️ স্লাইড রাইট (বাম থেকে)</option>
+                      <option value="zoom-in">🔍 জুম ইন (ছোট থেকে বড়)</option>
+                      <option value="bounce">🏀 বাউন্স (স্প্রিং ইফেক্ট)</option>
                     </select>
                   </div>
                 </div>
@@ -897,6 +921,22 @@
         <button class="pres-nav-btn" onclick="nextSlide()">
           পরের স্লাইড <i class="fa-solid fa-arrow-right"></i>
         </button>
+        
+        <!-- Auto Play Controls -->
+        <div style="display: flex; align-items: center; gap: 10px; margin-left: 20px; border-left: 1px solid #334155; padding-left: 20px;">
+          <button class="pres-nav-btn" id="btnAutoplay" onclick="toggleAutoplay()" style="background: #0f766e; border-color: #115e59;" title="স্লাইড অটো প্লে চালু/বন্ধ করুন">
+            <i class="fa-solid fa-play"></i> অটো প্লে
+          </button>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: #94a3b8;">
+            <span>বিরতি:</span>
+            <select id="autoplayInterval" class="pres-select" style="background: #1e293b; color: white; border: 1px solid #334155; padding: 6px 12px; border-radius: 20px; outline: none; cursor: pointer; font-weight: bold;" onchange="updateAutoplayInterval()">
+              <option value="3000">৩ সেকেন্ড</option>
+              <option value="5000" selected>৫ সেকেন্ড</option>
+              <option value="10000">১০ সেকেন্ড</option>
+              <option value="15000">১৫ সেকেন্ড</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
 

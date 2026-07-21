@@ -1685,16 +1685,63 @@ body {
 
 /* Print Hide */
 @media print {
-  .sidebar, .input-panel, .top-bar, .slide-toolbar, .slide-editor-panel, .slide-thumbnails-sidebar, .canvas-nav {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  /* Hide all editor UI wrappers */
+  .sidebar, 
+  .top-bar, 
+  .input-panel, 
+  .slide-thumbnails-sidebar, 
+  .slide-toolbar, 
+  .canvas-nav,
+  .teacher-notes-badge,
+  .whiteboard-toolbar {
     display: none !important;
   }
-  .presentation-workspace {
-    background: white;
+  
+  /* Reset container layouts */
+  .app-container,
+  .main-content,
+  .workspace,
+  .presentation-workspace,
+  .slide-editor-panel,
+  .slide-canvas-container {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: none !important;
   }
+
+  /* Make slide-frame print beautifully */
   .slide-frame {
-    box-shadow: none;
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16/9 !important;
+    margin: 0 auto !important;
+    padding: 30px !important;
+    box-shadow: none !important;
+    border: none !important;
+    page-break-inside: avoid;
     break-after: page;
+    background-size: cover !important;
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important; /* Force print backgrounds */
+  }
+  
+  /* Ensure whiteboard wrapper is transparent and centered */
+  .whiteboard-wrapper {
+    height: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
   }
 }
 

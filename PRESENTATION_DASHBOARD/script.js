@@ -2333,6 +2333,7 @@ function exitPresentationMode() {
   const overlay = document.getElementById("fullscreenOverlay");
   if (overlay) overlay.style.display = "none";
   if (presenterTimer) clearInterval(presenterTimer);
+  stopAutoplay();
   if (document.fullscreenElement && document.exitFullscreen) {
     document.exitFullscreen().catch(() => {});
   }
@@ -2968,174 +2969,281 @@ function downloadAsPowerPointPPTX() {
   slides.forEach((slideObj, index) => {
     let slide = pptx.addSlide();
     
-    // Check slide type and apply theme/layout
+    // Check slide background colors mapping
+    let bgFill = 'FFFFFF';
+    if (slideObj.bg === 'bg-blue') bgFill = '1E3A8A';
+    else if (slideObj.bg === 'bg-emerald') bgFill = '065F46';
+    else if (slideObj.bg === 'bg-dark') bgFill = '0F172A';
+    else if (slideObj.bg === 'bg-amber') bgFill = '78350F';
+    else if (slideObj.bg === 'bg-purple') bgFill = '581C87';
+    else if (slideObj.bg === 'bg-cosmic') bgFill = '2E1065';
+    else if (slideObj.bg === 'bg-sunset') bgFill = '7C2D12';
+    else if (slideObj.bg === 'bg-ocean') bgFill = '0369A1';
+    else if (slideObj.bg === 'bg-neon') bgFill = '111827';
+    else if (slideObj.bg === 'bg-nordic') bgFill = 'F1F5F9';
+    else if (slideObj.bg === 'bg-matte') bgFill = '1C1917';
+    else if (slideObj.type === "Cover") bgFill = secondaryColor;
+
+    slide.background = { fill: bgFill };
+    const isDarkBg = bgFill !== 'FFFFFF' && bgFill !== 'F1F5F9';
+    const textColor = isDarkBg ? lightTextColor : darkTextColor;
+
     if (slideObj.type === "Cover") {
-      // Dark cover slide
-      slide.background = { fill: secondaryColor };
-      
-      // Title
+      // Cover slide
       slide.addText(slideObj.title || "স্বাগতম", {
         x: 1.0,
         y: 2.0,
-        w: 8.0,
+        w: 11.33,
         h: 1.5,
-        fontSize: 36,
+        fontSize: 38,
         bold: true,
         color: lightTextColor,
         fontFace: 'Arial',
         align: 'left'
       });
       
-      // Bullets / Info
-      let bulletY = 3.6;
+      let bulletY = 3.8;
       if (slideObj.bullets && slideObj.bullets.length > 0) {
         slideObj.bullets.forEach((bullet) => {
           slide.addText(bullet, {
             x: 1.0,
             y: bulletY,
-            w: 8.0,
-            h: 0.4,
-            fontSize: 16,
+            w: 11.33,
+            h: 0.5,
+            fontSize: 18,
             color: 'C7D2FE',
             fontFace: 'Arial',
             align: 'left'
           });
-          bulletY += 0.5;
+          bulletY += 0.6;
         });
       }
-      
     } else {
       // Content slide with header
-      slide.background = { fill: 'FFFFFF' };
-      
-      // Header Bar
       slide.addRect({
         x: 0,
         y: 0,
         w: '100%',
         h: 1.0,
-        fill: primaryColor
+        fill: isDarkBg ? '00000033' : primaryColor
       });
       
       // Header Title
       slide.addText(slideObj.title || "স্লাইড", {
         x: 0.6,
-        y: 0.25,
-        w: 8.8,
-        h: 0.5,
-        fontSize: 24,
+        y: 0.2,
+        w: 12.0,
+        h: 0.6,
+        fontSize: 26,
         bold: true,
         color: lightTextColor,
         fontFace: 'Arial',
         align: 'left'
       });
       
-      // Bullet list spacing and layout
       const bullets = slideObj.bullets || [];
-      
-      if (slideObj.layout === "split" || slideObj.type === "Content") {
-        // Two columns or lists
-        const mid = Math.ceil(bullets.length / 2);
-        const leftBullets = bullets.slice(0, mid);
-        const rightBullets = bullets.slice(mid);
-        
-        // Left column
-        let leftY = 1.4;
-        leftBullets.forEach((bullet) => {
-          slide.addText(bullet, {
-            x: 0.6,
-            y: leftY,
-            w: 4.2,
-            h: 0.8,
-            fontSize: 16,
-            color: darkTextColor,
-            fontFace: 'Arial',
-            align: 'left',
-            valign: 'top',
-            bullet: true
-          });
-          leftY += 1.0;
-        });
-        
-        // Right column
-        let rightY = 1.4;
-        rightBullets.forEach((bullet) => {
-          slide.addText(bullet, {
-            x: 5.2,
-            y: rightY,
-            w: 4.2,
-            h: 0.8,
-            fontSize: 16,
-            color: darkTextColor,
-            fontFace: 'Arial',
-            align: 'left',
-            valign: 'top',
-            bullet: true
-          });
-          rightY += 1.0;
-        });
-        
-      } else if (slideObj.layout === "card" || slideObj.type === "Outcomes" || slideObj.type === "Quiz") {
-        // Render bullets as card blocks
-        let cardX = 0.6;
-        let cardY = 1.4;
-        let cardW = 2.7;
-        
-        bullets.forEach((bullet, bIdx) => {
-          if (bIdx < 3) { // Max 3 cards
-            slide.addRect({
-              x: cardX,
-              y: cardY,
-              w: cardW,
-              h: 3.5,
-              fill: cardBgColor,
-              line: { color: 'E2E8F0', width: 1.5 }
-            });
-            
-            slide.addText(bullet, {
-              x: cardX + 0.2,
-              y: cardY + 0.3,
-              w: cardW - 0.4,
-              h: 2.9,
-              fontSize: 14,
-              color: darkTextColor,
-              fontFace: 'Arial',
-              align: 'left',
-              valign: 'top'
-            });
-            
-            cardX += 3.1;
-          }
-        });
-        
-      } else {
-        // Standard single column
+
+      // Check if image is present
+      if (slideObj.image && slideObj.showImage !== false) {
+        // Left Column (Bullets)
         let bulletY = 1.4;
         bullets.forEach((bullet) => {
           slide.addText(bullet, {
             x: 0.6,
             y: bulletY,
-            w: 8.8,
+            w: 5.5,
             h: 0.8,
-            fontSize: 18,
-            color: darkTextColor,
+            fontSize: 16,
+            color: textColor,
             fontFace: 'Arial',
             align: 'left',
             valign: 'top',
             bullet: true
           });
-          bulletY += 1.0;
+          bulletY += 0.9;
         });
+
+        // Right Column (Whiteboard Image + Annotations)
+        const imgX = ((slideObj.imageX || 20) / 100) * 5.8 + 6.5;
+        const imgY = ((slideObj.imageY || 10) / 100) * 5.0 + 1.2;
+        const imgW = ((slideObj.imageWidth || 60) / 100) * 5.8;
+        const imgH = imgW * 0.75; // aspect ratio approximation
+
+        // Add base uploaded image
+        slide.addImage({
+          data: slideObj.image,
+          x: imgX,
+          y: imgY,
+          w: imgW,
+          h: imgH
+        });
+
+        // Add saved canvas drawing overlay (if any)
+        if (slideObj.canvasDrawing) {
+          slide.addImage({
+            data: slideObj.canvasDrawing,
+            x: 6.5,
+            y: 1.2,
+            w: 6.2,
+            h: 5.0
+          });
+        }
+
+        // Add text/shape annotations
+        if (slideObj.annotations && slideObj.annotations.length > 0) {
+          slideObj.annotations.forEach((ann) => {
+            const annX = 6.5 + (ann.x / 100) * 6.2;
+            const annY = 1.2 + (ann.y / 100) * 5.0;
+            const annW = ((ann.width || 15) / 100) * 6.2;
+            const annH = ((ann.height || 10) / 100) * 5.0;
+            const hexColor = (ann.color || '#ef4444').replace('#', '');
+
+            if (ann.type === 'text') {
+              slide.addText(ann.text || '', {
+                x: annX,
+                y: annY,
+                w: annW,
+                h: annH,
+                fontSize: ann.fontSize || 16,
+                bold: ann.fontWeight === 'bold',
+                color: hexColor,
+                fontFace: 'Arial'
+              });
+            } else if (ann.type === 'rect') {
+              slide.addShape(pptx.shapes.RECTANGLE, {
+                x: annX,
+                y: annY,
+                w: annW,
+                h: annH,
+                line: { color: hexColor, width: 2 },
+                fill: { color: 'FFFFFF', transparency: 100 }
+              });
+            } else if (ann.type === 'circle') {
+              slide.addShape(pptx.shapes.OVAL, {
+                x: annX,
+                y: annY,
+                w: annW,
+                h: annH,
+                line: { color: hexColor, width: 2 },
+                fill: { color: 'FFFFFF', transparency: 100 }
+              });
+            } else if (ann.type === 'arrow') {
+              slide.addText("→", {
+                x: annX,
+                y: annY,
+                w: annW,
+                h: annH,
+                fontSize: 24,
+                bold: true,
+                color: hexColor,
+                align: 'center'
+              });
+            }
+          });
+        }
+
+      } else {
+        // No image: Use full width layout
+        if (slideObj.layout === "split" || slideObj.type === "Content") {
+          const mid = Math.ceil(bullets.length / 2);
+          const leftBullets = bullets.slice(0, mid);
+          const rightBullets = bullets.slice(mid);
+          
+          let leftY = 1.4;
+          leftBullets.forEach((bullet) => {
+            slide.addText(bullet, {
+              x: 0.6,
+              y: leftY,
+              w: 5.8,
+              h: 0.8,
+              fontSize: 16,
+              color: textColor,
+              fontFace: 'Arial',
+              align: 'left',
+              valign: 'top',
+              bullet: true
+            });
+            leftY += 0.9;
+          });
+          
+          let rightY = 1.4;
+          rightBullets.forEach((bullet) => {
+            slide.addText(bullet, {
+              x: 6.8,
+              y: rightY,
+              w: 5.8,
+              h: 0.8,
+              fontSize: 16,
+              color: textColor,
+              fontFace: 'Arial',
+              align: 'left',
+              valign: 'top',
+              bullet: true
+            });
+            rightY += 0.9;
+          });
+          
+        } else if (slideObj.layout === "card" || slideObj.type === "Outcomes" || slideObj.type === "Quiz") {
+          let cardX = 0.6;
+          let cardY = 1.6;
+          let cardW = 3.6;
+          
+          bullets.forEach((bullet, bIdx) => {
+            if (bIdx < 3) {
+              slide.addRect({
+                x: cardX,
+                y: cardY,
+                w: cardW,
+                h: 4.2,
+                fill: isDarkBg ? 'FFFFFF11' : cardBgColor,
+                line: { color: isDarkBg ? 'FFFFFF22' : 'E2E8F0', width: 1.5 }
+              });
+              
+              slide.addText(bullet, {
+                x: cardX + 0.25,
+                y: cardY + 0.3,
+                w: cardW - 0.5,
+                h: 3.6,
+                fontSize: 15,
+                color: textColor,
+                fontFace: 'Arial',
+                align: 'left',
+                valign: 'top'
+              });
+              
+              cardX += 4.2;
+            }
+          });
+          
+        } else {
+          // Single Column Full width
+          let bulletY = 1.4;
+          bullets.forEach((bullet) => {
+            slide.addText(bullet, {
+              x: 0.6,
+              y: bulletY,
+              w: 12.0,
+              h: 0.8,
+              fontSize: 18,
+              color: textColor,
+              fontFace: 'Arial',
+              align: 'left',
+              valign: 'top',
+              bullet: true
+            });
+            bulletY += 0.9;
+          });
+        }
       }
-      
-      // Footer text
+
+      // Footer
       slide.addText("স্মার্ট শিক্ষা বাতায়ন", {
         x: 0.6,
-        y: 6.8,
-        w: 4.0,
+        y: 6.9,
+        w: 6.0,
         h: 0.3,
-        fontSize: 10,
-        color: mutedTextColor,
+        fontSize: 11,
+        color: isDarkBg ? '94A3B8' : mutedTextColor,
         fontFace: 'Arial'
       });
     }
@@ -3151,4 +3259,68 @@ function downloadAsPowerPointPPTX() {
       console.error(err);
       alert("Error generating PPTX: " + err);
     });
+}
+
+
+
+// =================== অটো প্লে লজিক ===================
+let wbAutoplayInterval = null;
+let wbAutoplayTime = 5000; // default 5s
+let wbIsAutoplayActive = false;
+
+function toggleAutoplay() {
+  const btn = document.getElementById("btnAutoplay");
+  if (!btn) return;
+  
+  if (wbIsAutoplayActive) {
+    stopAutoplay();
+  } else {
+    startAutoplay();
+  }
+}
+
+function startAutoplay() {
+  wbIsAutoplayActive = true;
+  const btn = document.getElementById("btnAutoplay");
+  if (btn) {
+    btn.innerHTML = `<i class="fa-solid fa-pause"></i> থামুন`;
+    btn.style.background = "#be123c"; // Red background for Pause
+    btn.style.borderColor = "#9f1239";
+  }
+  
+  const intervalSelect = document.getElementById("autoplayInterval");
+  if (intervalSelect) {
+    wbAutoplayTime = parseInt(intervalSelect.value) || 5000;
+  }
+  
+  if (wbAutoplayInterval) clearInterval(wbAutoplayInterval);
+  wbAutoplayInterval = setInterval(() => {
+    if (activeSlideIndex < slides.length - 1) {
+      nextSlide();
+    } else {
+      // Loop back to start
+      activeSlideIndex = 0;
+      renderPresenterSlide();
+    }
+  }, wbAutoplayTime);
+}
+
+function stopAutoplay() {
+  wbIsAutoplayActive = false;
+  const btn = document.getElementById("btnAutoplay");
+  if (btn) {
+    btn.innerHTML = `<i class="fa-solid fa-play"></i> অটো প্লে`;
+    btn.style.background = "#0f766e"; // Teal background for Play
+    btn.style.borderColor = "#115e59";
+  }
+  if (wbAutoplayInterval) {
+    clearInterval(wbAutoplayInterval);
+    wbAutoplayInterval = null;
+  }
+}
+
+function updateAutoplayInterval() {
+  if (wbIsAutoplayActive) {
+    startAutoplay();
+  }
 }
