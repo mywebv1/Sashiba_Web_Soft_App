@@ -2946,327 +2946,362 @@ function toggleSidebar() {
 }
 
 function downloadAsPowerPointPPTX() {
+  if (typeof PptxGenJS === 'undefined') {
+    alert(currentLang === "bn" 
+      ? "পিপিটিএক্স লাইব্রেরি লোড হয়নি! অনুগ্রহ করে ইন্টারনেট কানেকশন চেক করুন বা পেজটি রিফ্রেশ করুন।" 
+      : "PPTX library not loaded! Please check your internet connection or refresh the page.");
+    return;
+  }
+
   if (slides.length === 0) {
     alert(currentLang === "bn" ? "প্রথমে কোনো স্লাইড তৈরি করুন!" : "Please create some slides first!");
     return;
   }
 
-  // Initialize presentation
-  let pptx = new PptxGenJS();
-  
-  // Set layout 16x9
-  pptx.layout = 'LAYOUT_16x9';
-
-  // Define colors
-  const primaryColor = '4F46E5'; // Indigo
-  const secondaryColor = '3730A3'; // Dark Indigo
-  const darkTextColor = '1E293B';
-  const lightTextColor = 'FFFFFF';
-  const mutedTextColor = '64748B';
-  const cardBgColor = 'F8FAFC';
-
-  // Loop through slides array
-  slides.forEach((slideObj, index) => {
-    let slide = pptx.addSlide();
+  try {
+    // Initialize presentation
+    let pptx = new PptxGenJS();
     
-    // Check slide background colors mapping
-    let bgFill = 'FFFFFF';
-    if (slideObj.bg === 'bg-blue') bgFill = '1E3A8A';
-    else if (slideObj.bg === 'bg-emerald') bgFill = '065F46';
-    else if (slideObj.bg === 'bg-dark') bgFill = '0F172A';
-    else if (slideObj.bg === 'bg-amber') bgFill = '78350F';
-    else if (slideObj.bg === 'bg-purple') bgFill = '581C87';
-    else if (slideObj.bg === 'bg-cosmic') bgFill = '2E1065';
-    else if (slideObj.bg === 'bg-sunset') bgFill = '7C2D12';
-    else if (slideObj.bg === 'bg-ocean') bgFill = '0369A1';
-    else if (slideObj.bg === 'bg-neon') bgFill = '111827';
-    else if (slideObj.bg === 'bg-nordic') bgFill = 'F1F5F9';
-    else if (slideObj.bg === 'bg-matte') bgFill = '1C1917';
-    else if (slideObj.type === "Cover") bgFill = secondaryColor;
+    // Set layout 16x9
+    pptx.layout = 'LAYOUT_16x9';
 
-    slide.background = { fill: bgFill };
-    const isDarkBg = bgFill !== 'FFFFFF' && bgFill !== 'F1F5F9';
-    const textColor = isDarkBg ? lightTextColor : darkTextColor;
+    // Define colors
+    const primaryColor = '4F46E5'; // Indigo
+    const secondaryColor = '3730A3'; // Dark Indigo
+    const darkTextColor = '1E293B';
+    const lightTextColor = 'FFFFFF';
+    const mutedTextColor = '64748B';
+    const cardBgColor = 'F8FAFC';
 
-    if (slideObj.type === "Cover") {
-      // Cover slide
-      slide.addText(slideObj.title || "স্বাগতম", {
-        x: 1.0,
-        y: 2.0,
-        w: 11.33,
-        h: 1.5,
-        fontSize: 38,
-        bold: true,
-        color: lightTextColor,
-        fontFace: 'Arial',
-        align: 'left'
-      });
-      
-      let bulletY = 3.8;
-      if (slideObj.bullets && slideObj.bullets.length > 0) {
-        slideObj.bullets.forEach((bullet) => {
-          slide.addText(bullet, {
+    // Loop through slides array
+    slides.forEach((slideObj, index) => {
+      try {
+        let slide = pptx.addSlide();
+        
+        // Check slide background colors mapping
+        let bgFill = 'FFFFFF';
+        if (slideObj.bg === 'bg-blue') bgFill = '1E3A8A';
+        else if (slideObj.bg === 'bg-emerald') bgFill = '065F46';
+        else if (slideObj.bg === 'bg-dark') bgFill = '0F172A';
+        else if (slideObj.bg === 'bg-amber') bgFill = '78350F';
+        else if (slideObj.bg === 'bg-purple') bgFill = '581C87';
+        else if (slideObj.bg === 'bg-cosmic') bgFill = '2E1065';
+        else if (slideObj.bg === 'bg-sunset') bgFill = '7C2D12';
+        else if (slideObj.bg === 'bg-ocean') bgFill = '0369A1';
+        else if (slideObj.bg === 'bg-neon') bgFill = '111827';
+        else if (slideObj.bg === 'bg-nordic') bgFill = 'F1F5F9';
+        else if (slideObj.bg === 'bg-matte') bgFill = '1C1917';
+        else if (slideObj.type === "Cover") bgFill = secondaryColor;
+
+        slide.background = { fill: bgFill };
+        const isDarkBg = bgFill !== 'FFFFFF' && bgFill !== 'F1F5F9';
+        const textColor = isDarkBg ? lightTextColor : darkTextColor;
+
+        if (slideObj.type === "Cover") {
+          // Cover slide
+          slide.addText(slideObj.title || "স্বাগতম", {
             x: 1.0,
-            y: bulletY,
+            y: 2.0,
             w: 11.33,
-            h: 0.5,
-            fontSize: 18,
-            color: 'C7D2FE',
+            h: 1.5,
+            fontSize: 38,
+            bold: true,
+            color: lightTextColor,
             fontFace: 'Arial',
             align: 'left'
           });
-          bulletY += 0.6;
-        });
-      }
-    } else {
-      // Content slide with header
-      slide.addRect({
-        x: 0,
-        y: 0,
-        w: '100%',
-        h: 1.0,
-        fill: isDarkBg ? '00000033' : primaryColor
-      });
-      
-      // Header Title
-      slide.addText(slideObj.title || "স্লাইড", {
-        x: 0.6,
-        y: 0.2,
-        w: 12.0,
-        h: 0.6,
-        fontSize: 26,
-        bold: true,
-        color: lightTextColor,
-        fontFace: 'Arial',
-        align: 'left'
-      });
-      
-      const bullets = slideObj.bullets || [];
-
-      // Check if image is present
-      if (slideObj.image && slideObj.showImage !== false) {
-        // Left Column (Bullets)
-        let bulletY = 1.4;
-        bullets.forEach((bullet) => {
-          slide.addText(bullet, {
-            x: 0.6,
-            y: bulletY,
-            w: 5.5,
-            h: 0.8,
-            fontSize: 16,
-            color: textColor,
-            fontFace: 'Arial',
-            align: 'left',
-            valign: 'top',
-            bullet: true
-          });
-          bulletY += 0.9;
-        });
-
-        // Right Column (Whiteboard Image + Annotations)
-        const imgX = ((slideObj.imageX || 20) / 100) * 5.8 + 6.5;
-        const imgY = ((slideObj.imageY || 10) / 100) * 5.0 + 1.2;
-        const imgW = ((slideObj.imageWidth || 60) / 100) * 5.8;
-        const imgH = imgW * 0.75; // aspect ratio approximation
-
-        // Add base uploaded image
-        let imgOptions = {
-          x: imgX,
-          y: imgY,
-          w: imgW,
-          h: imgH
-        };
-
-        if (slideObj.image.startsWith("data:")) {
-          // Strip data: prefix from base64 string
-          imgOptions.data = slideObj.image.replace(/^data:/, '');
-        } else {
-          imgOptions.path = slideObj.image;
-        }
-
-        slide.addImage(imgOptions);
-
-        // Add saved canvas drawing overlay (if any)
-        if (slideObj.canvasDrawing) {
-          slide.addImage({
-            data: slideObj.canvasDrawing.replace(/^data:/, ''),
-            x: 6.5,
-            y: 1.2,
-            w: 6.2,
-            h: 5.0
-          });
-        }
-
-        // Add text/shape annotations
-        if (slideObj.annotations && slideObj.annotations.length > 0) {
-          slideObj.annotations.forEach((ann) => {
-            const annX = 6.5 + (ann.x / 100) * 6.2;
-            const annY = 1.2 + (ann.y / 100) * 5.0;
-            const annW = ((ann.width || 15) / 100) * 6.2;
-            const annH = ((ann.height || 10) / 100) * 5.0;
-            const hexColor = (ann.color || '#ef4444').replace('#', '');
-
-            if (ann.type === 'text') {
-              slide.addText(ann.text || '', {
-                x: annX,
-                y: annY,
-                w: annW,
-                h: annH,
-                fontSize: ann.fontSize || 16,
-                bold: ann.fontWeight === 'bold',
-                color: hexColor,
-                fontFace: 'Arial'
-              });
-            } else if (ann.type === 'rect') {
-              slide.addShape(pptx.shapes.RECTANGLE, {
-                x: annX,
-                y: annY,
-                w: annW,
-                h: annH,
-                line: { color: hexColor, width: 2 },
-                fill: { color: 'FFFFFF', transparency: 100 }
-              });
-            } else if (ann.type === 'circle') {
-              slide.addShape(pptx.shapes.OVAL, {
-                x: annX,
-                y: annY,
-                w: annW,
-                h: annH,
-                line: { color: hexColor, width: 2 },
-                fill: { color: 'FFFFFF', transparency: 100 }
-              });
-            } else if (ann.type === 'arrow') {
-              slide.addText("→", {
-                x: annX,
-                y: annY,
-                w: annW,
-                h: annH,
-                fontSize: 24,
-                bold: true,
-                color: hexColor,
-                align: 'center'
-              });
-            }
-          });
-        }
-
-      } else {
-        // No image: Use full width layout
-        if (slideObj.layout === "split" || slideObj.type === "Content") {
-          const mid = Math.ceil(bullets.length / 2);
-          const leftBullets = bullets.slice(0, mid);
-          const rightBullets = bullets.slice(mid);
           
-          let leftY = 1.4;
-          leftBullets.forEach((bullet) => {
-            slide.addText(bullet, {
-              x: 0.6,
-              y: leftY,
-              w: 5.8,
-              h: 0.8,
-              fontSize: 16,
-              color: textColor,
-              fontFace: 'Arial',
-              align: 'left',
-              valign: 'top',
-              bullet: true
-            });
-            leftY += 0.9;
-          });
-          
-          let rightY = 1.4;
-          rightBullets.forEach((bullet) => {
-            slide.addText(bullet, {
-              x: 6.8,
-              y: rightY,
-              w: 5.8,
-              h: 0.8,
-              fontSize: 16,
-              color: textColor,
-              fontFace: 'Arial',
-              align: 'left',
-              valign: 'top',
-              bullet: true
-            });
-            rightY += 0.9;
-          });
-          
-        } else if (slideObj.layout === "card" || slideObj.type === "Outcomes" || slideObj.type === "Quiz") {
-          let cardX = 0.6;
-          let cardY = 1.6;
-          let cardW = 3.6;
-          
-          bullets.forEach((bullet, bIdx) => {
-            if (bIdx < 3) {
-              slide.addRect({
-                x: cardX,
-                y: cardY,
-                w: cardW,
-                h: 4.2,
-                fill: isDarkBg ? 'FFFFFF11' : cardBgColor,
-                line: { color: isDarkBg ? 'FFFFFF22' : 'E2E8F0', width: 1.5 }
-              });
-              
+          let bulletY = 3.8;
+          if (slideObj.bullets && slideObj.bullets.length > 0) {
+            slideObj.bullets.forEach((bullet) => {
               slide.addText(bullet, {
-                x: cardX + 0.25,
-                y: cardY + 0.3,
-                w: cardW - 0.5,
-                h: 3.6,
-                fontSize: 15,
+                x: 1.0,
+                y: bulletY,
+                w: 11.33,
+                h: 0.5,
+                fontSize: 18,
+                color: 'C7D2FE',
+                fontFace: 'Arial',
+                align: 'left'
+              });
+              bulletY += 0.6;
+            });
+          }
+        } else {
+          // Content slide with header
+          slide.addRect({
+            x: 0,
+            y: 0,
+            w: '100%',
+            h: 1.0,
+            fill: isDarkBg ? '00000033' : primaryColor
+          });
+          
+          // Header Title
+          slide.addText(slideObj.title || "স্লাইড", {
+            x: 0.6,
+            y: 0.2,
+            w: 12.0,
+            h: 0.6,
+            fontSize: 26,
+            bold: true,
+            color: lightTextColor,
+            fontFace: 'Arial',
+            align: 'left'
+          });
+          
+          const bullets = slideObj.bullets || [];
+
+          // Check if image is present
+          if (slideObj.image && slideObj.showImage !== false) {
+            // Left Column (Bullets)
+            let bulletY = 1.4;
+            bullets.forEach((bullet) => {
+              slide.addText(bullet, {
+                x: 0.6,
+                y: bulletY,
+                w: 5.5,
+                h: 0.8,
+                fontSize: 16,
                 color: textColor,
                 fontFace: 'Arial',
                 align: 'left',
-                valign: 'top'
+                valign: 'top',
+                bullet: true
+              });
+              bulletY += 0.9;
+            });
+
+            // Parse image coordinates safely
+            let rawX = parseFloat(slideObj.imageX);
+            let rawY = parseFloat(slideObj.imageY);
+            let rawW = parseFloat(slideObj.imageWidth);
+
+            if (isNaN(rawX)) rawX = 20;
+            if (isNaN(rawY)) rawY = 10;
+            if (isNaN(rawW)) rawW = 60;
+
+            const imgX = (rawX / 100) * 5.8 + 6.5;
+            const imgY = (rawY / 100) * 5.0 + 1.2;
+            const imgW = (rawW / 100) * 5.8;
+            const imgH = imgW * 0.75; // aspect ratio approximation
+
+            // Add base uploaded image
+            let imgOptions = {
+              x: imgX,
+              y: imgY,
+              w: imgW,
+              h: imgH
+            };
+
+            if (slideObj.image.startsWith("data:")) {
+              // Strip data: prefix from base64 string
+              imgOptions.data = slideObj.image.replace(/^data:/, '');
+            } else {
+              imgOptions.path = slideObj.image;
+            }
+
+            slide.addImage(imgOptions);
+
+            // Add saved canvas drawing overlay (if any)
+            if (slideObj.canvasDrawing && slideObj.canvasDrawing.startsWith("data:")) {
+              slide.addImage({
+                data: slideObj.canvasDrawing.replace(/^data:/, ''),
+                x: 6.5,
+                y: 1.2,
+                w: 6.2,
+                h: 5.0
+              });
+            }
+
+            // Add text/shape annotations
+            if (slideObj.annotations && slideObj.annotations.length > 0) {
+              slideObj.annotations.forEach((ann) => {
+                let aX = parseFloat(ann.x);
+                let aY = parseFloat(ann.y);
+                let aW = parseFloat(ann.width);
+                let aH = parseFloat(ann.height);
+
+                if (isNaN(aX)) aX = 40;
+                if (isNaN(aY)) aY = 40;
+                if (isNaN(aW)) aW = 15;
+                if (isNaN(aH)) aH = 10;
+
+                const annX = 6.5 + (aX / 100) * 6.2;
+                const annY = 1.2 + (aY / 100) * 5.0;
+                const annW = (aW / 100) * 6.2;
+                const annH = (aH / 100) * 5.0;
+                const hexColor = (ann.color || '#ef4444').replace('#', '');
+
+                if (ann.type === 'text') {
+                  slide.addText(ann.text || '', {
+                    x: annX,
+                    y: annY,
+                    w: annW,
+                    h: annH,
+                    fontSize: ann.fontSize || 16,
+                    bold: ann.fontWeight === 'bold',
+                    color: hexColor,
+                    fontFace: 'Arial'
+                  });
+                } else if (ann.type === 'rect') {
+                  slide.addShape(pptx.shapes.RECTANGLE, {
+                    x: annX,
+                    y: annY,
+                    w: annW,
+                    h: annH,
+                    line: { color: hexColor, width: 2 },
+                    fill: { color: 'FFFFFF', transparency: 100 }
+                  });
+                } else if (ann.type === 'circle') {
+                  slide.addShape(pptx.shapes.OVAL, {
+                    x: annX,
+                    y: annY,
+                    w: annW,
+                    h: annH,
+                    line: { color: hexColor, width: 2 },
+                    fill: { color: 'FFFFFF', transparency: 100 }
+                  });
+                } else if (ann.type === 'arrow') {
+                  slide.addText("→", {
+                    x: annX,
+                    y: annY,
+                    w: annW,
+                    h: annH,
+                    fontSize: 24,
+                    bold: true,
+                    color: hexColor,
+                    align: 'center'
+                  });
+                }
+              });
+            }
+
+          } else {
+            // No image: Use full width layout
+            if (slideObj.layout === "split" || slideObj.type === "Content") {
+              const mid = Math.ceil(bullets.length / 2);
+              const leftBullets = bullets.slice(0, mid);
+              const rightBullets = bullets.slice(mid);
+              
+              let leftY = 1.4;
+              leftBullets.forEach((bullet) => {
+                slide.addText(bullet, {
+                  x: 0.6,
+                  y: leftY,
+                  w: 5.8,
+                  h: 0.8,
+                  fontSize: 16,
+                  color: textColor,
+                  fontFace: 'Arial',
+                  align: 'left',
+                  valign: 'top',
+                  bullet: true
+                });
+                leftY += 0.9;
               });
               
-              cardX += 4.2;
+              let rightY = 1.4;
+              rightBullets.forEach((bullet) => {
+                slide.addText(bullet, {
+                  x: 6.8,
+                  y: rightY,
+                  w: 5.8,
+                  h: 0.8,
+                  fontSize: 16,
+                  color: textColor,
+                  fontFace: 'Arial',
+                  align: 'left',
+                  valign: 'top',
+                  bullet: true
+                });
+                rightY += 0.9;
+              });
+              
+            } else if (slideObj.layout === "card" || slideObj.type === "Outcomes" || slideObj.type === "Quiz") {
+              let cardX = 0.6;
+              let cardY = 1.6;
+              let cardW = 3.6;
+              
+              bullets.forEach((bullet, bIdx) => {
+                if (bIdx < 3) {
+                  slide.addRect({
+                    x: cardX,
+                    y: cardY,
+                    w: cardW,
+                    h: 4.2,
+                    fill: isDarkBg ? 'FFFFFF11' : cardBgColor,
+                    line: { color: isDarkBg ? 'FFFFFF22' : 'E2E8F0', width: 1.5 }
+                  });
+                  
+                  slide.addText(bullet, {
+                    x: cardX + 0.25,
+                    y: cardY + 0.3,
+                    w: cardW - 0.5,
+                    h: 3.6,
+                    fontSize: 15,
+                    color: textColor,
+                    fontFace: 'Arial',
+                    align: 'left',
+                    valign: 'top'
+                  });
+                  
+                  cardX += 4.2;
+                }
+              });
+              
+            } else {
+              // Single Column Full width
+              let bulletY = 1.4;
+              bullets.forEach((bullet) => {
+                slide.addText(bullet, {
+                  x: 0.6,
+                  y: bulletY,
+                  w: 12.0,
+                  h: 0.8,
+                  fontSize: 18,
+                  color: textColor,
+                  fontFace: 'Arial',
+                  align: 'left',
+                  valign: 'top',
+                  bullet: true
+                });
+                bulletY += 0.9;
+              });
             }
-          });
-          
-        } else {
-          // Single Column Full width
-          let bulletY = 1.4;
-          bullets.forEach((bullet) => {
-            slide.addText(bullet, {
-              x: 0.6,
-              y: bulletY,
-              w: 12.0,
-              h: 0.8,
-              fontSize: 18,
-              color: textColor,
-              fontFace: 'Arial',
-              align: 'left',
-              valign: 'top',
-              bullet: true
-            });
-            bulletY += 0.9;
+          }
+
+          // Footer
+          slide.addText("স্মার্ট শিক্ষা বাতায়ন", {
+            x: 0.6,
+            y: 6.9,
+            w: 6.0,
+            h: 0.3,
+            fontSize: 11,
+            color: isDarkBg ? '94A3B8' : mutedTextColor,
+            fontFace: 'Arial'
           });
         }
+      } catch (slideErr) {
+        console.error("Error generating slide index " + index + ":", slideErr);
       }
-
-      // Footer
-      slide.addText("স্মার্ট শিক্ষা বাতায়ন", {
-        x: 0.6,
-        y: 6.9,
-        w: 6.0,
-        h: 0.3,
-        fontSize: 11,
-        color: isDarkBg ? '94A3B8' : mutedTextColor,
-        fontFace: 'Arial'
-      });
-    }
-  });
-
-  // Save the presentation
-  const fileName = "presentation_" + Date.now() + ".pptx";
-  pptx.writeFile({ fileName: fileName })
-    .then(fileName => {
-      alert(currentLang === "bn" ? "পিপিটিএক্স প্রেজেন্টেশন ফাইলটি সফলভাবে ডাউনলোড হয়েছে!" : "PPTX Presentation successfully downloaded!");
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error generating PPTX: " + err);
     });
+
+    // Save the presentation using the highly-compatible string-only argument
+    const fileName = "presentation_" + Date.now() + ".pptx";
+    pptx.writeFile(fileName)
+      .then(() => {
+        alert(currentLang === "bn" ? "পিপিটিএক্স প্রেজেন্টেশন ফাইলটি সফলভাবে ডাউনলোড হয়েছে!" : "PPTX Presentation successfully downloaded!");
+      })
+      .catch(err => {
+        console.error("pptx.writeFile Promise catch error:", err);
+        alert("Error saving PPTX file: " + err);
+      });
+
+  } catch (err) {
+    console.error("General downloadAsPowerPointPPTX try-catch error:", err);
+    alert("Error writing PPTX: " + err.message);
+  }
 }
 
 
