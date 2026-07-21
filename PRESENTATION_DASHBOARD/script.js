@@ -3101,7 +3101,7 @@ function downloadAsPowerPointPPTX() {
                     fill: { color: 'FFFFFF', transparency: 100 }
                   });
                 } else if (ann.type === 'circle') {
-                  slide.addShape(pptx.ShapeType.oval, {
+                  slide.addShape(pptx.ShapeType.ellipse, {
                     x: annX,
                     y: annY,
                     w: annW,
@@ -3259,5 +3259,20 @@ function stopAutoplay() {
 function updateAutoplayInterval() {
   if (wbIsAutoplayActive) {
     startAutoplay();
+  }
+}
+
+function toggleEditorPanel() {
+  const studio = document.querySelector(".studio-layout");
+  const icon = document.getElementById("editorToggleIcon");
+  if (studio) {
+    const isCollapsed = studio.classList.toggle("editor-collapsed");
+    if (icon) {
+      if (isCollapsed) {
+        icon.className = "fa-solid fa-chevron-left";
+      } else {
+        icon.className = "fa-solid fa-chevron-right";
+      }
+    }
   }
 }
