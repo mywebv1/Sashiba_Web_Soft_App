@@ -2947,7 +2947,14 @@ function toggleSidebar() {
 
 function downloadAsPowerPointPPTX() {
   if (typeof PptxGenJS === 'undefined') {
-    alert("PPTX library not loaded!");
+    alert(currentLang === "bn" 
+      ? "পিপিটিএক্স লাইব্রেরি লোড হয়নি! অনুগ্রহ করে ইন্টারনেট কানেকশন চেক করুন বা পেজটি রিফ্রেশ করুন।" 
+      : "PPTX library not loaded! Please check your internet connection or refresh the page.");
+    return;
+  }
+
+  if (slides.length === 0) {
+    alert(currentLang === "bn" ? "প্রথমে কোনো স্লাইড তৈরি করুন!" : "Please create some slides first!");
     return;
   }
 
@@ -2955,100 +2962,367 @@ function downloadAsPowerPointPPTX() {
     let pptx = new PptxGenJS();
     pptx.layout = 'LAYOUT_16x9';
 
-    // ১. কালার প্যালেট (আপনার অ্যাপের থিম অনুযায়ী)
-    const APP_THEME_COLOR = '4F46E5'; // Indigo
-    const DARK_BG = '1E293B';
-    const WHITE = 'FFFFFF';
+    // Premium Color Palette
+    const primaryColor = '4F46E5'; // Indigo
+    const secondaryColor = '3730A3'; // Dark Indigo
+    const darkTextColor = '1E293B';
+    const lightTextColor = 'FFFFFF';
+    const mutedTextColor = '64748B';
+    const cardBgColor = 'F8FAFC';
 
     slides.forEach((slideObj, index) => {
-      let slide = pptx.addSlide();
-      
-      // ২. ব্যাকগ্রাউন্ড সেট করা
-      let bgFill = WHITE;
-      if (slideObj.type === "Cover") bgFill = '312E81'; // ডার্ক নেভি ব্লু
-      else if (slideObj.bg === 'bg-blue') bgFill = '1E3A8A';
-      else if (slideObj.bg === 'bg-dark') bgFill = DARK_BG;
-      
-      slide.background = { fill: bgFill };
-      let isDark = (bgFill !== WHITE);
-      let textColor = isDark ? WHITE : '0F172A';
+      try {
+        let slide = pptx.addSlide();
+        
+        // 1. Background mapping exactly like dashboard swatches
+        let bgFill = 'FFFFFF';
+        if (slideObj.bg === 'bg-blue') bgFill = '1E3A8A';
+        else if (slideObj.bg === 'bg-emerald') bgFill = '065F46';
+        else if (slideObj.bg === 'bg-dark') bgFill = '0F172A';
+        else if (slideObj.bg === 'bg-amber') bgFill = '78350F';
+        else if (slideObj.bg === 'bg-purple') bgFill = '581C87';
+        else if (slideObj.bg === 'bg-cosmic') bgFill = '2E1065';
+        else if (slideObj.bg === 'bg-sunset') bgFill = '7C2D12';
+        else if (slideObj.bg === 'bg-ocean') bgFill = '0369A1';
+        else if (slideObj.bg === 'bg-neon') bgFill = '111827';
+        else if (slideObj.bg === 'bg-nordic') bgFill = 'F1F5F9';
+        else if (slideObj.bg === 'bg-matte') bgFill = '1C1917';
+        else if (slideObj.bg === 'bg-white') bgFill = 'FFFFFF';
+        else if (slideObj.type === "Cover") bgFill = '312E81'; // Dark Navy Blue Cover
 
-      if (slideObj.type === "Cover") {
-        // --- কভার স্লাইড ডিজাইন ---
-        // মেইন টাইটেল (মাঝখানে বড় করে)
-        slide.addText(slideObj.title || "", {
-          x: '5%', y: '30%', w: '90%', fontSize: 44, bold: true, 
-          color: WHITE, align: 'center', fontFace: 'Arial'
-        });
+        slide.background = { fill: bgFill };
+        const isDarkBg = bgFill !== 'FFFFFF' && bgFill !== 'F1F5F9';
+        const textColor = isDarkBg ? lightTextColor : darkTextColor;
 
-        // নিচের ইনফো বক্স (একটি হালকা শেড এর ওপর)
-        slide.addShape(pptx.ShapeType.rect, {
-          x: '10%', y: '60%', w: '80%', h: '25%', 
-          fill: { color: 'FFFFFF', transparency: 85 } 
-        });
+        // Clean emojis from text function
+        const cleanText = (txt) => {
+          if (!txt) return "";
+          return txt.replace(/[^\x00-\x7F\u0980-\u09FF\s]/g, ""); // Remove emojis, keep English and Bengali
+        };
 
-        let infoText = Array.isArray(slideObj.bullets) ? slideObj.bullets.join("  |  ") : "";
-        slide.addText(infoText, {
-          x: '12%', y: '65%', w: '76%', fontSize: 16, 
-          color: WHITE, align: 'center', fontFace: 'Arial'
-        });
-
-      } else {
-        // --- কন্টেন্ট স্লাইড ডিজাইন ---
-        // উপরের নীল হেডার বার
-        slide.addShape(pptx.ShapeType.rect, { 
-          x: 0, y: 0, w: '100%', h: 0.8, 
-          fill: { color: APP_THEME_COLOR } 
-        });
-
-        // হেডার টাইটেল
-        slide.addText(slideObj.title || "", {
-          x: 0.5, y: 0.15, w: 9, fontSize: 24, bold: true, 
-          color: WHITE, fontFace: 'Arial'
-        });
-
-        // ছবি থাকলে ডান পাশে দেখানোর লজিক
-        let hasImage = (slideObj.image && slideObj.showImage !== false);
-        let bulletWidth = hasImage ? '50%' : '90%';
-
-        if (hasImage) {
-            try {
-                let imgData = slideObj.image.includes("base64,") ? slideObj.image.split("base64,")[1] : slideObj.image;
-                slide.addImage({ 
-                    data: imgData, x: '55%', y: '20%', w: '40%', h: '60%',
-                    sizing: { type: 'contain' } 
-                });
-            } catch (e) { console.error("Image Error", e); }
-        }
-
-        // বুলেট পয়েন্টগুলো (বাম পাশে এবং লাইন স্পেসিং দিয়ে)
-        let bulletY = 1.3;
-        let bullets = Array.isArray(slideObj.bullets) ? slideObj.bullets : [];
-
-        bullets.forEach((text) => {
-          // ইমোজি বা আইকন থাকলে সেগুলো পাওয়ারপয়েন্টে সমস্যা করে, তাই সিম্পল টেক্সট রাখা ভালো
-          let cleanText = text.replace(/[^\x00-\x7F\u0980-\u09FF\s]/g, ""); // Non-Unicode ক্যারেক্টার রিমুভ
-          
-          slide.addText(cleanText, {
-            x: 0.6, y: bulletY, w: bulletWidth, fontSize: 18, 
-            color: textColor, bullet: { code: '2022' }, 
-            lineSpacing: 30, fontFace: 'Arial', align: 'left'
+        if (slideObj.type === "Cover") {
+          // --- Cover Slide Design (Centered Title, Clean vertical bullets) ---
+          slide.addText(cleanText(slideObj.title || "স্বাগতম"), {
+            x: '5%',
+            y: '22%',
+            w: '90%',
+            h: 1.5,
+            fontSize: 42,
+            bold: true,
+            color: lightTextColor,
+            fontFace: 'Arial',
+            align: 'center'
           });
-          bulletY += 0.8; // প্রতিটি লাইনের মাঝে গ্যাপ
-        });
 
-        // নিচের দিকে পেজ নম্বর বা ব্র্যান্ডিং
-        slide.addText("স্মার্ট শিক্ষা বাতায়ন | সশিবা পোর্টাল", {
-          x: 0.5, y: 7.0, fontSize: 10, color: '94A3B8', fontFace: 'Arial'
-        });
+          // Horizontal decorative line under title
+          slide.addShape(pptx.ShapeType.rect, {
+            x: '35%',
+            y: '42%',
+            w: '30%',
+            h: 0.05,
+            fill: { color: 'F59E0B' } // Gold/Amber accent line
+          });
+
+          // Bullet points listed vertically
+          let bullets = Array.isArray(slideObj.bullets) ? slideObj.bullets : [];
+          let bulletY = 4.6;
+          bullets.forEach((bullet) => {
+            slide.addText(cleanText(bullet), {
+              x: '10%',
+              y: bulletY,
+              w: '80%',
+              h: 0.4,
+              fontSize: 16,
+              color: 'C7D2FE',
+              fontFace: 'Arial',
+              align: 'center'
+            });
+            bulletY += 0.5;
+          });
+
+        } else {
+          // --- Content Slide Design ---
+          // Upper Header Bar
+          slide.addShape(pptx.ShapeType.rect, {
+            x: 0,
+            y: 0,
+            w: '100%',
+            h: 0.8,
+            fill: { color: isDarkBg ? '00000033' : primaryColor }
+          });
+          
+          // Header Title
+          slide.addText(cleanText(slideObj.title || "স্লাইড"), {
+            x: 0.6,
+            y: 0.15,
+            w: 12.0,
+            h: 0.5,
+            fontSize: 24,
+            bold: true,
+            color: lightTextColor,
+            fontFace: 'Arial',
+            align: 'left'
+          });
+          
+          const bullets = Array.isArray(slideObj.bullets) ? slideObj.bullets : [];
+
+          // Image & Canvas Drawing Check
+          let hasImage = (slideObj.image && slideObj.showImage !== false);
+
+          if (hasImage) {
+            // Left Column (Bullets)
+            let bulletY = 1.3;
+            bullets.forEach((bullet) => {
+              slide.addText(cleanText(bullet), {
+                x: 0.6,
+                y: bulletY,
+                w: 5.5,
+                h: 0.8,
+                fontSize: 16,
+                color: textColor,
+                fontFace: 'Arial',
+                align: 'left',
+                valign: 'top',
+                bullet: { code: '2022' },
+                lineSpacing: 24
+              });
+              bulletY += 0.9;
+            });
+
+            // Parse coordinates safely
+            let rawX = parseFloat(slideObj.imageX);
+            let rawY = parseFloat(slideObj.imageY);
+            let rawW = parseFloat(slideObj.imageWidth);
+
+            if (isNaN(rawX)) rawX = 20;
+            if (isNaN(rawY)) rawY = 10;
+            if (isNaN(rawW)) rawW = 60;
+
+            const imgX = (rawX / 100) * 5.8 + 6.5;
+            const imgY = (rawY / 100) * 5.0 + 1.2;
+            const imgW = (rawW / 100) * 5.8;
+            const imgH = imgW * 0.75;
+
+            // Add main image
+            try {
+              let imgOptions = { x: imgX, y: imgY, w: imgW, h: imgH, sizing: { type: 'contain' } };
+              if (slideObj.image.startsWith("data:")) {
+                imgOptions.data = slideObj.image.split(',')[1];
+              } else {
+                imgOptions.path = slideObj.image;
+              }
+              slide.addImage(imgOptions);
+            } catch (e) {
+              console.error("Main Image Draw Error:", e);
+            }
+
+            // Add canvas drawing overlay
+            if (slideObj.canvasDrawing && slideObj.canvasDrawing.startsWith("data:")) {
+              try {
+                slide.addImage({
+                  data: slideObj.canvasDrawing.split(',')[1],
+                  x: 6.5,
+                  y: 1.2,
+                  w: 6.2,
+                  h: 5.0,
+                  sizing: { type: 'contain' }
+                });
+              } catch (e) {
+                console.error("Canvas Drawing Overlay Error:", e);
+              }
+            }
+
+            // Custom Text & Shape Annotations
+            if (slideObj.annotations && slideObj.annotations.length > 0) {
+              slideObj.annotations.forEach((ann) => {
+                let aX = parseFloat(ann.x);
+                let aY = parseFloat(ann.y);
+                let aW = parseFloat(ann.width);
+                let aH = parseFloat(ann.height);
+
+                if (isNaN(aX)) aX = 40;
+                if (isNaN(aY)) aY = 40;
+                if (isNaN(aW)) aW = 15;
+                if (isNaN(aH)) aH = 10;
+
+                const annX = 6.5 + (aX / 100) * 6.2;
+                const annY = 1.2 + (aY / 100) * 5.0;
+                const annW = (aW / 100) * 6.2;
+                const annH = (aH / 100) * 5.0;
+                const hexColor = (ann.color || '#ef4444').replace('#', '');
+
+                if (ann.type === 'text') {
+                  slide.addText(cleanText(ann.text || ''), {
+                    x: annX,
+                    y: annY,
+                    w: annW,
+                    h: annH,
+                    fontSize: ann.fontSize || 16,
+                    bold: ann.fontWeight === 'bold',
+                    color: hexColor,
+                    fontFace: 'Arial'
+                  });
+                } else if (ann.type === 'rect') {
+                  slide.addShape(pptx.ShapeType.rect, {
+                    x: annX,
+                    y: annY,
+                    w: annW,
+                    h: annH,
+                    line: { color: hexColor, width: 2 },
+                    fill: { color: 'FFFFFF', transparency: 100 }
+                  });
+                } else if (ann.type === 'circle') {
+                  slide.addShape(pptx.ShapeType.ellipse, {
+                    x: annX,
+                    y: annY,
+                    w: annW,
+                    h: annH,
+                    line: { color: hexColor, width: 2 },
+                    fill: { color: 'FFFFFF', transparency: 100 }
+                  });
+                } else if (ann.type === 'arrow') {
+                  slide.addText("→", {
+                    x: annX,
+                    y: annY,
+                    w: annW,
+                    h: annH,
+                    fontSize: 24,
+                    bold: true,
+                    color: hexColor,
+                    align: 'center'
+                  });
+                }
+              });
+            }
+
+          } else {
+            // No image: Use full width layouts matching dashboard
+            if (slideObj.layout === "split" || slideObj.type === "Content") {
+              const mid = Math.ceil(bullets.length / 2);
+              const leftBullets = bullets.slice(0, mid);
+              const rightBullets = bullets.slice(mid);
+              
+              let leftY = 1.3;
+              leftBullets.forEach((bullet) => {
+                slide.addText(cleanText(bullet), {
+                  x: 0.6,
+                  y: leftY,
+                  w: 5.8,
+                  h: 0.8,
+                  fontSize: 16,
+                  color: textColor,
+                  fontFace: 'Arial',
+                  align: 'left',
+                  valign: 'top',
+                  bullet: { code: '2022' },
+                  lineSpacing: 24
+                });
+                leftY += 0.9;
+              });
+              
+              let rightY = 1.3;
+              rightBullets.forEach((bullet) => {
+                slide.addText(cleanText(bullet), {
+                  x: 6.8,
+                  y: rightY,
+                  w: 5.8,
+                  h: 0.8,
+                  fontSize: 16,
+                  color: textColor,
+                  fontFace: 'Arial',
+                  align: 'left',
+                  valign: 'top',
+                  bullet: { code: '2022' },
+                  lineSpacing: 24
+                });
+                rightY += 0.9;
+              });
+              
+            } else if (slideObj.layout === "card" || slideObj.type === "Outcomes" || slideObj.type === "Quiz") {
+              let cardX = 0.6;
+              let cardY = 1.6;
+              let cardW = 3.6;
+              
+              bullets.forEach((bullet, bIdx) => {
+                if (bIdx < 3) {
+                  // Rounded card box shape
+                  slide.addShape(pptx.ShapeType.roundRect, {
+                    x: cardX,
+                    y: cardY,
+                    w: cardW,
+                    h: 4.2,
+                    fill: { color: isDarkBg ? 'FFFFFF' : cardBgColor, transparency: isDarkBg ? 90 : 0 },
+                    line: { color: isDarkBg ? 'FFFFFF22' : 'E2E8F0', width: 1.5 }
+                  });
+                  
+                  slide.addText(cleanText(bullet), {
+                    x: cardX + 0.25,
+                    y: cardY + 0.3,
+                    w: cardW - 0.5,
+                    h: 3.6,
+                    fontSize: 15,
+                    color: textColor,
+                    fontFace: 'Arial',
+                    align: 'left',
+                    valign: 'top',
+                    lineSpacing: 22
+                  });
+                  
+                  cardX += 4.2;
+                }
+              });
+              
+            } else {
+              // Single Column Full width
+              let bulletY = 1.3;
+              bullets.forEach((bullet) => {
+                slide.addText(cleanText(bullet), {
+                  x: 0.6,
+                  y: bulletY,
+                  w: 12.0,
+                  h: 0.8,
+                  fontSize: 18,
+                  color: textColor,
+                  fontFace: 'Arial',
+                  align: 'left',
+                  valign: 'top',
+                  bullet: { code: '2022' },
+                  lineSpacing: 28
+                });
+                bulletY += 0.9;
+              });
+            }
+          }
+
+          // Footer
+          slide.addText("স্মার্ট শিক্ষা বাতায়ন | সশিবা পোর্টাল", {
+            x: 0.6,
+            y: 6.9,
+            w: 6.0,
+            h: 0.3,
+            fontSize: 11,
+            color: isDarkBg ? '94A3B8' : mutedTextColor,
+            fontFace: 'Arial'
+          });
+        }
+      } catch (slideErr) {
+        console.error("Error generating slide index " + index + ":", slideErr);
       }
     });
 
-    // ফাইল সেভ করা
-    pptx.writeFile({ fileName: `Lesson_Presentation_${new Date().getTime()}.pptx` });
+    const fileName = "Lesson_Presentation_" + Date.now() + ".pptx";
+    pptx.writeFile({ fileName: fileName })
+      .then(fName => {
+        alert(currentLang === "bn" ? "পিপিটিএক্স প্রেজেন্টেশন ফাইলটি সফলভাবে ডাউনলোড হয়েছে!" : "PPTX Presentation successfully downloaded!");
+      })
+      .catch(err => {
+        console.error("pptx.writeFile catch error:", err);
+        alert("ডাউনলোড এরর: " + err);
+      });
 
   } catch (err) {
-    alert("ডিজাইন জেনারেট করতে সমস্যা হয়েছে: " + err.message);
+    console.error("PPTX Generation error:", err);
+    alert("পিপিটি তৈরি করা যাচ্ছে না: " + err.message);
   }
 }
 
