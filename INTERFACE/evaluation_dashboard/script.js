@@ -836,6 +836,23 @@ function updateStats() {
 // ═══════════════════════════════════════════════════════
 //  ৮. ADD/EDIT STUDENT MODAL
 // ═══════════════════════════════════════════════════════
+function previewStudentPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    document.getElementById('m-photo-base64').value = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function triggerStudentPhotoUpload(id) {
+  openEditModal(id);
+  setTimeout(() => {
+    document.getElementById('m-photo')?.focus();
+  }, 200);
+}
+
 function openAddStudentModal() {
   document.getElementById('modal-title').innerHTML='<i class="fa-solid fa-user-plus"></i> নতুন শিক্ষার্থী';
   document.getElementById('modal-student-id').value='';
@@ -844,6 +861,8 @@ function openAddStudentModal() {
   document.getElementById('m-parent').value='';
   document.getElementById('m-phone').value='';
   document.getElementById('m-remarks').value='';
+  if(document.getElementById('m-photo')) document.getElementById('m-photo').value='';
+  if(document.getElementById('m-photo-base64')) document.getElementById('m-photo-base64').value='';
   buildScoreInputs({});
   document.getElementById('student-modal').classList.remove('hidden');
 }
@@ -859,6 +878,8 @@ function openEditModal(id) {
   document.getElementById('m-parent').value=s.parentName||'';
   document.getElementById('m-phone').value=s.phone||'';
   document.getElementById('m-remarks').value=s.remarks||'';
+  if(document.getElementById('m-photo')) document.getElementById('m-photo').value='';
+  if(document.getElementById('m-photo-base64')) document.getElementById('m-photo-base64').value=s.photo||'';
   buildScoreInputs(s.scores||{});
   document.getElementById('student-modal').classList.remove('hidden');
 }
@@ -875,6 +896,7 @@ function saveStudentFromModal() {
   const roll=parseInt(document.getElementById('m-roll').value);
   const className=document.getElementById('m-class')?.value.trim() || settings.className;
   const section=document.getElementById('m-section')?.value.trim() || settings.section;
+  const photo = document.getElementById('m-photo-base64')?.value || '';
   if(!name){showToast('নাম দিন!','error');return;}
   if(!roll){showToast('রোল দিন!','error');return;}
   const scores={};
@@ -883,7 +905,7 @@ function saveStudentFromModal() {
     scores[sub]=isNaN(v)?0:Math.min(100,Math.max(0,v));
   });
   const id=document.getElementById('modal-student-id').value;
-  const data={name,roll,className,section,scores,parentName:document.getElementById('m-parent').value.trim(),phone:document.getElementById('m-phone').value.trim(),remarks:document.getElementById('m-remarks').value.trim()};
+  const data={name,roll,className,section,scores,photo,parentName:document.getElementById('m-parent').value.trim(),phone:document.getElementById('m-phone').value.trim(),remarks:document.getElementById('m-remarks').value.trim()};
   if(id){
     const idx=students.findIndex(s=>s.id===id);
     if(idx!==-1) students[idx]={...students[idx],...data};
@@ -1050,8 +1072,9 @@ function renderReportCard(id) {
 
         <!-- ডায়নামিক স্টুডেন্ট প্রোফাইল কার্ড -->
         <div class="student-profile-strip">
-          <div class="student-avatar-box">
-             <span>${s.name.charAt(0)}</span>
+          <div class="student-avatar-box" onclick="triggerStudentPhotoUpload('${s.id}')" title="ছবি পরিবর্তন/আপলোড করতে ক্লিক করুন">
+             ${s.photo ? `<img src="${s.photo}" alt="${s.name}" class="student-profile-img" />` : `<span>${s.name.charAt(0)}</span>`}
+             <div class="photo-upload-overlay"><i class="fa-solid fa-camera"></i></div>
           </div>
           <div class="student-meta-grid">
              <div class="meta-item"><span class="meta-lbl">শিক্ষার্থীর নাম</span><strong class="meta-val">${s.name}</strong></div>

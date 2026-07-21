@@ -601,13 +601,44 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 .report-marks-table th,.report-marks-table td{padding:8px 10px;border-bottom:1px solid #eee;text-align:center;}
 .report-marks-table th{background:#4f46e5;color:white;font-size:11px;font-weight:700;letter-spacing:.04em;}
 
-/* Column Alignments */
+/* Student Profile Photo Upload Styling */
+.student-avatar-box {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.student-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+.photo-upload-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.student-avatar-box:hover .photo-upload-overlay {
+    opacity: 1;
+}
+
+/* Column Alignments & Spacing */
 .col-subject{text-align:left!important;font-weight:600;width:25%;color:#0f172a;}
-.col-total{color:#64748b;font-family:'Inter',sans-serif;}
-.col-obtained{font-weight:800;color:#0f172a;font-family:'Inter',sans-serif;}
-.col-pct{font-family:'Inter',sans-serif;font-weight:600;}
-.col-grade{width:10%;}
-.col-remark{text-align:left!important;color:#059669;font-size:11px;font-weight:600;}
+.col-total{color:#64748b;font-family:'Inter',sans-serif;width:12%;}
+.col-obtained{font-weight:800;color:#0f172a;font-family:'Inter',sans-serif;width:13%;}
+.col-pct{font-family:'Inter',sans-serif;font-weight:600;width:13%;}
+.col-grade{width:12%;}
+.col-remark{text-align:left!important;color:#059669;font-size:11px;font-weight:600;padding-left:35px!important;width:25%;}
 
 .report-summary{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid #e2e8f0;background:#f8fafc;}
 .summary-cell{padding:10px;text-align:center;border-right:1px solid #e2e8f0;}
