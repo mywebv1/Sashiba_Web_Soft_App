@@ -3070,18 +3070,26 @@ function downloadAsPowerPointPPTX() {
         const imgH = imgW * 0.75; // aspect ratio approximation
 
         // Add base uploaded image
-        slide.addImage({
-          data: slideObj.image,
+        let imgOptions = {
           x: imgX,
           y: imgY,
           w: imgW,
           h: imgH
-        });
+        };
+
+        if (slideObj.image.startsWith("data:")) {
+          // Strip data: prefix from base64 string
+          imgOptions.data = slideObj.image.replace(/^data:/, '');
+        } else {
+          imgOptions.path = slideObj.image;
+        }
+
+        slide.addImage(imgOptions);
 
         // Add saved canvas drawing overlay (if any)
         if (slideObj.canvasDrawing) {
           slide.addImage({
-            data: slideObj.canvasDrawing,
+            data: slideObj.canvasDrawing.replace(/^data:/, ''),
             x: 6.5,
             y: 1.2,
             w: 6.2,

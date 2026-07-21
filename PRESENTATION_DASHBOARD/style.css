@@ -2470,3 +2470,13 @@ body.dark-mode .slide-bullet-card {
   height: 520px; /* Larger vertical height for slideshow */
   margin-top: 15px;
 }
+
+
+
+/* Accordion Styling */
+.editor-accordion summary::-webkit-details-marker {
+  display: none;
+}
+.editor-accordion[open] .accordion-arrow {
+  transform: rotate(180deg);
+}
