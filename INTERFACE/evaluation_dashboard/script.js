@@ -141,8 +141,10 @@ function loadPerformance(id) {
   `;
 
   renderTimeline(s, currentTimeline);
+  renderMarkingInputs(s, currentTimeline);
   renderWeakStrongTopics(s);
   renderPerfSubjectBars(s);
+  renderAllAvgBars(s);
   generateAIFeedbackFor(id);
 }
 
@@ -152,7 +154,7 @@ function switchTimeline(type, btn) {
   btn.classList.add('active');
   if(currentPerfStudent) {
     const s = students.find(x=>x.id===currentPerfStudent);
-    if(s) renderTimeline(s, type);
+    if(s) { renderTimeline(s, type); renderMarkingInputs(s, type); }
   }
 }
 
@@ -161,20 +163,125 @@ function renderTimeline(s, type) {
   if(!el) return;
   const data = s.timeline?.[type] || [];
   const subjs = settings.subjects;
+  const typeLabels = {quiz:'Quiz নম্বর',assignment:'Assignment নম্বর',oral:'Oral নম্বর',practical:'Practical নম্বর',attendance:'উপস্থিতি (%)',homework:'হোমওয়ার্ক (%)',};
   const colors = ['#4f46e5','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e'];
 
-  if(data.length === 0) {
-    el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:10px 0;">এই বিভাগে ডেটা নেই।</div>';
+  if(data.length === 0 && subjs.every(sub=>{const v=s.timeline?.[type]?.[subjs.indexOf(sub)];return v===undefined;})) {
+    el.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:12px 0;"><i class="fa-solid fa-info-circle" style="margin-right:6px;"></i>উপরের ইনপুট ফিল্ডে নম্বর দিয়ে সংরক্ষণ করুন।</div>`;
     return;
   }
-  el.innerHTML = subjs.map((sub, i) => {
-    const val = data[i] !== undefined ? data[i] : (s.scores?.[sub] || 0);
+  el.innerHTML = `<div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">${typeLabels[type]||type} চার্ট</div>`
+    + subjs.map((sub, i) => {
+    const val = data[i] !== undefined ? data[i] : 0;
     const c = colors[i % colors.length];
+    const pctW = Math.min(100, val);
     return `
       <div class="tl-row">
         <div class="tl-subject">${sub}</div>
-        <div class="tl-track"><div class="tl-fill" style="width:${val}%;background:${c}"></div></div>
+        <div class="tl-track"><div class="tl-fill" style="width:${pctW}%;background:${c}"></div></div>
         <div class="tl-val" style="color:${c}">${val}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ─── Marking Inputs ─── */
+function renderMarkingInputs(s, type) {
+  const infoBar = document.getElementById('marking-info-bar');
+  const grid = document.getElementById('marking-inputs-grid');
+  if(!infoBar || !grid) return;
+
+  const typeInfo = {
+    quiz: { label: 'Quiz মার্কিং', max: 100, hint: 'প্রতিটি বিষয়ের Quiz নম্বর লিখুন (০–১০০)' },
+    assignment: { label: 'Assignment মার্কিং', max: 100, hint: 'Assignment-এর নম্বর লিখুন' },
+    oral: { label: 'Oral মূল্যায়ন', max: 100, hint: 'মৌখিক পরীক্ষার নম্বর লিখুন' },
+    practical: { label: 'Practical মূল্যায়ন', max: 100, hint: 'ব্যবহারিক পরীক্ষার নম্বর লিখুন' },
+    attendance: { label: 'উপস্থিতি (%)', max: 100, hint: 'উপস্থিতির শতকরা হার লিখুন' },
+    homework: { label: 'হোমওয়ার্ক মার্কিং', max: 100, hint: 'হোমওয়ার্ক সম্পন্নের হার লিখুন' },
+  };
+  const info = typeInfo[type] || { label: type, max: 100, hint: '' };
+  const existing = s.timeline?.[type] || [];
+
+  infoBar.innerHTML = `<i class="fa-solid fa-pen-to-square"></i><span>${info.label} — ${info.hint}</span>`;
+
+  grid.innerHTML = settings.subjects.map((sub, i) => {
+    const val = existing[i] !== undefined ? existing[i] : '';
+    const pctW = val !== '' ? Math.min(100, parseFloat(val)||0) : 0;
+    return `
+      <div class="marking-input-cell">
+        <label>${sub}</label>
+        <input type="number" id="mark-inp-${type}-${i}" min="0" max="${info.max}" value="${val}"
+               placeholder="০" oninput="updateScoreIndicator(this,${info.max})" />
+        <div class="score-indicator" id="si-${type}-${i}" style="width:${pctW}%"></div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateScoreIndicator(inp, max) {
+  const v = parseFloat(inp.value) || 0;
+  const pct = Math.min(100, Math.round((v/max)*100));
+  const id = inp.id.replace('mark-inp-','si-');
+  const ind = document.getElementById(id);
+  if(ind) ind.style.width = pct + '%';
+  // Color by score
+  const color = v/max >= 0.8 ? 'var(--success)' : v/max >= 0.5 ? 'var(--warning)' : 'var(--danger)';
+  if(ind) ind.style.background = color;
+}
+
+function saveTimelineMarks() {
+  if(!currentPerfStudent) { showToast('শিক্ষার্থী নির্বাচন করুন!', 'error'); return; }
+  const s = students.find(x=>x.id===currentPerfStudent);
+  if(!s) return;
+  if(!s.timeline) s.timeline = {};
+  const type = currentTimeline;
+  const values = settings.subjects.map((sub, i) => {
+    const inp = document.getElementById(`mark-inp-${type}-${i}`);
+    return inp ? (parseFloat(inp.value) || 0) : 0;
+  });
+  s.timeline[type] = values;
+  saveToStorage();
+  renderTimeline(s, type);
+  renderAllAvgBars(s);
+  showToast('নম্বর সংরক্ষিত হয়েছে!', 'success');
+}
+
+function autoFillFromScores() {
+  if(!currentPerfStudent) return;
+  const s = students.find(x=>x.id===currentPerfStudent);
+  if(!s) return;
+  const type = currentTimeline;
+  settings.subjects.forEach((sub, i) => {
+    const inp = document.getElementById(`mark-inp-${type}-${i}`);
+    if(inp) {
+      inp.value = s.scores?.[sub] || 0;
+      updateScoreIndicator(inp, 100);
+    }
+  });
+  showToast('মূল স্কোর থেকে পূরণ হয়েছে। সংরক্ষণ করুন।', 'success');
+}
+
+/* ─── All-type average bars ─── */
+function renderAllAvgBars(s) {
+  const el = document.getElementById('perf-all-avg-bars');
+  if(!el) return;
+  const types = [
+    { key:'quiz', label:'Quiz', color:'#4f46e5' },
+    { key:'assignment', label:'Assignment', color:'#10b981' },
+    { key:'oral', label:'Oral', color:'#f59e0b' },
+    { key:'practical', label:'Practical', color:'#8b5cf6' },
+    { key:'attendance', label:'উপস্থিতি', color:'#06b6d4' },
+    { key:'homework', label:'হোমওয়ার্ক', color:'#f43f5e' },
+  ];
+  el.innerHTML = types.map(({key, label, color}) => {
+    const data = s.timeline?.[key] || [];
+    const avg = data.length ? Math.round(data.reduce((a,b)=>a+b,0)/data.length) : 0;
+    const hasData = data.length > 0;
+    return `
+      <div class="avg-bar-row">
+        <div class="avg-bar-label">${label}</div>
+        <div class="avg-bar-track"><div class="avg-bar-fill" style="width:${avg}%;background:${color}"></div></div>
+        <div class="avg-bar-meta" style="color:${color}">${hasData ? avg+'%' : '—'}</div>
       </div>
     `;
   }).join('');
@@ -313,6 +420,34 @@ function shareFeedbackWhatsApp() {
 // ═══════════════════════════════════════════════════════
 //  ৬. RUBRIC BUILDER
 // ═══════════════════════════════════════════════════════
+/* ─── Rubric: Activity & Score tile helpers ─── */
+function selectActivity(el, type) {
+  document.querySelectorAll('.activity-tile').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const inp = document.getElementById('rubric-type');
+  if(inp) inp.value = type;
+  // Mark step 1 active
+  document.getElementById('rstep-1')?.classList.add('active');
+}
+
+function selectScore(el, score) {
+  document.querySelectorAll('.score-tile').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const inp = document.getElementById('rubric-max-score');
+  if(inp) inp.value = score;
+}
+
+function refreshRubricStudentSelect() {
+  const sel = document.getElementById('rubric-student-select');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">-- শিক্ষার্থী বেছে নিন --</option>';
+  [...students].sort((a,b)=>a.roll-b.roll).forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id; opt.textContent = `${s.roll}. ${s.name}`;
+    sel.appendChild(opt);
+  });
+}
+
 const rubricTemplates = {
   'Presentation': {
     criteria: ['Content', 'Accuracy', 'Communication', 'Creativity', 'Confidence'],
@@ -374,64 +509,123 @@ function generateRubric() {
   const type = document.getElementById('rubric-type')?.value || 'Presentation';
   const topic = document.getElementById('rubric-topic')?.value?.trim() || '';
   const maxScore = parseInt(document.getElementById('rubric-max-score')?.value || '5');
+  const studentId = document.getElementById('rubric-student-select')?.value || '';
 
   const template = rubricTemplates[type] || getGenericRubric(type);
   const scores = maxScore === 4 ? [4,3,2,1] : maxScore === 10 ? [10,8,6,4,2] : maxScore === 100 ? [100,80,60,40,20] : [5,4,3,2,1];
+
+  // Activate step 2
+  document.getElementById('rstep-2')?.classList.add('active');
 
   // Show result
   document.getElementById('rubric-placeholder').classList.add('hidden');
   document.getElementById('rubric-result').classList.remove('hidden');
   document.getElementById('rubric-result-title').textContent = `${type} Rubric`;
-  document.getElementById('rubric-result-sub').textContent = topic ? `বিষয়: ${topic}` : settings.subjects[0] || '';
+  document.getElementById('rubric-result-sub').textContent = topic ? `বিষয়: ${topic}` : (settings.subjects[0] || '');
 
   const thead = document.getElementById('rubric-thead');
   const tbody = document.getElementById('rubric-tbody');
 
   thead.innerHTML = `<tr>
     <th>মানদণ্ড</th>
-    ${scores.map(s=>`<th style="min-width:100px;">${s} পয়েন্ট</th>`).join('')}
+    ${scores.map(s=>`<th>${s} পয়েন্ট</th>`).join('')}
   </tr>`;
+
+  // Helper: map score index to template description
+  const descRow = (crit) => {
+    const idx = template.criteria.indexOf(crit);
+    return scores.map((sc,si) => {
+      const key = maxScore===4?[4,3,2,1][si]:maxScore===10?[5,4,3,2,1][si]:maxScore===100?[5,4,3,2,1][si]:sc;
+      const desc = template.desc[key]?.[idx] || template.desc[5]?.[idx] || '—';
+      return `<td>${desc}</td>`;
+    }).join('');
+  };
 
   tbody.innerHTML = template.criteria.map(crit => `
     <tr>
       <td>${crit}</td>
-      ${scores.map((s,i)=>`<td>${template.desc[maxScore===4?[4,3,2,1][i]:maxScore===10?[5,4,3,2,1][i]:maxScore===100?[5,4,3,2,1][i]:s]?.[template.criteria.indexOf(crit)]||template.desc[scores[0]?.[0]]||'—'}</td>`).join('')}
+      ${descRow(crit)}
     </tr>
   `).join('');
 
-  // Score chips
-  let totalScore = 0;
-  document.getElementById('rubric-scoring').innerHTML = `
-    <div style="background:var(--bg-app);border-radius:var(--radius-sm);padding:16px;">
-      <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:10px;"><i class="fa-solid fa-calculator" style="color:var(--primary)"></i> স্কোর নির্ধারণ</div>
-      ${template.criteria.map((crit,ci)=>`
-        <div style="margin-bottom:8px;">
-          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:5px;">${crit}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;">
-            ${scores.map(s=>`<span class="rubric-score-chip" onclick="selectRubricScore(this,'${crit}',${s})">${s}</span>`).join('')}
-          </div>
-        </div>
-      `).join('')}
-      <div id="rubric-total-display" style="margin-top:12px;padding:10px 14px;background:var(--bg-card);border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:var(--primary);">
-        মোট স্কোর: ০ / ${scores[0] * template.criteria.length}
-      </div>
-    </div>
-  `;
+  // Interactive Scoring (Step 3)
   window._rubricScores = {};
   window._rubricMaxPerCrit = scores[0];
   window._rubricCritCount = template.criteria.length;
+  window._rubricCriteria = template.criteria;
 
+  document.getElementById('rubric-scoring').innerHTML = `
+    <div style="background:var(--bg-app);border-radius:var(--radius);padding:18px;border:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:800;color:var(--text-main);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+        <i class="fa-solid fa-calculator" style="color:var(--primary)"></i>
+        শিক্ষার্থীকে স্কোর দিন
+        <span id="rubric-total-display" style="margin-left:auto;font-size:14px;font-weight:800;color:var(--primary);">মোট: ০ / ${scores[0] * template.criteria.length}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+        ${template.criteria.map((crit,ci) => `
+          <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:12px;border:1px solid var(--border);">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;">${crit}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;">
+              ${scores.map(sc => `<span class="rubric-score-chip" onclick="selectRubricScore(this,'${crit}',${sc})">${sc}</span>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // If student selected, show student summary section
+  const summaryEl = document.getElementById('rubric-student-summary');
+  if(studentId && summaryEl) {
+    summaryEl.classList.remove('hidden');
+    const stu = students.find(x=>x.id===studentId);
+    if(stu) {
+      summaryEl.innerHTML = `
+        <div class="rubric-student-result">
+          <div class="rubric-student-result-header">
+            <div class="user-avatar" style="background:${getAvatarColor(stu.name)};width:32px;height:32px;font-size:13px;">${stu.name.charAt(0)}</div>
+            ${stu.name} এর জন্য স্কোর সারসংক্ষেপ
+          </div>
+          <div id="rubric-score-result-grid" class="rubric-score-result-grid"></div>
+          <div id="rubric-total-result" class="rubric-total-bar">
+            <span style="font-size:14px;font-weight:700;color:var(--text-main);">মোট স্কোর:</span>
+            <span style="font-size:20px;font-weight:800;color:var(--primary);">০ / ${scores[0]*template.criteria.length}</span>
+          </div>
+        </div>
+      `;
+    }
+  } else if(summaryEl) summaryEl.classList.add('hidden');
+
+  // Activate step 3
+  document.getElementById('rstep-3')?.classList.add('active');
   showToast('Rubric তৈরি হয়েছে!', 'success');
 }
 
 function selectRubricScore(el, crit, score) {
-  el.closest('.rubric-score-chip')?.parentElement?.querySelectorAll('.rubric-score-chip').forEach(c=>c.classList.remove('selected'));
+  el.closest('div')?.querySelectorAll('.rubric-score-chip').forEach(c=>c.classList.remove('selected'));
   el.classList.add('selected');
   window._rubricScores[crit] = score;
   const total = Object.values(window._rubricScores||{}).reduce((a,b)=>a+b,0);
   const max = (window._rubricMaxPerCrit||5) * (window._rubricCritCount||5);
+  // Update total display
   const disp = document.getElementById('rubric-total-display');
-  if(disp) disp.textContent = `মোট স্কোর: ${total} / ${max}`;
+  if(disp) disp.textContent = `মোট: ${total} / ${max}`;
+  // Update student summary if visible
+  const criteria = window._rubricCriteria || [];
+  const grid = document.getElementById('rubric-score-result-grid');
+  if(grid && criteria.length) {
+    grid.innerHTML = criteria.map(c => `
+      <div class="rubric-score-cell">
+        <div class="crit-name">${c}</div>
+        <div class="crit-score">${window._rubricScores[c] || '—'}</div>
+      </div>
+    `).join('');
+  }
+  const totalResult = document.getElementById('rubric-total-result');
+  if(totalResult) totalResult.innerHTML = `
+    <span style="font-size:14px;font-weight:700;color:var(--text-main);">মোট স্কোর:</span>
+    <span style="font-size:20px;font-weight:800;color:var(--primary);">${total} / ${max}</span>
+  `;
 }
 
 function saveRubric() {
@@ -964,7 +1158,7 @@ function showSection(name){
   if(name==='history') renderHistory();
   if(name==='performance') renderPerfStudentList();
   if(name==='feedback'){refreshFeedbackSelector();renderSavedRubrics();}
-  if(name==='rubric') renderSavedRubrics();
+  if(name==='rubric'){renderSavedRubrics();refreshRubricStudentSelect();}
 }
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');}
 function toggleDarkMode(){
@@ -974,7 +1168,15 @@ function toggleDarkMode(){
   if(btn) btn.innerHTML=isDark?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';
   try{localStorage.setItem('sashiba_eval_theme',isDark?'dark':'light');}catch(e){}
 }
-function goHome(){try{window.parent.showHome();}catch(e){try{window.top.showHome();}catch(e2){}}}
+function goHome(){
+  // Try to go back to the parent portal
+  try { window.parent.showHome(); return; } catch(e){}
+  try { window.top.showHome(); return; } catch(e){}
+  // Fallback: navigate to the main interface
+  try { window.parent.location.href = '../index.html'; } catch(e){
+    window.location.href = '../index.html';
+  }
+}
 
 // ── Utility ──
 function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
@@ -1009,6 +1211,7 @@ window.addEventListener('load',()=>{
   renderStudentTable();
   refreshReportSelector();
   refreshFeedbackSelector();
+  refreshRubricStudentSelect();
   renderSavedRubrics();
   showSection('students');
 });

@@ -23,8 +23,8 @@
 
         <nav class="sidebar-nav">
           <div class="nav-section-label">মূল মেনু</div>
-          <a href="javascript:void(0)" class="nav-item" onclick="goHome()" id="nav-home">
-            <i class="fa-solid fa-house"></i><span>হোম</span>
+          <a href="javascript:void(0)" class="nav-item nav-home-btn" onclick="goHome()" id="nav-home">
+            <i class="fa-solid fa-house"></i><span>হোম (মূল পোর্টাল)</span>
           </a>
           <a href="javascript:void(0)" class="nav-item" onclick="showSection('performance')" id="nav-performance">
             <i class="fa-solid fa-user-graduate"></i><span>শিক্ষার্থী পারফরম্যান্স</span>
@@ -122,30 +122,54 @@
                 <!-- Summary Stats -->
                 <div class="perf-summary-grid" id="perf-summary-grid"></div>
 
-                <!-- Performance Timeline -->
+                <!-- Performance Timeline: Marking Panel -->
                 <div class="perf-card">
                   <div class="perf-card-title">
-                    <i class="fa-solid fa-timeline"></i> পারফরম্যান্স টাইমলাইন
+                    <i class="fa-solid fa-pen-to-square"></i> পারফরম্যান্স মার্কিং
+                    <div class="timeline-tabs" style="margin-left:auto;margin-bottom:0;">
+                      <button class="ttab active" onclick="switchTimeline('quiz',this)" data-type="quiz">Quiz</button>
+                      <button class="ttab" onclick="switchTimeline('assignment',this)" data-type="assignment">Assignment</button>
+                      <button class="ttab" onclick="switchTimeline('oral',this)" data-type="oral">Oral</button>
+                      <button class="ttab" onclick="switchTimeline('practical',this)" data-type="practical">Practical</button>
+                      <button class="ttab" onclick="switchTimeline('attendance',this)" data-type="attendance">উপস্থিতি</button>
+                      <button class="ttab" onclick="switchTimeline('homework',this)" data-type="homework">হোমওয়ার্ক</button>
+                    </div>
                   </div>
-                  <div class="timeline-tabs">
-                    <button class="ttab active" onclick="switchTimeline('quiz',this)">Quiz</button>
-                    <button class="ttab" onclick="switchTimeline('assignment',this)">Assignment</button>
-                    <button class="ttab" onclick="switchTimeline('oral',this)">Oral</button>
-                    <button class="ttab" onclick="switchTimeline('practical',this)">Practical</button>
-                    <button class="ttab" onclick="switchTimeline('attendance',this)">উপস্থিতি</button>
-                    <button class="ttab" onclick="switchTimeline('homework',this)">হোমওয়ার্ক</button>
+
+                  <!-- Marking input area -->
+                  <div class="marking-area" id="marking-area">
+                    <div class="marking-info-bar" id="marking-info-bar"></div>
+                    <div class="marking-inputs-grid" id="marking-inputs-grid">
+                      <!-- JS generated: one input per subject -->
+                    </div>
+                    <div class="marking-actions">
+                      <button class="btn-primary" onclick="saveTimelineMarks()">
+                        <i class="fa-solid fa-floppy-disk"></i> নম্বর সংরক্ষণ করুন
+                      </button>
+                      <button class="btn-outline" onclick="autoFillFromScores()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> মূল স্কোর থেকে ভরুন
+                      </button>
+                    </div>
                   </div>
-                  <div class="timeline-bars" id="timeline-bars"></div>
+
+                  <!-- Chart / Visual bars -->
+                  <div class="timeline-chart" id="timeline-bars"></div>
+                </div>
+
+                <!-- Average Performance Summary -->
+                <div class="perf-card">
+                  <div class="perf-card-title"><i class="fa-solid fa-chart-bar"></i> সকল বিভাগের গড় সারসংক্ষেপ</div>
+                  <div id="perf-all-avg-bars"></div>
                 </div>
 
                 <!-- Subject Analysis: Weak & Strong -->
                 <div class="two-col-grid">
                   <div class="perf-card topic-card weak-topics">
-                    <div class="perf-card-title"><i class="fa-solid fa-triangle-exclamation"></i> দুর্বল বিষয়/টপিক</div>
+                    <div class="perf-card-title"><i class="fa-solid fa-triangle-exclamation"></i> দুর্বল বিষয়</div>
                     <div id="weak-topics-list"></div>
                   </div>
                   <div class="perf-card topic-card strong-topics">
-                    <div class="perf-card-title"><i class="fa-solid fa-star"></i> শক্তিশালী বিষয়/টপিক</div>
+                    <div class="perf-card-title"><i class="fa-solid fa-star"></i> শক্তিশালী বিষয়</div>
                     <div id="strong-topics-list"></div>
                   </div>
                 </div>
@@ -153,12 +177,12 @@
                 <!-- Subject Scores Visual -->
                 <div class="perf-card">
                   <div class="perf-card-title">
-                    <i class="fa-solid fa-book-open"></i> বিষয়ভিত্তিক স্কোর
+                    <i class="fa-solid fa-book-open"></i> বিষয়ভিত্তিক পরীক্ষার নম্বর
                     <button class="btn-outline btn-sm" onclick="openEditModal(currentPerfStudent)" style="margin-left:auto;">
                       <i class="fa-solid fa-pen"></i> এডিট
                     </button>
                     <button class="btn-primary btn-sm" onclick="openReportCardFor(currentPerfStudent)" style="margin-left:6px;">
-                      <i class="fa-solid fa-id-card"></i> রিপোর্ট কার্ড
+                      <i class="fa-solid fa-id-card"></i> রিপোর্ট
                     </button>
                   </div>
                   <div id="perf-subject-bars"></div>
@@ -172,7 +196,7 @@
                   </div>
                   <div id="perf-ai-feedback" class="ai-feedback-text"></div>
                   <button class="btn-primary btn-sm" style="margin-top:12px;" onclick="generateAIFeedbackFor(currentPerfStudent)">
-                    <i class="fa-solid fa-rotate"></i> পুনরায় জেনারেট করুন
+                    <i class="fa-solid fa-rotate"></i> পুনরায় জেনারেট
                   </button>
                 </div>
 
@@ -286,60 +310,85 @@
 
         <!-- ========== SECTION: RUBRIC BUILDER ========== -->
         <section class="content-section hidden" id="section-rubric">
+
+          <!-- Step Banner -->
+          <div class="rubric-steps">
+            <div class="rubric-step active" id="rstep-1"><span class="step-num">১</span> কার্যক্রম বেছে নিন</div>
+            <div class="step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="rubric-step" id="rstep-2"><span class="step-num">২</span> AI তৈরি করবে</div>
+            <div class="step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="rubric-step" id="rstep-3"><span class="step-num">৩</span> স্কোর দিন ও সংরক্ষণ করুন</div>
+          </div>
+
           <div class="rubric-layout">
 
-            <!-- Rubric Generator Panel -->
+            <!-- Left: Config Panel -->
             <div class="rubric-gen-panel">
               <div class="ai-panel-header">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 <div>
                   <div class="ai-panel-title">AI Rubric নির্মাতা</div>
-                  <div class="ai-panel-sub">টপিক লিখুন — AI তৈরি করবে</div>
+                  <div class="ai-panel-sub">মাত্র ২টি তথ্য দিন</div>
                 </div>
                 <span class="ai-pill">AI</span>
               </div>
+
+              <!-- Activity Type Tiles -->
               <div class="form-group">
-                <label>কার্যক্রমের ধরন</label>
-                <select id="rubric-type" class="form-input">
-                  <option>Presentation</option>
-                  <option>Project Work</option>
-                  <option>Written Assignment</option>
-                  <option>Lab Report</option>
-                  <option>Group Discussion</option>
-                  <option>Oral Exam</option>
-                  <option>Creative Work</option>
-                  <option>Homework</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>বিষয় / টপিক</label>
-                <input type="text" id="rubric-topic" class="form-input" placeholder="যেমন: বাংলাদেশের মুক্তিযুদ্ধ" />
-              </div>
-              <div class="form-group">
-                <label>সর্বোচ্চ স্কোর</label>
-                <select id="rubric-max-score" class="form-input">
-                  <option value="5">৫ পয়েন্ট</option>
-                  <option value="4">৪ পয়েন্ট</option>
-                  <option value="10">১০ পয়েন্ট</option>
-                  <option value="100">১০০ নম্বর</option>
-                </select>
-              </div>
-              <button class="btn-primary" style="width:100%;" onclick="generateRubric()">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Rubric তৈরি করুন
-              </button>
-              <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
-                <div class="form-group">
-                  <label>সংরক্ষিত Rubric সমূহ</label>
-                  <div id="saved-rubrics-list"></div>
+                <label>কার্যক্রমের ধরন বেছে নিন</label>
+                <div class="activity-tiles" id="activity-tiles">
+                  <div class="activity-tile active" onclick="selectActivity(this,'Presentation')"><i class="fa-solid fa-display"></i><span>Presentation</span></div>
+                  <div class="activity-tile" onclick="selectActivity(this,'Project Work')"><i class="fa-solid fa-diagram-project"></i><span>Project</span></div>
+                  <div class="activity-tile" onclick="selectActivity(this,'Written Assignment')"><i class="fa-solid fa-pen-nib"></i><span>Assignment</span></div>
+                  <div class="activity-tile" onclick="selectActivity(this,'Oral Exam')"><i class="fa-solid fa-microphone"></i><span>Oral Exam</span></div>
+                  <div class="activity-tile" onclick="selectActivity(this,'Lab Report')"><i class="fa-solid fa-flask"></i><span>Lab Report</span></div>
+                  <div class="activity-tile" onclick="selectActivity(this,'Group Discussion')"><i class="fa-solid fa-people-group"></i><span>Discussion</span></div>
+                  <div class="activity-tile" onclick="selectActivity(this,'Creative Work')"><i class="fa-solid fa-palette"></i><span>Creative</span></div>
+                  <div class="activity-tile" onclick="selectActivity(this,'Homework')"><i class="fa-solid fa-house-user"></i><span>Homework</span></div>
                 </div>
+                <input type="hidden" id="rubric-type" value="Presentation" />
+              </div>
+
+              <div class="form-group">
+                <label><i class="fa-solid fa-book" style="color:var(--primary);margin-right:5px;"></i> টপিক / বিষয় (ঐচ্ছিক)</label>
+                <input type="text" id="rubric-topic" class="form-input" placeholder="যেমন: মুক্তিযুদ্ধ, অঙ্ক সমাধান..." />
+              </div>
+
+              <div class="form-group">
+                <label><i class="fa-solid fa-star" style="color:var(--warning);margin-right:5px;"></i> সর্বোচ্চ স্কোর</label>
+                <div class="score-tiles">
+                  <div class="score-tile active" onclick="selectScore(this,5)">৫ পয়েন্ট</div>
+                  <div class="score-tile" onclick="selectScore(this,4)">৪ পয়েন্ট</div>
+                  <div class="score-tile" onclick="selectScore(this,10)">১০ পয়েন্ট</div>
+                  <div class="score-tile" onclick="selectScore(this,100)">১০০ নম্বর</div>
+                </div>
+                <input type="hidden" id="rubric-max-score" value="5" />
+              </div>
+
+              <!-- Student Picker for Scoring -->
+              <div class="form-group" style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px;">
+                <label><i class="fa-solid fa-user" style="color:var(--success);margin-right:5px;"></i> শিক্ষার্থীর জন্য স্কোর করুন (ঐচ্ছিক)</label>
+                <select id="rubric-student-select" class="form-input">
+                  <option value="">-- শিক্ষার্থী বেছে নিন --</option>
+                </select>
+              </div>
+
+              <button class="btn-primary" style="width:100%;font-size:15px;padding:12px;" onclick="generateRubric()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Rubric তৈরি করুন
+              </button>
+
+              <!-- Saved Rubrics -->
+              <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+                <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">সংরক্ষিত Rubric</div>
+                <div id="saved-rubrics-list"></div>
               </div>
             </div>
 
-            <!-- Rubric Preview/Editor -->
+            <!-- Right: Rubric Preview -->
             <div class="rubric-preview-panel">
               <div id="rubric-placeholder" class="perf-placeholder">
                 <i class="fa-solid fa-table-list"></i>
-                <p>AI Rubric তৈরি করতে বাম দিক থেকে কার্যক্রম ও টপিক দিন</p>
+                <p>বাম দিক থেকে কার্যক্রম বেছে <strong>Rubric তৈরি করুন</strong> বাটনে ক্লিক করুন</p>
               </div>
               <div id="rubric-result" class="hidden">
                 <div class="rubric-result-header">
@@ -347,18 +396,25 @@
                     <div id="rubric-result-title" style="font-size:18px;font-weight:800;color:var(--text-main);"></div>
                     <div id="rubric-result-sub" style="font-size:13px;color:var(--text-muted);margin-top:3px;"></div>
                   </div>
-                  <div style="display:flex;gap:8px;">
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <button class="btn-outline btn-sm" onclick="printRubric()"><i class="fa-solid fa-print"></i> প্রিন্ট</button>
                     <button class="btn-green btn-sm" onclick="saveRubric()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ</button>
                   </div>
                 </div>
-                <div class="table-wrapper">
+
+                <!-- Rubric Table -->
+                <div class="table-wrapper" style="margin-bottom:18px;">
                   <table class="rubric-table" id="rubric-table">
                     <thead id="rubric-thead"></thead>
                     <tbody id="rubric-tbody"></tbody>
                   </table>
                 </div>
-                <div id="rubric-scoring" style="margin-top:16px;"></div>
+
+                <!-- Interactive Scoring Area -->
+                <div id="rubric-scoring"></div>
+
+                <!-- Student Score Summary -->
+                <div id="rubric-student-summary" class="hidden" style="margin-top:16px;"></div>
               </div>
             </div>
           </div>
