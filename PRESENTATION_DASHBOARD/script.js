@@ -2948,8 +2948,8 @@ function toggleSidebar() {
 function downloadAsPowerPointPPTX() {
   if (typeof PptxGenJS === 'undefined') {
     alert(currentLang === "bn" 
-      ? "পিপিটিএক্স লাইব্রেরি লোড হয়নি! অনুগ্রহ করে ইন্টারনেট কানেকশন চেক করুন বা পেজটি রিফ্রেশ করুন।" 
-      : "PPTX library not loaded! Please check your internet connection or refresh the page.");
+      ? "পিপিটিএক্স লাইব্রেরি লোড হয়নি! অনুগ্রহ করে ইন্টারনেট কানেকশন চেক করুন।" 
+      : "PPTX library not loaded! Please check your internet connection.");
     return;
   }
 
@@ -2959,26 +2959,21 @@ function downloadAsPowerPointPPTX() {
   }
 
   try {
-    // Initialize presentation
     let pptx = new PptxGenJS();
-    
-    // Set layout 16x9
     pptx.layout = 'LAYOUT_16x9';
 
-    // Define colors
-    const primaryColor = '4F46E5'; // Indigo
-    const secondaryColor = '3730A3'; // Dark Indigo
-    const darkTextColor = '1E293B';
+    // কালার এবং স্টাইল ভেরিয়েবল
+    const primaryColor = '4F46E5'; 
+    const secondaryColor = '3730A3'; 
     const lightTextColor = 'FFFFFF';
-    const mutedTextColor = '64748B';
+    const darkTextColor = '1E293B';
     const cardBgColor = 'F8FAFC';
 
-    // Loop through slides array
     slides.forEach((slideObj, index) => {
       try {
         let slide = pptx.addSlide();
         
-        // Check slide background colors mapping
+        // ব্যাকগ্রাউন্ড নির্ধারণ
         let bgFill = 'FFFFFF';
         if (slideObj.bg === 'bg-blue') bgFill = '1E3A8A';
         else if (slideObj.bg === 'bg-emerald') bgFill = '065F46';
@@ -2992,83 +2987,38 @@ function downloadAsPowerPointPPTX() {
         else if (slideObj.bg === 'bg-nordic') bgFill = 'F1F5F9';
         else if (slideObj.bg === 'bg-matte') bgFill = '1C1917';
         else if (slideObj.type === "Cover") bgFill = secondaryColor;
-
+        
         slide.background = { fill: bgFill };
         const isDarkBg = bgFill !== 'FFFFFF' && bgFill !== 'F1F5F9';
         const textColor = isDarkBg ? lightTextColor : darkTextColor;
 
         if (slideObj.type === "Cover") {
-          // Cover slide
           slide.addText(slideObj.title || "স্বাগতম", {
-            x: 1.0,
-            y: 2.0,
-            w: 11.33,
-            h: 1.5,
-            fontSize: 38,
-            bold: true,
-            color: lightTextColor,
-            fontFace: 'Arial',
-            align: 'left'
+            x: 0.5, y: 2.0, w: 12.33, h: 1.5, fontSize: 38, bold: true, color: lightTextColor, align: 'left'
           });
           
-          let bulletY = 3.8;
           if (slideObj.bullets && slideObj.bullets.length > 0) {
-            slideObj.bullets.forEach((bullet) => {
-              slide.addText(bullet, {
-                x: 1.0,
-                y: bulletY,
-                w: 11.33,
-                h: 0.5,
-                fontSize: 18,
-                color: 'C7D2FE',
-                fontFace: 'Arial',
-                align: 'left'
-              });
-              bulletY += 0.6;
+            let bulletText = slideObj.bullets.join("
+");
+            slide.addText(bulletText, {
+              x: 0.5, y: 3.8, w: 12.33, h: 2, fontSize: 18, color: 'C7D2FE', align: 'left'
             });
           }
         } else {
-          // Content slide with header
-          slide.addRect({
-            x: 0,
-            y: 0,
-            w: '100%',
-            h: 1.0,
-            fill: isDarkBg ? '00000033' : primaryColor
-          });
-          
-          // Header Title
+          // হেডার বার
+          slide.addRect({ x: 0, y: 0, w: '100%', h: 1.0, fill: isDarkBg ? '00000033' : primaryColor });
           slide.addText(slideObj.title || "স্লাইড", {
-            x: 0.6,
-            y: 0.2,
-            w: 12.0,
-            h: 0.6,
-            fontSize: 26,
-            bold: true,
-            color: lightTextColor,
-            fontFace: 'Arial',
-            align: 'left'
+            x: 0.6, y: 0.2, w: 12.0, h: 0.6, fontSize: 26, bold: true, color: lightTextColor
           });
-          
+
           const bullets = slideObj.bullets || [];
 
-          // Check if image is present
+          // ইমেজ এবং কন্টেন্ট হ্যান্ডেলিং
           if (slideObj.image && slideObj.showImage !== false) {
-            // Left Column (Bullets)
+            // টেক্সট বাম পাশে
             let bulletY = 1.4;
-            bullets.forEach((bullet) => {
-              slide.addText(bullet, {
-                x: 0.6,
-                y: bulletY,
-                w: 5.5,
-                h: 0.8,
-                fontSize: 16,
-                color: textColor,
-                fontFace: 'Arial',
-                align: 'left',
-                valign: 'top',
-                bullet: true
-              });
+            bullets.forEach(b => {
+              slide.addText(b, { x: 0.6, y: bulletY, w: 5.5, h: 0.8, fontSize: 16, color: textColor, bullet: true, valign: 'top' });
               bulletY += 0.9;
             });
 
@@ -3086,35 +3036,24 @@ function downloadAsPowerPointPPTX() {
             const imgW = (rawW / 100) * 5.8;
             const imgH = imgW * 0.75; // aspect ratio approximation
 
-            // Add base uploaded image
-            let imgOptions = {
-              x: imgX,
-              y: imgY,
-              w: imgW,
-              h: imgH
-            };
-
+            // ইমেজ ডান পাশে
+            let imgOptions = { x: imgX, y: imgY, w: imgW, h: imgH };
             if (slideObj.image.startsWith("data:")) {
-              // Strip data: prefix from base64 string
-              imgOptions.data = slideObj.image.replace(/^data:/, '');
+              imgOptions.data = slideObj.image.split(',')[1]; 
             } else {
               imgOptions.path = slideObj.image;
             }
-
             slide.addImage(imgOptions);
 
-            // Add saved canvas drawing overlay (if any)
+            // ক্যানভাস ড্রয়িং থাকলে তাও যোগ হবে
             if (slideObj.canvasDrawing && slideObj.canvasDrawing.startsWith("data:")) {
               slide.addImage({
-                data: slideObj.canvasDrawing.replace(/^data:/, ''),
-                x: 6.5,
-                y: 1.2,
-                w: 6.2,
-                h: 5.0
+                data: slideObj.canvasDrawing.split(',')[1],
+                x: 6.5, y: 1.2, w: 6.2, h: 5.0
               });
             }
 
-            // Add text/shape annotations
+            // কাস্টম টেক্সট ও শেপ অ্যানোটেশন যোগ করা
             if (slideObj.annotations && slideObj.annotations.length > 0) {
               slideObj.annotations.forEach((ann) => {
                 let aX = parseFloat(ann.x);
@@ -3176,9 +3115,8 @@ function downloadAsPowerPointPPTX() {
                 }
               });
             }
-
           } else {
-            // No image: Use full width layout
+            // ইমেজ না থাকলে ফুল উইডথ টেক্সট
             if (slideObj.layout === "split" || slideObj.type === "Content") {
               const mid = Math.ceil(bullets.length / 2);
               const leftBullets = bullets.slice(0, mid);
@@ -3187,16 +3125,7 @@ function downloadAsPowerPointPPTX() {
               let leftY = 1.4;
               leftBullets.forEach((bullet) => {
                 slide.addText(bullet, {
-                  x: 0.6,
-                  y: leftY,
-                  w: 5.8,
-                  h: 0.8,
-                  fontSize: 16,
-                  color: textColor,
-                  fontFace: 'Arial',
-                  align: 'left',
-                  valign: 'top',
-                  bullet: true
+                  x: 0.6, y: leftY, w: 5.8, h: 0.8, fontSize: 16, color: textColor, fontFace: 'Arial', align: 'left', valign: 'top', bullet: true
                 });
                 leftY += 0.9;
               });
@@ -3204,20 +3133,10 @@ function downloadAsPowerPointPPTX() {
               let rightY = 1.4;
               rightBullets.forEach((bullet) => {
                 slide.addText(bullet, {
-                  x: 6.8,
-                  y: rightY,
-                  w: 5.8,
-                  h: 0.8,
-                  fontSize: 16,
-                  color: textColor,
-                  fontFace: 'Arial',
-                  align: 'left',
-                  valign: 'top',
-                  bullet: true
+                  x: 6.8, y: rightY, w: 5.8, h: 0.8, fontSize: 16, color: textColor, fontFace: 'Arial', align: 'left', valign: 'top', bullet: true
                 });
                 rightY += 0.9;
               });
-              
             } else if (slideObj.layout === "card" || slideObj.type === "Outcomes" || slideObj.type === "Quiz") {
               let cardX = 0.6;
               let cardY = 1.6;
@@ -3226,46 +3145,18 @@ function downloadAsPowerPointPPTX() {
               bullets.forEach((bullet, bIdx) => {
                 if (bIdx < 3) {
                   slide.addRect({
-                    x: cardX,
-                    y: cardY,
-                    w: cardW,
-                    h: 4.2,
-                    fill: isDarkBg ? 'FFFFFF11' : cardBgColor,
-                    line: { color: isDarkBg ? 'FFFFFF22' : 'E2E8F0', width: 1.5 }
+                    x: cardX, y: cardY, w: cardW, h: 4.2, fill: isDarkBg ? 'FFFFFF11' : cardBgColor, line: { color: isDarkBg ? 'FFFFFF22' : 'E2E8F0', width: 1.5 }
                   });
-                  
                   slide.addText(bullet, {
-                    x: cardX + 0.25,
-                    y: cardY + 0.3,
-                    w: cardW - 0.5,
-                    h: 3.6,
-                    fontSize: 15,
-                    color: textColor,
-                    fontFace: 'Arial',
-                    align: 'left',
-                    valign: 'top'
+                    x: cardX + 0.25, y: cardY + 0.3, w: cardW - 0.5, h: 3.6, fontSize: 15, color: textColor, fontFace: 'Arial', align: 'left', valign: 'top'
                   });
-                  
                   cardX += 4.2;
                 }
               });
-              
             } else {
-              // Single Column Full width
               let bulletY = 1.4;
-              bullets.forEach((bullet) => {
-                slide.addText(bullet, {
-                  x: 0.6,
-                  y: bulletY,
-                  w: 12.0,
-                  h: 0.8,
-                  fontSize: 18,
-                  color: textColor,
-                  fontFace: 'Arial',
-                  align: 'left',
-                  valign: 'top',
-                  bullet: true
-                });
+              bullets.forEach(b => {
+                slide.addText(b, { x: 0.6, y: bulletY, w: 12.0, h: 0.8, fontSize: 18, color: textColor, bullet: true, valign: 'top' });
                 bulletY += 0.9;
               });
             }
@@ -3273,13 +3164,7 @@ function downloadAsPowerPointPPTX() {
 
           // Footer
           slide.addText("স্মার্ট শিক্ষা বাতায়ন", {
-            x: 0.6,
-            y: 6.9,
-            w: 6.0,
-            h: 0.3,
-            fontSize: 11,
-            color: isDarkBg ? '94A3B8' : mutedTextColor,
-            fontFace: 'Arial'
+            x: 0.6, y: 6.9, w: 6.0, h: 0.3, fontSize: 11, color: isDarkBg ? '94A3B8' : mutedTextColor, fontFace: 'Arial'
           });
         }
       } catch (slideErr) {
@@ -3287,20 +3172,21 @@ function downloadAsPowerPointPPTX() {
       }
     });
 
-    // Save the presentation using the highly-compatible string-only argument
-    const fileName = "presentation_" + Date.now() + ".pptx";
-    pptx.writeFile(fileName)
-      .then(() => {
+    // ফাইল সেভ করার আধুনিক পদ্ধতি
+    const fileName = "Presentation_" + new Date().getTime() + ".pptx";
+    pptx.writeFile({ fileName: fileName })
+      .then(fileName => {
+        console.log(`Downloaded: ${fileName}`);
         alert(currentLang === "bn" ? "পিপিটিএক্স প্রেজেন্টেশন ফাইলটি সফলভাবে ডাউনলোড হয়েছে!" : "PPTX Presentation successfully downloaded!");
       })
       .catch(err => {
-        console.error("pptx.writeFile Promise catch error:", err);
-        alert("Error saving PPTX file: " + err);
+        console.error("Download Error:", err);
+        alert("ডাউনলোড করার সময় একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।");
       });
 
   } catch (err) {
-    console.error("General downloadAsPowerPointPPTX try-catch error:", err);
-    alert("Error writing PPTX: " + err.message);
+    console.error("PPTX Generation Error:", err);
+    alert("PPTX তৈরি করা সম্ভব হচ্ছে না। ডাটাতে কোনো ভুল থাকতে পারে।");
   }
 }
 
