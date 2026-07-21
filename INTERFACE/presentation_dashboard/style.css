@@ -1764,6 +1764,11 @@ body {
 body.dark-mode {
   background-color: #0f172a;
   color: #f8fafc;
+  --bg-app: #0b0f19;
+  --border: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --white: #0f172a;
 }
 
 /* Scrollbar Customization for Dark Mode */
