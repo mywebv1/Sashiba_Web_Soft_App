@@ -509,17 +509,14 @@
               </select>
             </div>
             <div class="report-actions">
-              <button class="btn-primary" onclick="printReportCard()" title="প্রিন্ট করুন (Ctrl+P)">
-                <i class="fa-solid fa-print"></i> প্রিন্ট <span class="kbd-hint"><span class="kbd">Ctrl</span><span class="kbd">P</span></span>
-              </button>
-              <button class="btn-red" onclick="downloadAsPDF()" title="PDF ফাইল সরাসরি ডাউনলোড (Ctrl+P)">
-                <i class="fa-solid fa-file-pdf"></i> PDF ডাউনলোড
+              <button class="btn-primary" onclick="printReportCard()" title="প্রিন্ট করুন অথবা PDF ডাউনলোড (Ctrl+P)">
+                <i class="fa-solid fa-print"></i> প্রিন্ট / PDF <span class="kbd-hint"><span class="kbd">Ctrl</span><span class="kbd">P</span></span>
               </button>
               <button class="btn-blue" onclick="exportReportAsWord()" title="Word ফাইল ডাউনলোড (Ctrl+E)">
                 <i class="fa-solid fa-file-word"></i> Word <span class="kbd-hint"><span class="kbd">Ctrl</span><span class="kbd">E</span></span>
               </button>
-              <button class="btn-green" onclick="saveReportCard()" title="সংরক্ষণ (Ctrl+S)">
-                <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ <span class="kbd-hint"><span class="kbd">Ctrl</span><span class="kbd">S</span></span>
+              <button class="btn-green" onclick="openSaveOptionsModal()" title="সংরক্ষণ / সেভ অপশন (Ctrl+S)">
+                <i class="fa-solid fa-floppy-disk"></i> সেভ করুন <span class="kbd-hint"><span class="kbd">Ctrl</span><span class="kbd">S</span></span>
               </button>
               <button class="btn-whatsapp" onclick="shareWhatsApp()"><i class="fa-brands fa-whatsapp"></i> অভিভাবক</button>
               <button class="btn-outline" onclick="archiveCurrentReport()"><i class="fa-solid fa-box-archive"></i> আর্কাইভ</button>
@@ -633,6 +630,35 @@
           </div>
           <div class="form-row">
             <div class="form-group">
+              <label>শ্রেণি (প্রথম – দ্বাদশ)</label>
+              <select id="m-class" class="form-input">
+                <option value="প্রথম">প্রথম শ্রেণি</option>
+                <option value="দ্বিতীয়">দ্বিতীয় শ্রেণি</option>
+                <option value="তৃতীয়">তৃতীয় শ্রেণি</option>
+                <option value="চতুর্থ">চতুর্থ শ্রেণি</option>
+                <option value="পঞ্চম" selected>পঞ্চম শ্রেণি</option>
+                <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
+                <option value="সপ্তম">সপ্তম শ্রেণি</option>
+                <option value="অষ্টম">অষ্টম শ্রেণি</option>
+                <option value="নবম">নবম শ্রেণি</option>
+                <option value="দশম">দশম শ্রেণি</option>
+                <option value="একাদশ">একাদশ শ্রেণি</option>
+                <option value="দ্বাদশ">দ্বাদশ শ্রেণি</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>শাখা (ক, খ, গ, ঘ, ঙ)</label>
+              <select id="m-section" class="form-input">
+                <option value="ক" selected>শাখা: ক</option>
+                <option value="খ">শাখা: খ</option>
+                <option value="গ">শাখা: গ</option>
+                <option value="ঘ">শাখা: ঘ</option>
+                <option value="ঙ">শাখা: ঙ</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
               <label>অভিভাবকের নাম</label>
               <input type="text" id="m-parent" class="form-input" placeholder="করিম বেগম" />
             </div>
@@ -655,6 +681,50 @@
           <button class="btn-primary" onclick="saveStudentFromModal()">
             <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SAVE OPTIONS MODAL (Ctrl+S) ========== -->
+    <div class="modal-overlay hidden" id="save-options-modal" onclick="if(event.target===this)closeSaveOptionsModal()">
+      <div class="modal-box" style="max-width:440px;">
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-floppy-disk" style="color:var(--success);"></i> সংরক্ষণ অপশন (Save Options)</h2>
+          <button class="btn-icon" onclick="closeSaveOptionsModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;padding:20px;">
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">কন্ট্রোল+এস চাপার পর আপনি নিচের যেকোনো ফরম্যাটে ফাইল ডাউনলোড বা সংরক্ষণ করতে পারবেন:</p>
+          <button class="btn-primary" style="padding:12px;justify-content:flex-start;" onclick="closeSaveOptionsModal();printReportCard();">
+            <i class="fa-solid fa-file-pdf" style="font-size:18px;margin-right:10px;"></i>
+            <div style="text-align:left;">
+              <div style="font-weight:700;">PDF ডকুমেন্ট (Print to PDF)</div>
+              <div style="font-size:11px;opacity:.8;">A4 পেজ প্রসেসিং ও ডাউনলোড</div>
+            </div>
+          </button>
+          <button class="btn-blue" style="padding:12px;justify-content:flex-start;" onclick="closeSaveOptionsModal();exportReportAsWord();">
+            <i class="fa-solid fa-file-word" style="font-size:18px;margin-right:10px;"></i>
+            <div style="text-align:left;">
+              <div style="font-weight:700;">MS Word ফাইল (.doc)</div>
+              <div style="font-size:11px;opacity:.8;">সম্পাদনাযোগ্য ওয়ার্ড ফাইল ডাউনলোড</div>
+            </div>
+          </button>
+          <button class="btn-outline" style="padding:12px;justify-content:flex-start;" onclick="closeSaveOptionsModal();exportTableAsCSV();">
+            <i class="fa-solid fa-file-csv" style="font-size:18px;color:var(--success);margin-right:10px;"></i>
+            <div style="text-align:left;">
+              <div style="font-weight:700;color:var(--text-main);">Excel / CSV স্প্রেডশিট</div>
+              <div style="font-size:11px;color:var(--text-muted);">সকল শিক্ষার্থীর মার্কশিট ডাটাবেজ</div>
+            </div>
+          </button>
+          <button class="btn-green" style="padding:12px;justify-content:flex-start;" onclick="closeSaveOptionsModal();saveReportCard();">
+            <i class="fa-solid fa-database" style="font-size:18px;margin-right:10px;"></i>
+            <div style="text-align:left;">
+              <div style="font-weight:700;">সিস্টেম মেমোরিতে সংরক্ষণ</div>
+              <div style="font-size:11px;opacity:.8;">ব্রাউজার লোকাল স্টোরেজে সেভ</div>
+            </div>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-outline" onclick="closeSaveOptionsModal()">বন্ধ করুন</button>
         </div>
       </div>
     </div>

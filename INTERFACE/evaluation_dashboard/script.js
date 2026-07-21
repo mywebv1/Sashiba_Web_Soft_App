@@ -458,13 +458,9 @@ function generateAIFeedback() {
   document.getElementById('feedback-meta').textContent = `AI জেনারেটেড • ${new Date().toLocaleString('bn-BD')}`;
 }
 
-function typewriterEffect(el, text, speed=12) {
-  let i = 0;
-  const timer = setInterval(()=>{
-    el.textContent += text[i];
-    i++;
-    if(i>=text.length) clearInterval(timer);
-  }, speed);
+function typewriterEffect(el, text) {
+  // Direct & smooth output — no laggy character interval
+  el.textContent = text;
 }
 
 function copyFeedback() {
@@ -751,6 +747,7 @@ function renderStudentTable() {
   thead.innerHTML=`<tr>
     <th onclick="sortBy('roll')">#রোল ${si('roll')}</th>
     <th onclick="sortBy('name')">নাম ${si('name')}</th>
+    <th>শ্রেণি (শাখা)</th>
     ${subjs.map(s=>`<th onclick="sortBy('${s}')">${s}</th>`).join('')}
     <th onclick="sortBy('total')">মোট ${si('total')}</th>
     <th>গড়%</th><th>গ্রেড</th><th>শ্রেণি</th><th>অ্যাকশন</th>
@@ -761,9 +758,12 @@ function renderStudentTable() {
     const {total,maxTotal,avg,pct}=calcTotals(s);
     const grade=getGrade(pct);
     const cat=getCategory(pct);
+    const clsName = s.className || settings.className;
+    const secName = s.section || settings.section;
     return `<tr>
       <td><strong>${s.roll}</strong></td>
       <td><strong>${s.name}</strong></td>
+      <td><span class="badge badge-info" style="font-size:11px;">${clsName} (${secName})</span></td>
       ${subjs.map(sub=>`<td>${s.scores?.[sub]??'—'}</td>`).join('')}
       <td><strong>${total}/${maxTotal}</strong></td>
       <td>${avg}%</td>
@@ -815,6 +815,8 @@ function openEditModal(id) {
   document.getElementById('modal-student-id').value=id;
   document.getElementById('m-name').value=s.name;
   document.getElementById('m-roll').value=s.roll;
+  if(document.getElementById('m-class')) document.getElementById('m-class').value=s.className||settings.className;
+  if(document.getElementById('m-section')) document.getElementById('m-section').value=s.section||settings.section;
   document.getElementById('m-parent').value=s.parentName||'';
   document.getElementById('m-phone').value=s.phone||'';
   document.getElementById('m-remarks').value=s.remarks||'';
@@ -832,6 +834,8 @@ function buildScoreInputs(scores) {
 function saveStudentFromModal() {
   const name=document.getElementById('m-name').value.trim();
   const roll=parseInt(document.getElementById('m-roll').value);
+  const className=document.getElementById('m-class')?.value.trim() || settings.className;
+  const section=document.getElementById('m-section')?.value.trim() || settings.section;
   if(!name){showToast('নাম দিন!','error');return;}
   if(!roll){showToast('রোল দিন!','error');return;}
   const scores={};
@@ -840,7 +844,7 @@ function saveStudentFromModal() {
     scores[sub]=isNaN(v)?0:Math.min(100,Math.max(0,v));
   });
   const id=document.getElementById('modal-student-id').value;
-  const data={name,roll,scores,parentName:document.getElementById('m-parent').value.trim(),phone:document.getElementById('m-phone').value.trim(),remarks:document.getElementById('m-remarks').value.trim()};
+  const data={name,roll,className,section,scores,parentName:document.getElementById('m-parent').value.trim(),phone:document.getElementById('m-phone').value.trim(),remarks:document.getElementById('m-remarks').value.trim()};
   if(id){
     const idx=students.findIndex(s=>s.id===id);
     if(idx!==-1) students[idx]={...students[idx],...data};
@@ -962,7 +966,11 @@ function renderReportCard(id) {
   if(!s) return;
   const {total,maxTotal,avg,pct}=calcTotals(s);
   const grade=getGrade(pct);
-  const pos=getPosition(s.id);
+  const posNum=getPosition(s.id);
+  const bnNums=['০','১ম','২য়','৩য়','৪র্থ','৫ম','৬ষ্ঠ','৭ম','৮ম','৯ম','১০ম'];
+  const posText = bnNums[posNum] || (toBnNum(posNum) + 'তম');
+  const clsName = s.className || settings.className;
+  const secName = s.section || settings.section;
   const subjs=settings.subjects;
   const marksRows=subjs.map(sub=>{
     const sc=s.scores?.[sub]??0;
@@ -976,16 +984,16 @@ function renderReportCard(id) {
         <div class="report-card-header">
           <div style="font-size:34px;margin-bottom:8px;">🏫</div>
           <div class="report-school-name">${settings.school}</div>
-          <div class="report-school-sub">শ্রেণি: ${settings.className} | শাখা: ${settings.section} | শিক্ষাবর্ষ: ${settings.year}</div>
+          <div class="report-school-sub">শ্রেণি: ${clsName} | শাখা: ${secName} | শিক্ষাবর্ষ: ${settings.year}</div>
           <div class="report-card-title">একাডেমিক মূল্যায়ন রিপোর্ট কার্ড</div>
         </div>
         <div class="report-student-info">
           <div class="report-info-row"><span class="info-label">নাম</span><span class="info-value">${s.name}</span></div>
           <div class="report-info-row"><span class="info-label">রোল</span><span class="info-value">${s.roll}</span></div>
-          <div class="report-info-row"><span class="info-label">শ্রেণি</span><span class="info-value">${settings.className} (${settings.section})</span></div>
+          <div class="report-info-row"><span class="info-label">শ্রেণি (শাখা)</span><span class="info-value">${clsName} (${secName})</span></div>
           <div class="report-info-row"><span class="info-label">শিক্ষাবর্ষ</span><span class="info-value">${settings.year}</span></div>
           <div class="report-info-row"><span class="info-label">অভিভাবক</span><span class="info-value">${s.parentName||'—'}</span></div>
-          <div class="report-info-row"><span class="info-label">অবস্থান</span><span class="info-value" style="color:#4f46e5;font-weight:800;">${pos}ম</span></div>
+          <div class="report-info-row"><span class="info-label">অবস্থান</span><span class="info-value" style="color:#4f46e5;font-weight:800;">${posText}</span></div>
         </div>
         <div class="report-marks-table">
           <table><thead><tr><th>বিষয়</th><th>পূর্ণমান</th><th>প্রাপ্তমান</th><th>শতকরা</th><th>গ্রেড</th><th>মন্তব্য</th></tr></thead><tbody>${marksRows}</tbody></table>
@@ -1324,20 +1332,32 @@ function goHome(){
   }
 }
 
-/* ─── Keyboard Shortcuts ─── */
+/* ─── Keyboard Shortcuts & Save Options ─── */
+function openSaveOptionsModal() {
+  const modal = document.getElementById('save-options-modal');
+  if(modal) modal.classList.remove('hidden');
+}
+
+function closeSaveOptionsModal() {
+  const modal = document.getElementById('save-options-modal');
+  if(modal) modal.classList.add('hidden');
+}
+
 document.addEventListener('keydown', e => {
-  // Only apply shortcuts when in report section
-  const isReport = !document.getElementById('section-report')?.classList.contains('hidden');
   const isCtrl = e.ctrlKey || e.metaKey;
   if(!isCtrl) return;
-  if(e.key === 'p' || e.key === 'P') {
-    if(isReport) { e.preventDefault(); printReportCard(); showToast('Ctrl+P → প্রিন্ট / PDF ডায়ালগ খুলছে...','success'); }
-  }
+
   if(e.key === 's' || e.key === 'S') {
-    if(isReport) { e.preventDefault(); saveReportCard(); showToast('Ctrl+S → সেভ হয়েছে!','success'); }
+    e.preventDefault();
+    openSaveOptionsModal();
+  }
+  if(e.key === 'p' || e.key === 'P') {
+    e.preventDefault();
+    printReportCard();
   }
   if(e.key === 'e' || e.key === 'E') {
-    if(isReport) { e.preventDefault(); exportReportAsWord(); showToast('Ctrl+E → Word এক্সপোর্ট হচ্ছে!','success'); }
+    e.preventDefault();
+    exportReportAsWord();
   }
 });
 
