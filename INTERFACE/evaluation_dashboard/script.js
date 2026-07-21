@@ -1041,27 +1041,11 @@ function renderReportCard(id) {
     <div class="report-card-container">
       <div class="report-card dynamic-ultra-card" id="printable-report">
         
-        <!-- মেডেল ব্যাজসহ আল্ট্রা ডায়নামিক হেডার -->
-        <div class="report-pro-header">
-           <div class="header-medal-container">
-              <div class="medal-ribbon"></div>
-              <div class="medal-circle">
-                 <span class="medal-brand-text">সশিবা</span>
-              </div>
-              <i class="fa-solid fa-star star-1"></i>
-              <i class="fa-solid fa-star star-2"></i>
-              <i class="fa-solid fa-star star-3"></i>
-           </div>
-
-           <div class="pro-header-center">
-              <div class="school-brand-centered">
-                 <h1 class="school-name-v3">${settings.school}</h1>
-                 <p class="school-location-v3">শ্রেণি: ${clsName} | শাখা: ${secName} | শিক্ষাবর্ষ: ${settings.year}</p>
-              </div>
-              <div class="report-main-title-centered">
-                 <strong>একাডেমিক মূল্যায়ন রিপোর্ট কার্ড</strong>
-              </div>
-           </div>
+        <!-- ক্লাসিক গ্রাডিয়েন্ট সেন্টার্ড হেডার (লোগো ছাড়া) -->
+        <div class="report-card-header">
+          <div class="report-school-name">${settings.school}</div>
+          <div class="report-school-sub">শ্রেণি: ${clsName} | শাখা: ${secName} | শিক্ষাবর্ষ: ${settings.year}</div>
+          <div class="report-card-title">একাডেমিক মূল্যায়ন রিপোর্ট কার্ড</div>
         </div>
 
         <!-- ডায়নামিক স্টুডেন্ট প্রোফাইল কার্ড -->

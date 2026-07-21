@@ -331,15 +331,38 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 /* Report Card Itself */
 .report-card-container{padding:16px;}
 .report-card{max-width:700px;margin:0 auto;background:white;color:#0f172a;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12);border:1px solid #e2e8f0;}
-/* ১. মেডেল এবং প্রিমিয়াম সেন্টার্ড হেডার */
-.report-pro-header {
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-    padding: 24px 20px 18px !important;
+.report-card-header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
     color: white !important;
-    position: relative;
-    overflow: hidden;
-    border-top: 5px solid #fbbf24;
-    text-align: center;
+    padding: 24px 20px !important;
+    text-align: center !important;
+}
+
+.report-school-name {
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    color: white !important;
+}
+
+.report-school-sub {
+    font-size: 13px !important;
+    opacity: 0.95;
+    font-weight: 600;
+    color: #e0e7ff !important;
+}
+
+.report-card-title {
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: white !important;
+    border-radius: 20px;
+    padding: 5px 20px;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    display: inline-block;
+    margin-top: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .pro-header-center {
