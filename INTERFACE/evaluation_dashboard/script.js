@@ -1029,11 +1029,35 @@ function renderReportCard(id) {
   preview.innerHTML=`
     <div class="report-card-container">
       <div class="report-card" id="printable-report">
-        <div class="report-card-header">
-          <div class="report-school-name">${settings.school}</div>
-          <div class="report-school-sub">শ্রেণি: ${clsName} | শাখা: ${secName} | শিক্ষাবর্ষ: ${settings.year}</div>
-          <div class="report-card-title">একাডেমিক মূল্যায়ন রিপোর্ট কার্ড</div>
+        
+        <!-- মেডেল ব্যাজসহ প্রিমিয়াম হেডার -->
+        <div class="report-pro-header">
+           <!-- ডানে মেডেল ব্যাজ -->
+           <div class="header-medal-container">
+              <div class="medal-ribbon"></div>
+              <div class="medal-circle">
+                 <div class="medal-inner"></div>
+              </div>
+              <i class="fa-solid fa-star star-1"></i>
+              <i class="fa-solid fa-star star-2"></i>
+              <i class="fa-solid fa-star star-3"></i>
+           </div>
+
+           <div class="pro-header-content">
+              <div class="school-brand">
+                 <div class="school-logo-alt">${settings.school.charAt(0)}</div>
+                 <div>
+                    <h1 class="school-name-v3">${settings.school}</h1>
+                    <p class="school-location-v3">শ্রেণি: ${clsName} | শাখা: ${secName} | শিক্ষাবর্ষ: ${settings.year}</p>
+                 </div>
+              </div>
+              <div class="report-main-title">
+                 <strong>অ্যাকাডেমিক ট্রান্সক্রিপ্ট</strong>
+                 <span>শিক্ষাবর্ষ: ${settings.year}</span>
+              </div>
+           </div>
         </div>
+
         <div class="report-student-info">
           <div class="report-info-row"><span class="info-label">নাম</span><span class="info-value">${s.name}</span></div>
           <div class="report-info-row"><span class="info-label">রোল</span><span class="info-value">${s.roll}</span></div>
