@@ -1297,10 +1297,16 @@ function renderActiveCanvas() {
             <button class="wb-btn" onclick="addWbShape('circle')" title="বৃত্ত যোগ করুন"><i class="fa-regular fa-circle"></i> বৃত্ত</button>
             <button class="wb-btn" onclick="addWbShape('arrow')" title="তীরচিহ্ন যোগ করুন"><i class="fa-solid fa-arrow-right"></i> তীর</button>
           </div>
+          <!-- Text formatting tools -->
+          <div class="wb-tools-group" style="border-left: 1px solid rgba(0,0,0,0.1); padding-left: 6px;">
+            <button class="wb-btn" onclick="changeWbTextSize(2)" title="লেখা বড় করুন"><i class="fa-solid fa-magnifying-glass-plus"></i> বড়</button>
+            <button class="wb-btn" onclick="changeWbTextSize(-2)" title="লেখা ছোট করুন"><i class="fa-solid fa-magnifying-glass-minus"></i> ছোট</button>
+            <button class="wb-btn" onclick="toggleWbTextBold()" title="বোল্ড / রেগুলার"><i class="fa-solid fa-bold"></i> বোল্ড</button>
+          </div>
           <div class="wb-tools-group" style="gap: 8px;">
             <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px;">
               <span>সাইজ:</span>
-              <input type="range" class="wb-img-size-slider" min="20" max="150" value="${slide.imageWidth || 60}" style="width: 50px; height:4px; cursor:pointer;" oninput="updateWbImageSize(this.value)">
+              <input type="range" class="wb-img-size-slider" min="20" max="150" value="${slide.imageWidth || 60}" style="width: 40px; height:4px; cursor:pointer;" oninput="updateWbImageSize(this.value)">
             </div>
             <div class="wb-color-picker">
               <span class="wb-color-dot active" style="background:#ef4444;" onclick="setWbColor(this, '#ef4444')"></span>
@@ -1513,6 +1519,7 @@ function onCanvasContentEdit(event, field, index) {
   renderThumbnails();
 }
 
+
 // হোয়াইটবোর্ড গ্লোবাল ভ্যারিয়েবলসমূহ
 let wbActiveTool = 'select'; // select, pen, eraser
 let wbActiveColor = '#ef4444';
@@ -1521,6 +1528,7 @@ let wbIsDrawing = false;
 let wbLastX = 0;
 let wbLastY = 0;
 let wbActiveElement = null; // element being dragged/resized
+let wbLastActiveElement = null; // last interacted/selected text or shape element
 let wbIsDragging = false;
 let wbIsResizing = false;
 let wbDragStartX = 0;
@@ -1622,6 +1630,7 @@ function handleImageUpload(event) {
     slide.imageWidth = 60;
     delete slide.canvasDrawing;
     slide.annotations = [];
+    wbLastActiveElement = null;
 
     // Update preview
     const previewArea = document.getElementById("imagePreviewArea");
@@ -1660,6 +1669,7 @@ function applyPresetImage() {
   slide.imageWidth = 60;
   delete slide.canvasDrawing;
   slide.annotations = [];
+  wbLastActiveElement = null;
 
   // Clear file input
   const fileInput = document.getElementById("editImageFile");
@@ -1685,6 +1695,7 @@ function removeSlideImage() {
   
   delete slide.canvasDrawing;
   slide.annotations = [];
+  wbLastActiveElement = null;
 
   // Clear inputs
   const fileInput = document.getElementById("editImageFile");
@@ -1749,7 +1760,16 @@ function initWhiteboard(slide, isPresenter) {
           el.contentEditable = !isPresenter;
           el.innerText = ann.text || 'টেক্সট';
           el.style.color = ann.color || '#ef4444';
-          el.onblur = () => saveWhiteboardState(slide);
+          el.style.fontSize = ann.fontSize ? `${ann.fontSize}px` : '18px';
+          el.style.fontWeight = ann.fontWeight || 'bold';
+          el.onblur = () => {
+            el.classList.remove("editing");
+            saveWhiteboardState(slide);
+          };
+          el.onfocus = () => {
+            el.classList.add("editing");
+            wbLastActiveElement = el;
+          };
         } else if (ann.type === 'arrow') {
           el.innerHTML = `<i class="fa-solid fa-arrow-right-long"></i>`;
         }
@@ -1759,6 +1779,20 @@ function initWhiteboard(slide, isPresenter) {
           const handle = document.createElement("div");
           handle.className = "wb-resize-handle";
           el.appendChild(handle);
+        }
+
+        // মুছে ফেলার বাটন (delete button)
+        if (!isPresenter) {
+          const delBtn = document.createElement("div");
+          delBtn.className = "wb-delete-btn";
+          delBtn.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+          delBtn.onclick = (e) => {
+            e.stopPropagation();
+            el.remove();
+            if (wbLastActiveElement === el) wbLastActiveElement = null;
+            saveWhiteboardState(slide);
+          };
+          el.appendChild(delBtn);
         }
 
         annotLayer.appendChild(el);
@@ -1818,10 +1852,12 @@ function makeElementInteractable(el, slide) {
   el.addEventListener("mousedown", (e) => {
     if (wbActiveTool !== 'select') return;
     if (e.target === handle) return;
-    if (document.activeElement === el) return; // Allow normal caret movement / editing when focused
+    if (e.target.closest(".wb-delete-btn")) return; // let delete button trigger its click
+    if (document.activeElement === el) return; // Allow caret editing when focused
 
     clickTime = Date.now();
     wbActiveElement = el;
+    wbLastActiveElement = el; // Store last active element!
     wbIsDragging = true;
     wbDragStartX = e.clientX;
     wbDragStartY = e.clientY;
@@ -1836,10 +1872,16 @@ function makeElementInteractable(el, slide) {
     document.querySelectorAll(".wb-element").forEach(item => item.classList.remove("selected"));
     el.classList.add("selected");
 
+    // Sync color picker to this elements current color
+    const currentColor = el.style.color || el.style.borderColor || '#ef4444';
+    document.querySelectorAll(".wb-color-dot").forEach(d => {
+      d.classList.remove("active");
+      // convert style color (e.g. rgb) to match picker style
+      const rgbColor = d.style.backgroundColor;
+      if (rgbColor === currentColor) d.classList.add("active");
+    });
+
     e.stopPropagation();
-    
-    // For contenteditable elements, we call preventDefault to stop default dragging behavior,
-    // but we will manually focus on mouseup if it was a quick click.
     e.preventDefault();
   });
 
@@ -1879,6 +1921,7 @@ function makeElementInteractable(el, slide) {
   if (handle) {
     handle.addEventListener("mousedown", (e) => {
       wbActiveElement = el;
+      wbLastActiveElement = el;
       wbIsResizing = true;
       wbDragStartX = e.clientX;
       wbDragStartY = e.clientY;
@@ -2032,6 +2075,8 @@ function saveWhiteboardState(slide) {
 
       if (type === "text") {
         annObj.text = el.innerText;
+        annObj.fontSize = parseInt(el.style.fontSize) || 18;
+        annObj.fontWeight = el.style.fontWeight || 'bold';
       }
       annList.push(annObj);
     });
@@ -2072,6 +2117,37 @@ function setWbColor(dot, color) {
   wbActiveColor = color;
   document.querySelectorAll(".wb-color-dot").forEach(d => d.classList.remove("active"));
   if (dot) dot.classList.add("active");
+
+  // ফোকাসড বা সিলেক্টেড অবজেক্টের কালার লাইভ চেঞ্জ করা
+  const selectedEl = document.querySelector(".wb-element.selected") || wbLastActiveElement;
+  if (selectedEl && !selectedEl.classList.contains("wb-image-container")) {
+    selectedEl.style.color = color;
+    selectedEl.style.borderColor = color;
+    const slide = slides[activeSlideIndex];
+    saveWhiteboardState(slide);
+  }
+}
+
+function changeWbTextSize(amount) {
+  const selectedEl = document.querySelector(".wb-element.selected") || wbLastActiveElement;
+  if (selectedEl && selectedEl.classList.contains("wb-text-box")) {
+    let currentSize = parseInt(selectedEl.style.fontSize) || 18;
+    let newSize = Math.max(10, Math.min(60, currentSize + amount));
+    selectedEl.style.fontSize = `${newSize}px`;
+    const slide = slides[activeSlideIndex];
+    saveWhiteboardState(slide);
+  }
+}
+
+function toggleWbTextBold() {
+  const selectedEl = document.querySelector(".wb-element.selected") || wbLastActiveElement;
+  if (selectedEl && selectedEl.classList.contains("wb-text-box")) {
+    let currentWeight = selectedEl.style.fontWeight;
+    let isBold = currentWeight === 'bold' || currentWeight === '700';
+    selectedEl.style.fontWeight = isBold ? 'normal' : 'bold';
+    const slide = slides[activeSlideIndex];
+    saveWhiteboardState(slide);
+  }
 }
 
 function addWbText() {
@@ -2087,6 +2163,8 @@ function addWbText() {
     width: 20,
     height: 8,
     color: wbActiveColor,
+    fontSize: 18,
+    fontWeight: 'bold',
     text: 'নতুন টেক্সট'
   });
   
@@ -2129,6 +2207,7 @@ function clearWbDrawing() {
       slide.imageX = 20;
       slide.imageY = 10;
       slide.imageWidth = 60;
+      wbLastActiveElement = null;
       renderActiveCanvas();
     }
   }
@@ -2285,10 +2364,16 @@ function renderPresenterSlide() {
             <button class="wb-btn" onclick="addWbShape('circle')" title="বৃত্ত"><i class="fa-regular fa-circle"></i> বৃত্ত</button>
             <button class="wb-btn" onclick="addWbShape('arrow')" title="তীর"><i class="fa-solid fa-arrow-right"></i> তীর</button>
           </div>
+          <!-- Text formatting tools -->
+          <div class="wb-tools-group" style="border-left: 1px solid rgba(0,0,0,0.1); padding-left: 6px;">
+            <button class="wb-btn" onclick="changeWbTextSize(2)" title="লেখা বড় করুন"><i class="fa-solid fa-magnifying-glass-plus"></i> বড়</button>
+            <button class="wb-btn" onclick="changeWbTextSize(-2)" title="লেখা ছোট করুন"><i class="fa-solid fa-magnifying-glass-minus"></i> ছোট</button>
+            <button class="wb-btn" onclick="toggleWbTextBold()" title="বোল্ড / রেগুলার"><i class="fa-solid fa-bold"></i> বোল্ড</button>
+          </div>
           <div class="wb-tools-group" style="gap: 8px;">
             <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px;">
               <span>সাইজ:</span>
-              <input type="range" class="wb-img-size-slider" min="20" max="150" value="${slide.imageWidth || 60}" style="width: 50px; height:4px; cursor:pointer;" oninput="updateWbImageSize(this.value)">
+              <input type="range" class="wb-img-size-slider" min="20" max="150" value="${slide.imageWidth || 60}" style="width: 40px; height:4px; cursor:pointer;" oninput="updateWbImageSize(this.value)">
             </div>
             <div class="wb-color-picker">
               <span class="wb-color-dot active" style="background:#ef4444;" onclick="setWbColor(this, '#ef4444')"></span>
