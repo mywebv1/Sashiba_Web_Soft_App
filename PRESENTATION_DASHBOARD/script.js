@@ -3145,7 +3145,7 @@ function downloadAsPowerPointPPTX() {
                     fontFace: 'Arial'
                   });
                 } else if (ann.type === 'rect') {
-                  slide.addShape(pptx.shapes.RECTANGLE, {
+                  slide.addShape(pptx.ShapeType.rect, {
                     x: annX,
                     y: annY,
                     w: annW,
@@ -3154,7 +3154,7 @@ function downloadAsPowerPointPPTX() {
                     fill: { color: 'FFFFFF', transparency: 100 }
                   });
                 } else if (ann.type === 'circle') {
-                  slide.addShape(pptx.shapes.OVAL, {
+                  slide.addShape(pptx.ShapeType.oval, {
                     x: annX,
                     y: annY,
                     w: annW,
