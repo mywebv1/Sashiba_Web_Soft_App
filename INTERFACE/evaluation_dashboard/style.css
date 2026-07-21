@@ -509,17 +509,19 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 }
 
 .student-avatar-box {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
+    width: 68px;
+    height: 68px;
+    border-radius: 16px;
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
     color: white;
-    font-size: 22px;
+    font-size: 28px;
     font-weight: 900;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+    border: 2px solid #ffffff;
+    outline: 2px solid #cbd5e1;
     flex-shrink: 0;
 }
 
