@@ -710,33 +710,61 @@ function printRubric() { window.print(); }
 // ═══════════════════════════════════════════════════════
 //  ৭. STUDENT TABLE
 // ═══════════════════════════════════════════════════════
+let sortField = 'total';
+let sortAsc = false;
+
 function renderStudentTable() {
-  const query = (document.getElementById('student-search')?.value||'').toLowerCase();
+  const query = (document.getElementById('student-search')?.value||'').toLowerCase().trim();
   let list = [...students];
+
   if(currentFilter!=='all') {
-    const mapLabel = {good:'ভালো',average:'মধ্যম',weak:'দুর্বল'};
+    const mapLabel = {good:'ভালো',average:'मध्यম',weak:'দুর্বল'};
     list = list.filter(s=>getCategory(calcTotals(s).pct).label===mapLabel[currentFilter]);
   }
-  if(query) list = list.filter(s=>s.name.toLowerCase().includes(query)||String(s.roll).includes(query));
+
+  // Expanded Multi-field Search: Name, Roll, Class, Section, Parent
+  if(query) {
+    list = list.filter(s => {
+      const clsName = (s.className || settings.className).toLowerCase();
+      const secName = (s.section || settings.section).toLowerCase();
+      const parentName = (s.parentName || '').toLowerCase();
+      const name = s.name.toLowerCase();
+      const roll = String(s.roll);
+
+      return name.includes(query) ||
+             roll.includes(query) ||
+             clsName.includes(query) ||
+             secName.includes(query) ||
+             parentName.includes(query) ||
+             `${clsName} ${secName}`.includes(query);
+    });
+  }
+
+  // Sorting logic (default is highest total/position first)
   if(sortField) {
     list.sort((a,b)=>{
       let va,vb;
       if(sortField==='roll'){va=a.roll;vb=b.roll;}
       else if(sortField==='name'){va=a.name;vb=b.name;}
-      else if(sortField==='total'){va=calcTotals(a).pct;vb=calcTotals(b).pct;}
+      else if(sortField==='position'||sortField==='total'){va=calcTotals(a).pct;vb=calcTotals(b).pct;}
       else{va=a.scores?.[sortField]||0;vb=b.scores?.[sortField]||0;}
       if(va<vb) return sortAsc?-1:1;
       if(va>vb) return sortAsc?1:-1;
       return 0;
     });
   }
+
   const thead=document.getElementById('table-header');
   const tbody=document.getElementById('table-body');
   const empty=document.getElementById('table-empty');
   if(!thead||!tbody) return;
+
   const subjs=settings.subjects;
   const si = s=>(sortField===s?(sortAsc?'↑':'↓'):'');
+  const bnNums=['০','১ম','২য়','৩য়','৪র্থ','৫ম','৬ষ্ঠ','৭ম','৮ম','৯ম','১০ম'];
+
   thead.innerHTML=`<tr>
+    <th onclick="sortBy('position')" style="color:var(--primary);font-weight:800;">অবস্থান (মেধা) ${si('position')||si('total')}</th>
     <th onclick="sortBy('roll')">#রোল ${si('roll')}</th>
     <th onclick="sortBy('name')">নাম ${si('name')}</th>
     <th>শ্রেণি (শাখা)</th>
@@ -744,15 +772,22 @@ function renderStudentTable() {
     <th onclick="sortBy('total')">মোট ${si('total')}</th>
     <th>গড়%</th><th>গ্রেড</th><th>শ্রেণি</th><th>অ্যাকশন</th>
   </tr>`;
+
   if(list.length===0){tbody.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
+
   tbody.innerHTML=list.map(s=>{
     const {total,maxTotal,avg,pct}=calcTotals(s);
     const grade=getGrade(pct);
     const cat=getCategory(pct);
+    const posNum=getPosition(s.id);
+    const posBadge = bnNums[posNum] || (toBnNum(posNum) + 'তম');
+    const posClass = posNum === 1 ? 'grade-aplus' : posNum === 2 ? 'grade-a' : posNum === 3 ? 'grade-aminus' : 'grade-b';
+
     const clsName = s.className || settings.className;
     const secName = s.section || settings.section;
     return `<tr>
+      <td><span class="grade-badge ${posClass}" style="font-weight:900;font-size:13px;padding:4px 10px;"><i class="fa-solid fa-trophy" style="font-size:11px;margin-right:4px;"></i>${posBadge}</span></td>
       <td><strong>${s.roll}</strong></td>
       <td><strong>${s.name}</strong></td>
       <td><span class="badge badge-info" style="font-size:11px;">${clsName} (${secName})</span></td>
