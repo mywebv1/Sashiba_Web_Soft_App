@@ -3036,13 +3036,22 @@ function downloadAsPowerPointPPTX() {
             const imgH = imgW * 0.75; // aspect ratio approximation
 
             // ইমেজ ডান পাশে
-            let imgOptions = { x: imgX, y: imgY, w: imgW, h: imgH };
-            if (slideObj.image.startsWith("data:")) {
-              imgOptions.data = slideObj.image.split(',')[1]; 
-            } else {
-              imgOptions.path = slideObj.image;
+            let addImgAllowed = true;
+            if (!slideObj.image.startsWith("data:")) {
+              if (window.location.protocol === 'file:') {
+                console.warn("Skipping relative/external image in PPTX due to file:// restrictions");
+                addImgAllowed = false;
+              }
             }
-            slide.addImage(imgOptions);
+            if (addImgAllowed) {
+              let imgOptions = { x: imgX, y: imgY, w: imgW, h: imgH };
+              if (slideObj.image.startsWith("data:")) {
+                imgOptions.data = slideObj.image.split(',')[1];
+              } else {
+                imgOptions.path = slideObj.image;
+              }
+              slide.addImage(imgOptions);
+            }
 
             // ক্যানভাস ড্রয়িং থাকলে তাও যোগ হবে
             if (slideObj.canvasDrawing && slideObj.canvasDrawing.startsWith("data:")) {
