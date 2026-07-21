@@ -1173,37 +1173,47 @@ function shareWhatsApp(){
 //  ১১. ASSESSMENT HISTORY
 // ═══════════════════════════════════════════════════════
 function saveCurrentSnapshot() {
+  const currentSub = settings.subjects[0] || "সাধারণ বিষয়";
+  const now = new Date();
+  
   const snap = {
     id: 'snap_'+Date.now(),
-    title: `মূল্যায়ন — ${settings.className} (${settings.section})`,
+    title: `বিষয়: ${currentSub}`,
     className: settings.className,
     section: settings.section,
-    date: new Date().toLocaleDateString('bn-BD'),
-    savedAt: new Date().toISOString(),
+    subject: currentSub,
+    school: settings.school,
+    date: now.toLocaleDateString('bn-BD'),
+    time: now.toLocaleTimeString('bn-BD', {hour: '2-digit', minute:'2-digit'}),
+    savedAt: now.toISOString(),
     studentCount: students.length,
-    classAvg: students.length?Math.round(students.reduce((s,x)=>s+calcTotals(x).pct,0)/students.length):0,
+    classAvg: students.length ? Math.round(students.reduce((s,x)=>s+calcTotals(x).pct,0)/students.length) : 0,
     status: 'active',
     students: JSON.parse(JSON.stringify(students)),
   };
+  
   assessmentHistory.unshift(snap);
   saveToStorage();
   renderHistory();
-  showToast('স্ন্যাপশট সংরক্ষিত!','success');
+  showToast('নতুন স্ন্যাপশট কার্ড তৈরি হয়েছে!', 'success');
 }
+
 function setHistoryFilter(f){
   historyFilter=f;
   document.querySelectorAll('[id^="hchip-"]').forEach(c=>c.classList.remove('chip-active'));
   document.getElementById('hchip-'+f)?.classList.add('chip-active');
   renderHistory();
 }
+
 function openSnapshot(id) {
   const snap = assessmentHistory.find(h => h.id === id);
   if (!snap) return;
 
-  if (confirm(`আপনি কি "${snap.title}" ফাইলটি সচল করতে চান? বর্তমানে স্ক্রিনে থাকা ডাটা বদলে যাবে।`)) {
+  if (confirm(`আপনি কি "${snap.title}" (${snap.className} শ্রেণি) ফাইলটি সচল করতে চান?`)) {
     students = JSON.parse(JSON.stringify(snap.students));
     settings.className = snap.className || settings.className;
     settings.section = snap.section || settings.section;
+    if(snap.school) settings.school = snap.school;
     window.activeSnapshotId = id;
 
     saveToStorage();
@@ -1213,46 +1223,76 @@ function openSnapshot(id) {
     renderHistory();
 
     showSection('students');
-    showToast(`"${snap.title}" সফলভাবে লোড হয়েছে। এখন আপনি প্রিন্ট বা ডাউনলোড করতে পারেন।`, 'success');
+    showToast(`"${snap.title}" সফলভাবে লোড হয়েছে।`, 'success');
   }
 }
 
-function renderHistory(){
-  const q=(document.getElementById('history-search')?.value||'').toLowerCase();
-  const classFilter=document.getElementById('history-class')?.value||'';
-  const sectionFilter=document.getElementById('history-section')?.value||'';
+function exportHistoricalReport(id) {
+  const snap = assessmentHistory.find(h => h.id === id);
+  if(!snap) return;
+  showToast(`"${snap.title}" ফাইল এক্সপোর্ট করা হচ্ছে...`, 'info');
+  openSnapshot(id);
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if(!el) return;
+
+  const q = (document.getElementById('history-search')?.value || '').toLowerCase();
+  const classFilter = document.getElementById('history-class')?.value || '';
+  const sectionFilter = document.getElementById('history-section')?.value || '';
   
-  let list=[...assessmentHistory];
+  let list = [...assessmentHistory];
   if(historyFilter==='active') list=list.filter(h=>h.status==='active');
   if(historyFilter==='archived') list=list.filter(h=>h.status==='archived');
-  if(classFilter) list=list.filter(h=>(h.className||settings.className)===classFilter);
-  if(sectionFilter) list=list.filter(h=>(h.section||settings.section)===sectionFilter);
-  if(q) list=list.filter(h=>h.title.toLowerCase().includes(q)||h.date.includes(q));
+  if(classFilter) list = list.filter(h => (h.className||settings.className) === classFilter);
+  if(sectionFilter) list = list.filter(h => (h.section||settings.section) === sectionFilter);
+  if(q) list = list.filter(h => (h.title||'').toLowerCase().includes(q) || (h.date||'').includes(q) || (h.subject||'').toLowerCase().includes(q));
 
-  const el=document.getElementById('history-list');
-  if(!el) return;
-  if(list.length===0){el.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:40px;"><i class="fa-solid fa-folder-open" style="font-size:40px;opacity:.2;display:block;margin-bottom:12px;"></i><p>কোনো সংরক্ষিত ফাইল পাওয়া যায়নি।</p></div>';return;}
-  
-  el.innerHTML=list.map(h=>{
-    const isActiveFile = window.activeSnapshotId === h.id;
+  if(list.length === 0) {
+    el.className = "history-list";
+    el.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:40px;width:100%;"><i class="fa-solid fa-folder-open" style="font-size:40px;opacity:.2;display:block;margin-bottom:12px;"></i><p>কোনো কার্ড পাওয়া যায়নি।</p></div>';
+    return;
+  }
+
+  el.className = "history-card-grid";
+  el.innerHTML = list.map(h => {
+    const isActive = window.activeSnapshotId === h.id;
+    const subName = h.subject || settings.subjects[0] || "সাধারণ বিষয়";
+    const clsName = h.className || settings.className;
+    const schoolName = h.school || settings.school;
+    const timeStr = h.time || "১২:০০ PM";
+
     return `
-    <div class="history-item ${isActiveFile ? 'currently-active' : ''} ${h.status==='archived'?'archived':''}" onclick="openSnapshot('${h.id}')">
-      <div class="history-icon">
-        <i class="fa-solid ${isActiveFile ? 'fa-file-signature' : 'fa-file-lines'}"></i>
+    <div class="hist-card ${isActive ? 'active-card' : ''}">
+      <div class="card-badges">
+        <span class="badge-cls"><i class="fa-solid fa-graduation-cap"></i> ${clsName} শ্রেণি</span>
+        <span class="badge-sub"><i class="fa-solid fa-book"></i> ${subName}</span>
       </div>
-      <div style="flex:1;">
-        <div class="history-title">
-            ${h.title} 
-            ${isActiveFile ? '<span class="active-file-pill">currently-active (বর্তমানে সচল)</span>' : ''}
-        </div>
-        <div class="history-meta">${h.date} • ${h.studentCount} জন শিক্ষার্থী • গড়: ${h.classAvg}%</div>
+      
+      <div class="card-time-row">
+        <span><i class="fa-solid fa-calendar-days"></i> ${h.date}</span>
+        <span><i class="fa-solid fa-clock"></i> ${timeStr}</span>
       </div>
-      <div class="history-actions" onclick="event.stopPropagation()">
-        <button class="action-btn" onclick="archiveSnapshot('${h.id}')" title="আর্কাইভ/আনআর্কাইভ"><i class="fa-solid fa-box-archive"></i></button>
-        <button class="action-btn danger" onclick="deleteSnapshot('${h.id}')" title="মুছুন"><i class="fa-solid fa-trash"></i></button>
+
+      <div class="card-body">
+        <h3 class="card-title">${h.title || ('বিষয়: ' + subName)}</h3>
+        <p class="card-school"><i class="fa-solid fa-school"></i> ${schoolName}</p>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn-card-load" onclick="openSnapshot('${h.id}')">
+          <i class="fa-solid fa-folder-open"></i> লোড
+        </button>
+        <button class="btn-card-word" onclick="exportHistoricalReport('${h.id}')">
+          <i class="fa-solid fa-file-word"></i> ওয়ার্ড
+        </button>
+        <button class="btn-card-del" onclick="deleteSnapshot('${h.id}')">
+          <i class="fa-solid fa-trash-can"></i> ডিলিট
+        </button>
       </div>
     </div>
-  `;
+    `;
   }).join('');
 }
 function restoreSnapshot(id){
