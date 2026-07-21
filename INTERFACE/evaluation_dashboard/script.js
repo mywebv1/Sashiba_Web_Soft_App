@@ -16,8 +16,8 @@ let students = [];
 let assessmentHistory = [];
 let savedRubrics = [];
 let currentFilter = 'all';
-let sortField = null;
-let sortAsc = true;
+let sortField = 'total';
+let sortAsc = false;
 let selectedReportStudentId = null;
 let currentPerfStudent = null;
 let currentTimeline = 'quiz';
@@ -715,8 +715,6 @@ function printRubric() { window.print(); }
 // ═══════════════════════════════════════════════════════
 //  ৭. STUDENT TABLE
 // ═══════════════════════════════════════════════════════
-let sortField = 'total';
-let sortAsc = false;
 
 function renderStudentTable() {
   const query = (document.getElementById('student-search')?.value||'').toLowerCase().trim();
@@ -1314,8 +1312,13 @@ function importData(event){
 function clearAllData(){
   if(!confirm('সব ডেটা মুছবেন?')) return;
   students=[];
-  saveToStorage(); renderStudentTable(); refreshReportSelector(); refreshFeedbackSelector();
-  showToast('মুছে গেছে।','error');
+  assessmentHistory=[];
+  savedRubrics=[];
+  localStorage.removeItem('sashiba_eval_students');
+  localStorage.removeItem('sashiba_eval_history');
+  localStorage.removeItem('sashiba_eval_rubrics');
+  saveToStorage();
+  window.location.reload();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1355,12 +1358,9 @@ function toggleDarkMode(){
   try{localStorage.setItem('sashiba_eval_theme',isDark?'dark':'light');}catch(e){}
 }
 function goHome(){
-  // Best UX: stay in eval dashboard, just show a visual home notification
-  // instead of navigating away. Show confirmation if user really wants to leave.
-  if(confirm('মূল পোর্টালে ফিরে যেতে চান? অসংরক্ষিত ডেটা রেখে যাবে।')) {
-    try { window.parent.showHome(); return; } catch(e){}
-    try { window.top.showHome(); return; } catch(e){}
-    try { window.parent.location.href = '../index.html'; } catch(e){ window.location.href = '../index.html'; }
+  if(confirm('মূল পোর্টালে ফিরে যেতে চান?')) {
+    try { if(window.parent && window.parent !== window && window.parent.showHome) { window.parent.showHome(); return; } } catch(e){}
+    try { window.location.href = '../index.html'; } catch(e){ window.location.href = 'index.html'; }
   }
 }
 
