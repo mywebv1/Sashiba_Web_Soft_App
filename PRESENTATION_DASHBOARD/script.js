@@ -1308,6 +1308,7 @@ function renderActiveCanvas() {
               <span class="wb-color-dot" style="background:#10b981;" onclick="setWbColor(this, '#10b981')"></span>
               <span class="wb-color-dot" style="background:#f59e0b;" onclick="setWbColor(this, '#f59e0b')"></span>
               <span class="wb-color-dot" style="background:#0f172a;" onclick="setWbColor(this, '#0f172a')"></span>
+              <span class="wb-color-dot" style="background:#ffffff;" onclick="setWbColor(this, '#ffffff')"></span>
             </div>
             <button class="wb-btn" onclick="clearWbDrawing()" style="color: var(--danger); font-weight:bold; padding: 2px 6px;"><i class="fa-solid fa-trash-can"></i> রিসেট</button>
           </div>
@@ -2295,6 +2296,7 @@ function renderPresenterSlide() {
               <span class="wb-color-dot" style="background:#10b981;" onclick="setWbColor(this, '#10b981')"></span>
               <span class="wb-color-dot" style="background:#f59e0b;" onclick="setWbColor(this, '#f59e0b')"></span>
               <span class="wb-color-dot" style="background:#0f172a;" onclick="setWbColor(this, '#0f172a')"></span>
+              <span class="wb-color-dot" style="background:#ffffff;" onclick="setWbColor(this, '#ffffff')"></span>
             </div>
             <button class="wb-btn" onclick="clearWbDrawing()" style="color: var(--danger); font-weight:bold; padding: 2px 6px;"><i class="fa-solid fa-trash-can"></i> রিসেট</button>
           </div>
