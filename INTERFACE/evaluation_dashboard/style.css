@@ -314,7 +314,7 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 .radio-card input{accent-color:var(--primary);}
 .feedback-result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
 .student-chip{display:flex;align-items:center;gap:8px;}
-.feedback-text-box{background:var(--bg-app);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-size:14px;line-height:1.9;color:var(--text-main);min-height:300px;outline:none;white-space:pre-wrap;}
+.feedback-text-box{background:var(--bg-app);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-size:14px;line-height:1.9;color:var(--text-main);min-height:300px;outline:none;white-space:pre-wrap;font-family:'Hind Siliguri','Inter',sans-serif;word-break:break-word;}
 .feedback-text-box:focus{border-color:var(--primary);}
 .feedback-meta{margin-top:10px;font-size:11px;color:var(--text-light);}
 
@@ -365,6 +365,55 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 .signature-block{text-align:center;}
 .signature-line{border-bottom:1px solid #94a3b8;min-width:150px;margin-bottom:5px;height:38px;}
 .signature-label{font-size:11px;color:#64748b;font-weight:600;}
+
+/* ─ Report card: ALWAYS light colors regardless of dark mode ─ */
+.report-card, .report-card *{
+  color-scheme: light;
+}
+.report-card{
+  background:#ffffff !important;
+  color:#0f172a !important;
+}
+.report-card .info-label { color:#64748b !important; }
+.report-card .info-value { color:#0f172a !important; }
+.report-card .report-remarks p { color:#0f172a !important; }
+.report-card .signature-label { color:#64748b !important; }
+.report-card .summary-label { color:#64748b !important; }
+.report-card .summary-value { color:#4f46e5 !important; }
+.report-card .prog-label { color:#0f172a !important; }
+.report-card .prog-val { color:#4f46e5 !important; }
+.report-card .report-student-info { background:#f8fafc !important; }
+.report-card .report-summary { background:#f8fafc !important; }
+.report-card .report-remarks { background:#f8fafc !important; }
+.report-card td { color:#0f172a !important; background:#fff !important; }
+.report-card td:hover, .report-marks-table tr:hover td { background:#f8fafc !important; }
+
+/* ─ Modern Subject Stats Grid ─ */
+.msb-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+  gap:10px;
+  padding:4px 0;
+}
+.msb-stat-card{
+  background:var(--bg-app);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 10px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  transition:var(--transition);
+}
+.msb-stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.msb-stat-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:currentColor;}
+.msb-stat-title{font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.msb-stat-val{font-size:28px;font-weight:900;line-height:1;font-family:'Inter',sans-serif;margin-bottom:6px;}
+.msb-stat-grade{display:inline-block;font-size:11px;font-weight:800;padding:2px 10px;border-radius:20px;font-family:'Inter',sans-serif;}
+
+/* ─ Keyboard shortcut badge ─ */
+.kbd-hint{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text-muted);margin-left:6px;}
+.kbd{background:var(--bg-app);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:'Inter',monospace;font-size:10px;font-weight:700;}
 
 /* ─────────── HISTORY ─────────── */
 .history-controls{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
@@ -528,3 +577,9 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 .btn-blue{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:white;border:none;border-radius:var(--radius-sm);padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--transition);}
 .btn-blue:hover{background:linear-gradient(135deg,#1e40af,#1d4ed8);transform:translateY(-1px);}
 body.dark-mode .btn-blue{background:linear-gradient(135deg,#2563eb,#3b82f6);}
+
+/* ── btn-red (PDF download) ── */
+.btn-red{background:linear-gradient(135deg,#dc2626,#ef4444);color:white;border:none;border-radius:var(--radius-sm);padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--transition);}
+.btn-red:hover{background:linear-gradient(135deg,#b91c1c,#dc2626);transform:translateY(-1px);}
+body.dark-mode .btn-red{background:linear-gradient(135deg,#ef4444,#f87171);}
+

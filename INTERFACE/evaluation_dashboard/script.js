@@ -289,22 +289,44 @@ function renderAllAvgBars(s) {
 
 function renderWeakStrongTopics(s) {
   const subjs = settings.subjects;
-  const sorted = subjs.map(sub=>({ sub, val: s.scores?.[sub] || 0 })).sort((a,b)=>a.val-b.val);
-  const weak = sorted.slice(0, Math.ceil(sorted.length/2));
-  const strong = sorted.slice(-Math.floor(sorted.length/2)).reverse();
+  const scored = subjs.map(sub => ({ sub, val: s.scores?.[sub] || 0 }));
+  const sorted = [...scored].sort((a,b) => a.val - b.val);
+
+  // Absolute thresholds: weak < 65, strong ≥ 80
+  const WEAK_THR = 65;
+  const STRONG_THR = 80;
+  let weakList = scored.filter(x => x.val < WEAK_THR).sort((a,b) => a.val - b.val);
+  let strongList = scored.filter(x => x.val >= STRONG_THR).sort((a,b) => b.val - a.val);
+
+  // Fallback: if everyone is above threshold, show bottom 3 as "relative" weak
+  if(weakList.length === 0) weakList = sorted.slice(0, Math.min(3, Math.ceil(sorted.length/3)));
+  // Fallback: if no one is strong, show top 3
+  if(strongList.length === 0) strongList = sorted.slice(-Math.min(3, Math.ceil(sorted.length/3))).reverse();
 
   const weakEl = document.getElementById('weak-topics-list');
   const strongEl = document.getElementById('strong-topics-list');
-  if(weakEl) weakEl.innerHTML = weak.map(({sub,val})=>`
+
+  if(weakEl) weakEl.innerHTML = weakList.length === 0
+    ? `<div style="color:var(--success);font-size:13px;padding:12px;font-weight:600;"><i class="fa-solid fa-check-circle" style="margin-right:6px;"></i>সব বিষয়ে ভালো!</div>`
+    : weakList.map(({sub,val}) => `
     <div class="topic-item weak">
       <div class="topic-name">${sub}</div>
-      <div class="topic-score weak">${val}/১০০</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+        <div style="width:60px;height:5px;background:rgba(239,68,68,.15);border-radius:3px;overflow:hidden;"><div style="width:${val}%;height:100%;background:var(--danger);"></div></div>
+        <div class="topic-score weak">${val}/১০০</div>
+      </div>
     </div>
   `).join('');
-  if(strongEl) strongEl.innerHTML = strong.map(({sub,val})=>`
+
+  if(strongEl) strongEl.innerHTML = strongList.length === 0
+    ? `<div style="color:var(--text-muted);font-size:13px;padding:12px;">কোনো শক্তিশালী বিষয় পাওয়া যায়নি</div>`
+    : strongList.map(({sub,val}) => `
     <div class="topic-item strong">
       <div class="topic-name">${sub}</div>
-      <div class="topic-score strong">${val}/১০০</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+        <div style="width:60px;height:5px;background:rgba(16,185,129,.15);border-radius:3px;overflow:hidden;"><div style="width:${val}%;height:100%;background:var(--success);"></div></div>
+        <div class="topic-score strong">${val}/১০০</div>
+      </div>
     </div>
   `).join('');
 }
@@ -312,24 +334,90 @@ function renderWeakStrongTopics(s) {
 function renderPerfSubjectBars(s) {
   const el = document.getElementById('perf-subject-bars');
   if(!el) return;
-  const colors = ['#4f46e5','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e'];
-  el.innerHTML = settings.subjects.map((sub,i)=>{
-    const val = s.scores?.[sub] || 0;
-    const c = colors[i % colors.length];
-    const g = getGrade(val);
-    return `
-      <div class="perf-subj-row">
-        <div class="perf-subj-name">${sub}</div>
-        <div class="perf-subj-track"><div class="perf-subj-fill" style="width:${val}%;background:${c}"></div></div>
-        <div class="perf-subj-val" style="color:${c}">${val} <span class="grade-badge ${g.cls}">${g.grade}</span></div>
+  el.innerHTML = `
+    <div class="modern-subject-card">
+      <div class="msb-grid">
+        ${settings.subjects.map((sub) => {
+          const val = s.scores?.[sub] || 0;
+          const g = getGrade(val);
+          const color = val >= 80 ? 'var(--success)' : val >= 50 ? 'var(--primary)' : 'var(--danger)';
+          return `
+            <div class="msb-stat-card">
+              <div class="msb-stat-title">${sub}</div>
+              <div class="msb-stat-val" style="color:${color}">${val}</div>
+              <div class="msb-stat-grade" style="background:${color}22;color:${color}">${g.grade}</div>
+            </div>
+          `;
+        }).join('')}
       </div>
-    `;
-  }).join('');
+    </div>
+  `;
 }
 
-// ═══════════════════════════════════════════════════════
-//  ৫. AI FEEDBACK
-// ═══════════════════════════════════════════════════════
+/* ─── Varied AI feedback using multiple template pools ─ */
+const aiFeedbackPools = {
+  excellent: [
+    (s,sub,weak,pct) => `⭐ ${s.name} সাধুবাদ! ${pct}% নম্বর অর্জন করে সত্যিকারের মেধাবিত্বের পরিচয় দিয়েছে। ${sub} বিষয়ে এর পারফরম্যান্স অনন্য। ভবিষ্যতে এই ধারা অব্যাহত রাখার অনুরোধ রইল। তার সাথে ${weak} বিষয়ের উপর আরো মনোযোগ দিলে ক্লাসে অপ্রতিদ্বন্দ্বী হয়ে ওঠা সম্ভব। গ্রেড: A+।`,
+    (s,sub,weak,pct) => `🌟 ${s.name} আপনার শিক্ষার্থী সত্যিকারের একটি রত্ন। ${pct}% নম্বর পাওয়া তার পরিশ্রম ও মেধার প্রমাণ। ${sub} বিষয়ে বিশেষ দক্ষতা প্রকাশ পেয়েছে। ${weak} বিষয়ে যদি সমান মনোযোগ দেওয়া সম্ভব হয়, তাহলে সব বিষয়েই A+ পাওয়া অসম্ভব নয়।`,
+    (s,sub,weak,pct) => `🏆 ক্লাসের সেরা শিক্ষার্থীদের মধ্যে ${s.name} একজন। তার ${pct}% সমগ্র পারফরম্যান্স অন্য শিক্ষার্থীদের জন্য অনুপ্রেরণার উৎস। ${sub} তার সবচেয়ে শক্তিশালী বিষয়। ${weak} বিষয়ে প্রতিদিন নিয়মিত বাড়ির কাজ করলে সম্প্রতি আরো উজ্জ্বল ফলাফল সম্ভব।`,
+  ],
+  average: [
+    (s,sub,weak,pct) => `📊 ${s.name} এই মূল্যায়নে ${pct}% অর্জন করেছে। ${sub} বিষয়ে ভালো প্রদর্শন রয়েছে। ${weak} বিষয়ে বিশেষ মনোযোগ দরকার। প্রতিদিন ২০-৩০ মিনিট অধ্যয়ন করলে পরবর্তী মূল্যায়নে অনেক ভালো ফলাফল সম্ভব।`,
+    (s,sub,weak,pct) => `💡 ${s.name} সম্ভাবনাময়। ${pct}% স্কোর দিয়ে সে দেখিয়েছে যে সে সক্ষম। ${sub} তার কাছে সহজ। ${weak} বিষয়ে আরো মনোযোগ দিলে A+ পাওয়া সম্ভব। হাল ছেড়ো না — তুমি পারবেই! 🌟`,
+    (s,sub,weak,pct) => `🔥 ${s.name} মোট ${pct}% পেয়েছে। ${sub} তার শক্তির জায়গা। তবে ${weak} বিষয়ে দুর্বলতা লক্ষ্য করা যাচ্ছে। নিয়মিত প্র্যাক্টিস সেট তৈরি করুন। বিষয়শিক্ষকের সাথে আলোচনা করুন।`,
+  ],
+  weak: [
+    (s,sub,weak,pct) => `🚨 ${s.name} এই মূল্যায়নে ${pct}% পেয়েছে। উন্নতির সুযোগ অনেক। ${weak} বিষয়ে বিশেষ দৃষ্টি দিতে হবে। ${sub} দিয়ে শুরু করুন — এটি তার তুলনামূলক ভালো বিষয়। অভিভাবকের সাথে নিয়মিত পড়ার রুটিন তৈরি করুন।`,
+    (s,sub,weak,pct) => `⚠️ ${s.name} এই মুহূর্তে সাহায্যের প্রয়োজন। ${pct}% প্রাপ্ত নম্বর তার প্রকৃত সামর্থ্যের প্রতিফলন নয়। ${weak} সহ সব বিষয়ে নিয়মিত অনুশীলন দরকার। ${sub} তার তুলনামূলক ভালো বিষয় — এখান থেকে আত্মবিশ্বাস বাড়াতে হবে।`,
+  ],
+};
+
+function buildFeedbackText(s, type, lang) {
+  const {total, maxTotal, avg, pct} = calcTotals(s);
+  const grade = getGrade(pct);
+  const cat = getCategory(pct);
+  const subjs = settings.subjects;
+  const sorted = subjs.map(sub => ({sub, val: s.scores?.[sub]||0})).sort((a,b) => a.val - b.val);
+  const weakSub = sorted[0]?.sub || '';
+  const weakVal = sorted[0]?.val || 0;
+  const strongSub = sorted[sorted.length-1]?.sub || '';
+  const strongVal = sorted[sorted.length-1]?.val || 0;
+
+  if(lang === 'en') {
+    const openings = [
+      `${s.name} has achieved ${pct}% in this assessment.`,
+      `This assessment reflects ${s.name}'s academic journey: ${total}/${maxTotal} marks secured.`,
+      `A comprehensive review for ${s.name} — Grade: ${grade.grade}, Average: ${avg}%.`,
+    ];
+    const opening = openings[Math.floor(Math.random()*openings.length)];
+    if(type==='general') return `${opening}\n\nStrengths: ${strongSub} (${strongVal}/100) is a standout subject.\nImprovement needed: ${weakSub} (${weakVal}/100) requires consistent practice.\n\nTeacher's remark: ${s.remarks||'Keep up the good work!'}`;
+    if(type==='motivational') return `Dear ${s.name},\n\n${pct>=80?`Your ${pct}% score is outstanding! You've set a benchmark for the class. Maintain this excellence in all subjects.`:`Your ${pct}% shows real effort! ${strongSub} is your strength. With focus on ${weakSub}, you can achieve so much more!`}\n\nBelieve in yourself. Every step forward counts. 🌟`;
+    if(type==='guardian') return `Dear Guardian of ${s.name},\n\nAcademic Results:\n${subjs.map(sub=>`• ${sub}: ${s.scores?.[sub]||0}/100`).join('\n')}\n\nTotal: ${total}/${maxTotal} | Grade: ${grade.grade} | GPA: ${grade.gp}\n\n${strongSub} is an area of excellence. Please support practice of ${weakSub} at home.\n\n— ${settings.teacherName}, ${settings.school}`;
+    return `Improvement Plan for ${s.name}:\n1. ${weakSub}: 25 mins daily practice.\n2. Revise previous test mistakes.\n3. Regular homework completion.\n4. Seek teacher help for doubts.\n5. Goal: +10% in next assessment.`;
+  }
+
+  const pool = pct >= 80 ? aiFeedbackPools.excellent : pct >= 50 ? aiFeedbackPools.average : aiFeedbackPools.weak;
+  const rndBase = pool[Math.floor(Math.random() * pool.length)](s, strongSub, weakSub, pct);
+
+  if(type==='general') return rndBase + `\n\nমোট: ${total}/${maxTotal} | গড়: ${avg}% | গ্রেড: ${grade.grade} | GPA: ${grade.gp}\nশিক্ষকের মন্তব্য: ${s.remarks || 'নিয়মিত পড়াশোনা অব্যাহত রাখুন।'}`;
+
+  if(type==='motivational') {
+    const msgs = [
+      `💫 প্রিয় ${s.name},\n\n${pct>=80?`তুমি ${pct}% পেয়ে সারা ক্লাসের উজ্জ্বল নক্ষত্র হয়ে উঠেছ। ${strongSub} তোমার রাজত্বের রাজমুকুট। এই অসাধারণ সাফল্যের জন্য অনেক অনেক শুভকামনা! 🌟`:`তুমি ${pct}% পেয়েছো — এর মধ্যে লুকিয়ে আছে তোমার অনেক সব্ভাবনা। ${strongSub} তোমার শক্তির রাজ্য। ${weakSub} তে আরো ১০% নম্বর যোগ করতে পারলেই তুমি ক্লাসের তারকাহবে!`}\n\nমনে রাখো — তুমি যা স্বপ্ন দেখো, তা অর্জন করার শক্তি তোমার আছে। 💪`,
+      `🚀 ${s.name}, তোমার প্রতিটি দিনের পরিশ্রম তোমাকে সামনে এগিয়ে নিয়ে যাচ্ছে। ${pct}% হলো তোমার আজকের অবস্থান, কালকের লস্য নয়। এগিয়ে চলো! 🌟`,
+    ];
+    return msgs[Math.floor(Math.random()*msgs.length)];
+  }
+
+  if(type==='guardian') return `শ্রদ্ধেয় অভিভাবক,\n\nআপনার সন্তান ${s.name} (রোল: ${s.roll}) এর মূল্যায়ন ফলাফল:\n\n${subjs.map(sub=>`• ${sub}: ${s.scores?.[sub]||0}/১০০`).join('\n')}\n\nমোট: ${total}/${maxTotal} | গ্রেড: ${grade.grade} | গড়: ${pct}% | GPA: ${grade.gp}\n\n${pct>=80?`আপনার সন্তান অসাধারণ ফলাফল করেছে। ${weakSub} তে যেন মানবিদ্যা বেড়ে উঠে সে লক্ষ্যে কাজ করে যাচ্ছে।`:`বাড়িতে ${weakSub} বিষয়ে সহায়তা করলে সে আরো ভালো ফলাফল করতে পারবে। ${strongSub} তে সে ইতিমধ্যে ভালো করছে।`}\n\nআন্তরিক ধন্যবাদ।\n— ${settings.teacherName}\n${settings.school}`;
+
+  const plans = [
+    `📈 ${s.name} এর ব্যক্তিগত উন্নতি পরিকল্পনা:\n\n১. ${weakSub}: প্রতিদিন ২৫ মিনিট পড়া ও অনুশীলন।\n২. বিগত পরীক্ষার ভুল থেকে শিক্ষা নেওয়া।\n৩. শিক্ষকের সাথে সাপ্তাহিক আলোচনা।\n৪. হোমওয়ার্ক প্রতিদিন সময়মতো শেষ করা।\n৫. লক্ষ্য: পরবর্তী মূল্যায়নে কমপক্ষে ${Math.min(pct+15,100)}% অর্জন।`,
+    `🎯 ${s.name} সাফল্যের রোডম্যাপ:\n\n• ${weakSub} তে প্রতিদিন ডেডিকেটেড স্টাডি সেশন।\n• ${strongSub} দিয়ে আত্মবিশ্বাস বাড়াও।\n• প্রশ্ন থাকলে দ্বিধা না করে শিক্ষককে ডাকো।\n• লক্ষ্য: পরবর্তী মূল্যায়নে ${Math.min(pct+10,100)}%+ অর্জন।`,
+  ];
+  return plans[Math.floor(Math.random()*plans.length)];
+}
+
 function generateAIFeedbackFor(id) {
   const s = students.find(x=>x.id===id);
   if(!s) return;
@@ -338,9 +426,7 @@ function generateAIFeedbackFor(id) {
   if(el) { el.textContent = ''; typewriterEffect(el, fb, 18); }
 }
 
-function onFeedbackStudentChange(id) {
-  // Just update the student chip if needed
-}
+function onFeedbackStudentChange(id) {}
 
 function generateAIFeedback() {
   const id = document.getElementById('feedback-student-select')?.value;
@@ -372,18 +458,6 @@ function generateAIFeedback() {
   document.getElementById('feedback-meta').textContent = `AI জেনারেটেড • ${new Date().toLocaleString('bn-BD')}`;
 }
 
-function buildFeedbackText(s, type, lang) {
-  const {total, maxTotal, avg, pct} = calcTotals(s);
-  const grade = getGrade(pct);
-  const cat = getCategory(pct);
-  const subjs = settings.subjects;
-  const sorted = subjs.map(sub=>({sub, val:s.scores?.[sub]||0})).sort((a,b)=>a.val-b.val);
-  const weakSub = sorted[0]?.sub || '';
-  const strongSub = sorted[sorted.length-1]?.sub || '';
-
-  if(lang === 'en') {
-    if(type==='general') return `Student: ${s.name} (Roll: ${s.roll})\n\nPerformance Summary:\n• Total: ${total}/${maxTotal} | Average: ${avg}%\n• Grade: ${grade.grade} | Status: ${pct>=80?'Excellent':pct>=50?'Average':'Needs Improvement'}\n\nStrengths: Performs well in ${strongSub} (${s.scores?.[strongSub]||0}/100).\n\nAreas for Improvement: ${weakSub} needs more attention (${s.scores?.[weakSub]||0}/100). Regular practice and revision will help.\n\nTeacher's Note: ${s.remarks || 'Keep up the good work and continue studying regularly.'}`;
-    if(type==='motivational') return `Dear ${s.name},\n\nYou've done a great job this term! Your score of ${pct}% shows your hard work. You excel in ${strongSub}. With a bit more focus on ${weakSub}, you can reach even greater heights!\n\nBelieve in yourself — every small step counts. Keep going! 🌟`;
     if(type==='guardian') return `Dear Guardian of ${s.name},\n\nWe are pleased to share the academic progress of your child.\n\nResults:\n${subjs.map(sub=>`• ${sub}: ${s.scores?.[sub]||0}/100`).join('\n')}\n\nTotal: ${total}/${maxTotal} | Grade: ${grade.grade}\n\nYour child shows strength in ${strongSub}. Please encourage practice in ${weakSub} at home.\n\nThank you for your continued support.\n\n— ${settings.teacherName}, ${settings.school}`;
     return `Improvement Plan for ${s.name}:\n\n1. Focus on ${weakSub} — practice daily for 20–30 minutes.\n2. Review past mistakes in tests.\n3. Maintain homework consistency.\n4. Seek help when stuck — do not hesitate to ask the teacher.\n5. Goal: Improve by at least 10% in the next assessment.`;
   }
@@ -1255,13 +1329,37 @@ function toggleDarkMode(){
   try{localStorage.setItem('sashiba_eval_theme',isDark?'dark':'light');}catch(e){}
 }
 function goHome(){
-  // Try to go back to the parent portal
-  try { window.parent.showHome(); return; } catch(e){}
-  try { window.top.showHome(); return; } catch(e){}
-  // Fallback: navigate to the main interface
-  try { window.parent.location.href = '../index.html'; } catch(e){
-    window.location.href = '../index.html';
+  // Best UX: stay in eval dashboard, just show a visual home notification
+  // instead of navigating away. Show confirmation if user really wants to leave.
+  if(confirm('মূল পোর্টালে ফিরে যেতে চান? অসংরক্ষিত ডেটা রেখে যাবে।')) {
+    try { window.parent.showHome(); return; } catch(e){}
+    try { window.top.showHome(); return; } catch(e){}
+    try { window.parent.location.href = '../index.html'; } catch(e){ window.location.href = '../index.html'; }
   }
+}
+
+/* ─── Keyboard Shortcuts ─── */
+document.addEventListener('keydown', e => {
+  // Only apply shortcuts when in report section
+  const isReport = !document.getElementById('section-report')?.classList.contains('hidden');
+  const isCtrl = e.ctrlKey || e.metaKey;
+  if(!isCtrl) return;
+  if(e.key === 'p' || e.key === 'P') {
+    if(isReport) { e.preventDefault(); printReportCard(); showToast('Ctrl+P → প্রিন্ট / PDF ডায়ালগ খুলছে...','success'); }
+  }
+  if(e.key === 's' || e.key === 'S') {
+    if(isReport) { e.preventDefault(); saveReportCard(); showToast('Ctrl+S → সেভ হয়েছে!','success'); }
+  }
+  if(e.key === 'e' || e.key === 'E') {
+    if(isReport) { e.preventDefault(); exportReportAsWord(); showToast('Ctrl+E → Word এক্সপোর্ট হচ্ছে!','success'); }
+  }
+});
+
+/* ─── PDF Download ─── */
+function downloadAsPDF() {
+  if(!selectedReportStudentId) { showToast('প্রথমে শিক্ষার্থী নির্বাচন করুন!','error'); return; }
+  showToast('প্রিন্ট ডায়ালগে "Save as PDF" বেছে নিন', 'success');
+  setTimeout(() => window.print(), 400);
 }
 
 // ── Utility ──
