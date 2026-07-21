@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>মূল্যায়ন আর্কিটেক্ট | স্মার্ট শিক্ষা বাতায়ন</title>
-    <meta name="description" content="সশিবা মূল্যায়ন আর্কিটেক্ট - শিক্ষার্থীদের পূর্ণাঙ্গ মূল্যায়ন, রিপোর্ট কার্ড ও অভিভাবক যোগাযোগ সিস্টেম।" />
+    <meta name="description" content="সশিবা মূল্যায়ন আর্কিটেক্ট - পূর্ণাঙ্গ মূল্যায়ন সিস্টেম।" />
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
@@ -26,14 +26,29 @@
           <a href="javascript:void(0)" class="nav-item" onclick="goHome()" id="nav-home">
             <i class="fa-solid fa-house"></i><span>হোম</span>
           </a>
+          <a href="javascript:void(0)" class="nav-item" onclick="showSection('performance')" id="nav-performance">
+            <i class="fa-solid fa-user-graduate"></i><span>শিক্ষার্থী পারফরম্যান্স</span>
+            <span class="nav-badge">নতুন</span>
+          </a>
           <a href="javascript:void(0)" class="nav-item active" onclick="showSection('students')" id="nav-students">
             <i class="fa-solid fa-users"></i><span>শিক্ষার্থী তালিকা</span>
           </a>
           <a href="javascript:void(0)" class="nav-item" onclick="showSection('analytics')" id="nav-analytics">
             <i class="fa-solid fa-chart-line"></i><span>ক্লাস বিশ্লেষণ</span>
           </a>
+          <a href="javascript:void(0)" class="nav-item" onclick="showSection('rubric')" id="nav-rubric">
+            <i class="fa-solid fa-table-list"></i><span>Rubric নির্মাতা</span>
+            <span class="nav-badge ai-badge">AI</span>
+          </a>
+          <a href="javascript:void(0)" class="nav-item" onclick="showSection('feedback')" id="nav-feedback">
+            <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI ফিডব্যাক</span>
+            <span class="nav-badge ai-badge">AI</span>
+          </a>
           <a href="javascript:void(0)" class="nav-item" onclick="showSection('report')" id="nav-report">
             <i class="fa-solid fa-id-card"></i><span>রিপোর্ট কার্ড</span>
+          </a>
+          <a href="javascript:void(0)" class="nav-item" onclick="showSection('history')" id="nav-history">
+            <i class="fa-solid fa-clock-rotate-left"></i><span>মূল্যায়ন ইতিহাস</span>
           </a>
 
           <div class="nav-section-label" style="margin-top:12px;">সেটিংস</div>
@@ -78,19 +93,102 @@
           </div>
         </div>
 
+        <!-- ========== SECTION: STUDENT PERFORMANCE ========== -->
+        <section class="content-section hidden" id="section-performance">
+          <div class="perf-layout">
+
+            <!-- Left: Student Picker -->
+            <div class="perf-sidebar-panel">
+              <div class="perf-panel-header">
+                <i class="fa-solid fa-users"></i> শিক্ষার্থী নির্বাচন
+              </div>
+              <input type="text" id="perf-search" class="form-input" placeholder="নাম বা রোল খুঁজুন..." oninput="filterPerfStudents()" style="margin-bottom:10px;" />
+              <div class="perf-student-list" id="perf-student-list">
+                <!-- JS generated -->
+              </div>
+            </div>
+
+            <!-- Right: Performance Detail -->
+            <div class="perf-detail-panel" id="perf-detail-panel">
+              <div class="perf-placeholder" id="perf-placeholder">
+                <i class="fa-solid fa-arrow-pointer"></i>
+                <p>বাম দিক থেকে একজন শিক্ষার্থী নির্বাচন করুন</p>
+              </div>
+              <div class="hidden" id="perf-content">
+
+                <!-- Student Header -->
+                <div class="perf-student-header" id="perf-header"></div>
+
+                <!-- Summary Stats -->
+                <div class="perf-summary-grid" id="perf-summary-grid"></div>
+
+                <!-- Performance Timeline -->
+                <div class="perf-card">
+                  <div class="perf-card-title">
+                    <i class="fa-solid fa-timeline"></i> পারফরম্যান্স টাইমলাইন
+                  </div>
+                  <div class="timeline-tabs">
+                    <button class="ttab active" onclick="switchTimeline('quiz',this)">Quiz</button>
+                    <button class="ttab" onclick="switchTimeline('assignment',this)">Assignment</button>
+                    <button class="ttab" onclick="switchTimeline('oral',this)">Oral</button>
+                    <button class="ttab" onclick="switchTimeline('practical',this)">Practical</button>
+                    <button class="ttab" onclick="switchTimeline('attendance',this)">উপস্থিতি</button>
+                    <button class="ttab" onclick="switchTimeline('homework',this)">হোমওয়ার্ক</button>
+                  </div>
+                  <div class="timeline-bars" id="timeline-bars"></div>
+                </div>
+
+                <!-- Subject Analysis: Weak & Strong -->
+                <div class="two-col-grid">
+                  <div class="perf-card topic-card weak-topics">
+                    <div class="perf-card-title"><i class="fa-solid fa-triangle-exclamation"></i> দুর্বল বিষয়/টপিক</div>
+                    <div id="weak-topics-list"></div>
+                  </div>
+                  <div class="perf-card topic-card strong-topics">
+                    <div class="perf-card-title"><i class="fa-solid fa-star"></i> শক্তিশালী বিষয়/টপিক</div>
+                    <div id="strong-topics-list"></div>
+                  </div>
+                </div>
+
+                <!-- Subject Scores Visual -->
+                <div class="perf-card">
+                  <div class="perf-card-title">
+                    <i class="fa-solid fa-book-open"></i> বিষয়ভিত্তিক স্কোর
+                    <button class="btn-outline btn-sm" onclick="openEditModal(currentPerfStudent)" style="margin-left:auto;">
+                      <i class="fa-solid fa-pen"></i> এডিট
+                    </button>
+                    <button class="btn-primary btn-sm" onclick="openReportCardFor(currentPerfStudent)" style="margin-left:6px;">
+                      <i class="fa-solid fa-id-card"></i> রিপোর্ট কার্ড
+                    </button>
+                  </div>
+                  <div id="perf-subject-bars"></div>
+                </div>
+
+                <!-- AI Feedback Preview -->
+                <div class="perf-card ai-feedback-card">
+                  <div class="perf-card-title">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI ফিডব্যাক
+                    <span class="ai-pill">AI</span>
+                  </div>
+                  <div id="perf-ai-feedback" class="ai-feedback-text"></div>
+                  <button class="btn-primary btn-sm" style="margin-top:12px;" onclick="generateAIFeedbackFor(currentPerfStudent)">
+                    <i class="fa-solid fa-rotate"></i> পুনরায় জেনারেট করুন
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- ========== SECTION: STUDENTS ========== -->
         <section class="content-section" id="section-students">
-
-          <!-- Stats Row -->
           <div class="stats-grid">
             <div class="stat-card stat-blue">
               <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
               <div class="stat-info">
                 <div class="stat-value" id="stat-total">০</div>
                 <div class="stat-label">মোট শিক্ষার্থী</div>
-              </div>
-              <div class="stat-trend">
-                <i class="fa-solid fa-arrow-up"></i>
               </div>
             </div>
             <div class="stat-card stat-green">
@@ -123,7 +221,6 @@
             </div>
           </div>
 
-          <!-- Search & Filter Bar -->
           <div class="table-controls">
             <div class="search-box">
               <i class="fa-solid fa-magnifying-glass"></i>
@@ -140,16 +237,11 @@
             </button>
           </div>
 
-          <!-- Students Table -->
           <div class="table-card">
             <div class="table-wrapper">
               <table id="students-table">
-                <thead id="table-header">
-                  <!-- Generated by JS -->
-                </thead>
-                <tbody id="table-body">
-                  <!-- Generated by JS -->
-                </tbody>
+                <thead id="table-header"></thead>
+                <tbody id="table-body"></tbody>
               </table>
             </div>
             <div class="table-empty" id="table-empty" style="display:none;">
@@ -163,8 +255,6 @@
         <!-- ========== SECTION: ANALYTICS ========== -->
         <section class="content-section hidden" id="section-analytics">
           <div class="analytics-grid">
-
-            <!-- Performance Distribution -->
             <div class="analytics-card analytics-full">
               <div class="card-header">
                 <h3><i class="fa-solid fa-chart-pie"></i> শ্রেণি বিতরণ</h3>
@@ -172,38 +262,173 @@
               </div>
               <div class="distribution-bars" id="distribution-bars"></div>
             </div>
-
-            <!-- Grade Distribution -->
             <div class="analytics-card">
-              <div class="card-header">
-                <h3><i class="fa-solid fa-star"></i> গ্রেড বিতরণ</h3>
-              </div>
+              <div class="card-header"><h3><i class="fa-solid fa-star"></i> গ্রেড বিতরণ</h3></div>
               <div class="grade-bars" id="grade-bars"></div>
             </div>
-
-            <!-- Subject Averages -->
             <div class="analytics-card">
-              <div class="card-header">
-                <h3><i class="fa-solid fa-book-open"></i> বিষয়ভিত্তিক গড়</h3>
-              </div>
+              <div class="card-header"><h3><i class="fa-solid fa-book-open"></i> বিষয়ভিত্তিক গড়</h3></div>
               <div class="subject-bars" id="subject-bars"></div>
             </div>
-
-            <!-- Top Students Podium -->
             <div class="analytics-card analytics-full">
-              <div class="card-header">
-                <h3><i class="fa-solid fa-medal"></i> শীর্ষ শিক্ষার্থী</h3>
-              </div>
+              <div class="card-header"><h3><i class="fa-solid fa-medal"></i> শীর্ষ শিক্ষার্থী</h3></div>
               <div class="podium" id="podium"></div>
             </div>
-
-            <!-- Weak Students -->
             <div class="analytics-card analytics-full">
               <div class="card-header">
                 <h3><i class="fa-solid fa-hand-holding-heart"></i> বিশেষ মনোযোগ প্রয়োজন</h3>
                 <span class="badge badge-danger" id="weak-count-badge">০ জন</span>
               </div>
               <div id="weak-students-list" class="weak-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== SECTION: RUBRIC BUILDER ========== -->
+        <section class="content-section hidden" id="section-rubric">
+          <div class="rubric-layout">
+
+            <!-- Rubric Generator Panel -->
+            <div class="rubric-gen-panel">
+              <div class="ai-panel-header">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <div>
+                  <div class="ai-panel-title">AI Rubric নির্মাতা</div>
+                  <div class="ai-panel-sub">টপিক লিখুন — AI তৈরি করবে</div>
+                </div>
+                <span class="ai-pill">AI</span>
+              </div>
+              <div class="form-group">
+                <label>কার্যক্রমের ধরন</label>
+                <select id="rubric-type" class="form-input">
+                  <option>Presentation</option>
+                  <option>Project Work</option>
+                  <option>Written Assignment</option>
+                  <option>Lab Report</option>
+                  <option>Group Discussion</option>
+                  <option>Oral Exam</option>
+                  <option>Creative Work</option>
+                  <option>Homework</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>বিষয় / টপিক</label>
+                <input type="text" id="rubric-topic" class="form-input" placeholder="যেমন: বাংলাদেশের মুক্তিযুদ্ধ" />
+              </div>
+              <div class="form-group">
+                <label>সর্বোচ্চ স্কোর</label>
+                <select id="rubric-max-score" class="form-input">
+                  <option value="5">৫ পয়েন্ট</option>
+                  <option value="4">৪ পয়েন্ট</option>
+                  <option value="10">১০ পয়েন্ট</option>
+                  <option value="100">১০০ নম্বর</option>
+                </select>
+              </div>
+              <button class="btn-primary" style="width:100%;" onclick="generateRubric()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Rubric তৈরি করুন
+              </button>
+              <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
+                <div class="form-group">
+                  <label>সংরক্ষিত Rubric সমূহ</label>
+                  <div id="saved-rubrics-list"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rubric Preview/Editor -->
+            <div class="rubric-preview-panel">
+              <div id="rubric-placeholder" class="perf-placeholder">
+                <i class="fa-solid fa-table-list"></i>
+                <p>AI Rubric তৈরি করতে বাম দিক থেকে কার্যক্রম ও টপিক দিন</p>
+              </div>
+              <div id="rubric-result" class="hidden">
+                <div class="rubric-result-header">
+                  <div>
+                    <div id="rubric-result-title" style="font-size:18px;font-weight:800;color:var(--text-main);"></div>
+                    <div id="rubric-result-sub" style="font-size:13px;color:var(--text-muted);margin-top:3px;"></div>
+                  </div>
+                  <div style="display:flex;gap:8px;">
+                    <button class="btn-outline btn-sm" onclick="printRubric()"><i class="fa-solid fa-print"></i> প্রিন্ট</button>
+                    <button class="btn-green btn-sm" onclick="saveRubric()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ</button>
+                  </div>
+                </div>
+                <div class="table-wrapper">
+                  <table class="rubric-table" id="rubric-table">
+                    <thead id="rubric-thead"></thead>
+                    <tbody id="rubric-tbody"></tbody>
+                  </table>
+                </div>
+                <div id="rubric-scoring" style="margin-top:16px;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== SECTION: AI FEEDBACK ========== -->
+        <section class="content-section hidden" id="section-feedback">
+          <div class="feedback-layout">
+
+            <div class="feedback-config-panel">
+              <div class="ai-panel-header">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <div>
+                  <div class="ai-panel-title">AI ফিডব্যাক জেনারেটর</div>
+                  <div class="ai-panel-sub">ফলাফল দেখে AI লিখে দেবে</div>
+                </div>
+                <span class="ai-pill">AI</span>
+              </div>
+              <div class="form-group">
+                <label>শিক্ষার্থী নির্বাচন করুন</label>
+                <select id="feedback-student-select" class="form-input" onchange="onFeedbackStudentChange(this.value)">
+                  <option value="">-- শিক্ষার্থী বেছে নিন --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ফিডব্যাকের ধরন</label>
+                <div class="feedback-type-grid">
+                  <label class="radio-card">
+                    <input type="radio" name="fb-type" value="general" checked /> সাধারণ মূল্যায়ন
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="fb-type" value="motivational" /> উৎসাহমূলক
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="fb-type" value="guardian" /> অভিভাবক বার্তা
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="fb-type" value="improvement" /> উন্নতি পরিকল্পনা
+                  </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>ভাষা</label>
+                <select id="fb-language" class="form-input">
+                  <option value="bn">বাংলা</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+              <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="generateAIFeedback()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> ফিডব্যাক জেনারেট করুন
+              </button>
+            </div>
+
+            <div class="feedback-result-panel">
+              <div id="feedback-placeholder" class="perf-placeholder">
+                <i class="fa-solid fa-comments"></i>
+                <p>একজন শিক্ষার্থী নির্বাচন করে ফিডব্যাক জেনারেট করুন</p>
+              </div>
+              <div id="feedback-result" class="hidden">
+                <div class="feedback-result-header">
+                  <div id="fb-student-chip" class="student-chip"></div>
+                  <div style="display:flex;gap:8px;">
+                    <button class="btn-outline btn-sm" onclick="copyFeedback()"><i class="fa-solid fa-copy"></i> কপি</button>
+                    <button class="btn-whatsapp btn-sm" onclick="shareFeedbackWhatsApp()"><i class="fa-brands fa-whatsapp"></i> শেয়ার</button>
+                    <button class="btn-primary btn-sm" onclick="generateAIFeedback()"><i class="fa-solid fa-rotate"></i> পুনরায়</button>
+                  </div>
+                </div>
+                <div class="feedback-text-box" id="feedback-text-output" contenteditable="true"></div>
+                <div class="feedback-meta" id="feedback-meta"></div>
+              </div>
             </div>
 
           </div>
@@ -213,25 +438,18 @@
         <section class="content-section hidden" id="section-report">
           <div class="report-controls">
             <div class="report-selector">
-              <label for="report-student-select"><i class="fa-solid fa-user"></i> শিক্ষার্থী নির্বাচন করুন:</label>
+              <label for="report-student-select"><i class="fa-solid fa-user"></i> শিক্ষার্থী:</label>
               <select id="report-student-select" onchange="renderReportCard(this.value)">
                 <option value="">-- শিক্ষার্থী বেছে নিন --</option>
               </select>
             </div>
             <div class="report-actions">
-              <button class="btn-primary" onclick="printReportCard()">
-                <i class="fa-solid fa-print"></i> প্রিন্ট করুন
-              </button>
-              <button class="btn-green" onclick="saveReportCard()">
-                <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ
-              </button>
-              <button class="btn-whatsapp" onclick="shareWhatsApp()">
-                <i class="fa-brands fa-whatsapp"></i> WhatsApp
-              </button>
+              <button class="btn-primary" onclick="printReportCard()"><i class="fa-solid fa-print"></i> প্রিন্ট</button>
+              <button class="btn-green" onclick="saveReportCard()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ</button>
+              <button class="btn-whatsapp" onclick="shareWhatsApp()"><i class="fa-brands fa-whatsapp"></i> অভিভাবক</button>
+              <button class="btn-outline" onclick="archiveCurrentReport()"><i class="fa-solid fa-box-archive"></i> আর্কাইভ</button>
             </div>
           </div>
-
-          <!-- Report Card Preview Area -->
           <div class="report-preview" id="report-preview">
             <div class="report-placeholder">
               <i class="fa-solid fa-id-card"></i>
@@ -240,107 +458,79 @@
           </div>
         </section>
 
+        <!-- ========== SECTION: ASSESSMENT HISTORY ========== -->
+        <section class="content-section hidden" id="section-history">
+          <div class="history-controls">
+            <div class="search-box" style="flex:1;max-width:340px;">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="history-search" placeholder="নাম বা তারিখ দিয়ে খুঁজুন..." oninput="renderHistory()" />
+            </div>
+            <div class="filter-chips">
+              <button class="chip chip-active" onclick="setHistoryFilter('all')" id="hchip-all">সকল</button>
+              <button class="chip" onclick="setHistoryFilter('active')" id="hchip-active">সক্রিয়</button>
+              <button class="chip" onclick="setHistoryFilter('archived')" id="hchip-archived">আর্কাইভ</button>
+            </div>
+            <button class="btn-primary btn-sm" onclick="saveCurrentSnapshot()">
+              <i class="fa-solid fa-camera"></i> স্ন্যাপশট সংরক্ষণ
+            </button>
+          </div>
+
+          <div class="history-list" id="history-list">
+            <!-- JS generated -->
+          </div>
+        </section>
+
         <!-- ========== SECTION: SETTINGS ========== -->
         <section class="content-section hidden" id="section-settings">
           <div class="settings-grid">
-
-            <!-- School Info -->
             <div class="settings-card">
-              <div class="settings-card-header">
-                <i class="fa-solid fa-school"></i>
-                <h3>বিদ্যালয়ের তথ্য</h3>
-              </div>
-              <div class="form-group">
-                <label>বিদ্যালয়ের নাম</label>
-                <input type="text" id="set-school" class="form-input" value="" />
-              </div>
+              <div class="settings-card-header"><i class="fa-solid fa-school"></i><h3>বিদ্যালয়ের তথ্য</h3></div>
+              <div class="form-group"><label>বিদ্যালয়ের নাম</label><input type="text" id="set-school" class="form-input" /></div>
               <div class="form-row">
-                <div class="form-group">
-                  <label>শ্রেণি</label>
-                  <input type="text" id="set-class" class="form-input" value="" />
-                </div>
-                <div class="form-group">
-                  <label>শাখা</label>
-                  <input type="text" id="set-section" class="form-input" value="" />
-                </div>
+                <div class="form-group"><label>শ্রেণি</label><input type="text" id="set-class" class="form-input" /></div>
+                <div class="form-group"><label>শাখা</label><input type="text" id="set-section" class="form-input" /></div>
               </div>
-              <div class="form-group">
-                <label>শিক্ষাবর্ষ</label>
-                <input type="text" id="set-year" class="form-input" value="" />
-              </div>
-              <div class="form-group">
-                <label>শিক্ষকের নাম</label>
-                <input type="text" id="set-teacher" class="form-input" value="" />
-              </div>
-              <div class="form-group">
-                <label>পদবি</label>
-                <input type="text" id="set-designation" class="form-input" value="" />
-              </div>
+              <div class="form-group"><label>শিক্ষাবর্ষ</label><input type="text" id="set-year" class="form-input" /></div>
+              <div class="form-group"><label>শিক্ষকের নাম</label><input type="text" id="set-teacher" class="form-input" /></div>
+              <div class="form-group"><label>পদবি</label><input type="text" id="set-designation" class="form-input" /></div>
             </div>
-
-            <!-- Subjects -->
             <div class="settings-card">
-              <div class="settings-card-header">
-                <i class="fa-solid fa-book"></i>
-                <h3>বিষয় তালিকা</h3>
-              </div>
+              <div class="settings-card-header"><i class="fa-solid fa-book"></i><h3>বিষয় তালিকা</h3></div>
               <div id="subjects-list" class="subjects-list"></div>
               <div class="form-row" style="margin-top:12px;">
                 <input type="text" id="new-subject" class="form-input" placeholder="নতুন বিষয়ের নাম..." />
-                <button class="btn-primary btn-sm" onclick="addSubject()">
-                  <i class="fa-solid fa-plus"></i> যোগ করুন
-                </button>
+                <button class="btn-primary btn-sm" onclick="addSubject()"><i class="fa-solid fa-plus"></i> যোগ</button>
               </div>
             </div>
-
-            <!-- Grading System -->
             <div class="settings-card">
-              <div class="settings-card-header">
-                <i class="fa-solid fa-star-half-stroke"></i>
-                <h3>গ্রেডিং সিস্টেম</h3>
-              </div>
-              <div class="grade-table-preview">
-                <table class="grade-ref-table">
-                  <thead><tr><th>গ্রেড</th><th>% রেঞ্জ</th><th>গ্রেড পয়েন্ট</th></tr></thead>
-                  <tbody>
-                    <tr><td><span class="grade-badge grade-aplus">A+</span></td><td>৮০–১০০%</td><td>৫.০০</td></tr>
-                    <tr><td><span class="grade-badge grade-a">A</span></td><td>৭০–৭৯%</td><td>৪.০০</td></tr>
-                    <tr><td><span class="grade-badge grade-aminus">A-</span></td><td>৬০–৬৯%</td><td>৩.৫০</td></tr>
-                    <tr><td><span class="grade-badge grade-b">B</span></td><td>৫০–৫৯%</td><td>৩.০০</td></tr>
-                    <tr><td><span class="grade-badge grade-c">C</span></td><td>৪০–৪৯%</td><td>২.০০</td></tr>
-                    <tr><td><span class="grade-badge grade-d">D</span></td><td>৩৩–৩৯%</td><td>১.০০</td></tr>
-                    <tr><td><span class="grade-badge grade-f">F</span></td><td>&lt;৩৩%</td><td>০.০০</td></tr>
-                  </tbody>
-                </table>
-              </div>
+              <div class="settings-card-header"><i class="fa-solid fa-star-half-stroke"></i><h3>গ্রেডিং সিস্টেম</h3></div>
+              <table class="grade-ref-table">
+                <thead><tr><th>গ্রেড</th><th>% রেঞ্জ</th><th>GPA</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="grade-badge grade-aplus">A+</span></td><td>৮০–১০০%</td><td>৫.০০</td></tr>
+                  <tr><td><span class="grade-badge grade-a">A</span></td><td>৭০–৭৯%</td><td>৪.০০</td></tr>
+                  <tr><td><span class="grade-badge grade-aminus">A-</span></td><td>৬০–৬৯%</td><td>৩.৫০</td></tr>
+                  <tr><td><span class="grade-badge grade-b">B</span></td><td>৫০–৫৯%</td><td>৩.০০</td></tr>
+                  <tr><td><span class="grade-badge grade-c">C</span></td><td>৪০–৪৯%</td><td>২.০০</td></tr>
+                  <tr><td><span class="grade-badge grade-d">D</span></td><td>৩৩–৩৯%</td><td>১.০০</td></tr>
+                  <tr><td><span class="grade-badge grade-f">F</span></td><td>&lt;৩৩%</td><td>০.০০</td></tr>
+                </tbody>
+              </table>
             </div>
-
-            <!-- Data Management -->
             <div class="settings-card">
-              <div class="settings-card-header">
-                <i class="fa-solid fa-database"></i>
-                <h3>ডেটা ব্যবস্থাপনা</h3>
-              </div>
+              <div class="settings-card-header"><i class="fa-solid fa-database"></i><h3>ডেটা ব্যবস্থাপনা</h3></div>
               <div class="settings-actions">
-                <button class="btn-outline" onclick="exportData()">
-                  <i class="fa-solid fa-file-export"></i> সব ডেটা এক্সপোর্ট (JSON)
-                </button>
+                <button class="btn-outline" onclick="exportData()"><i class="fa-solid fa-file-export"></i> JSON এক্সপোর্ট</button>
                 <label class="btn-outline" style="cursor:pointer;">
-                  <i class="fa-solid fa-file-import"></i> ডেটা ইম্পোর্ট (JSON)
+                  <i class="fa-solid fa-file-import"></i> JSON ইম্পোর্ট
                   <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display:none;" />
                 </label>
-                <button class="btn-danger" onclick="clearAllData()">
-                  <i class="fa-solid fa-trash"></i> সব ডেটা মুছুন
-                </button>
+                <button class="btn-danger" onclick="clearAllData()"><i class="fa-solid fa-trash"></i> সব মুছুন</button>
               </div>
             </div>
-
           </div>
-
           <div class="settings-save-bar">
-            <button class="btn-primary" onclick="saveSettings()">
-              <i class="fa-solid fa-floppy-disk"></i> সেটিংস সংরক্ষণ করুন
-            </button>
+            <button class="btn-primary" onclick="saveSettings()"><i class="fa-solid fa-floppy-disk"></i> সেটিংস সংরক্ষণ</button>
           </div>
         </section>
 
@@ -351,7 +541,7 @@
     <div class="modal-overlay hidden" id="student-modal" onclick="closeModalOnBackdrop(event)">
       <div class="modal-box" id="modal-box">
         <div class="modal-header">
-          <h2 id="modal-title"><i class="fa-solid fa-user-plus"></i> নতুন শিক্ষার্থী যোগ করুন</h2>
+          <h2 id="modal-title"><i class="fa-solid fa-user-plus"></i> নতুন শিক্ষার্থী</h2>
           <button class="btn-icon" onclick="closeStudentModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="modal-body">
@@ -363,38 +553,38 @@
             </div>
             <div class="form-group">
               <label>রোল নম্বর <span class="req">*</span></label>
-              <input type="number" id="m-roll" class="form-input" placeholder="যেমন: ০১" min="1" />
+              <input type="number" id="m-roll" class="form-input" placeholder="০১" min="1" />
             </div>
           </div>
-          <div class="form-group">
-            <label>অভিভাবকের নাম</label>
-            <input type="text" id="m-parent" class="form-input" placeholder="যেমন: করিম বেগম" />
-          </div>
-          <div class="form-group">
-            <label>অভিভাবকের ফোন (WhatsApp)</label>
-            <input type="text" id="m-phone" class="form-input" placeholder="যেমন: 01XXXXXXXXX" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>অভিভাবকের নাম</label>
+              <input type="text" id="m-parent" class="form-input" placeholder="করিম বেগম" />
+            </div>
+            <div class="form-group">
+              <label>ফোন (WhatsApp)</label>
+              <input type="text" id="m-phone" class="form-input" placeholder="01XXXXXXXXX" />
+            </div>
           </div>
           <div class="scores-section">
             <label class="scores-label">বিষয়ভিত্তিক নম্বর (সর্বোচ্চ ১০০)</label>
-            <div class="scores-grid" id="scores-inputs">
-              <!-- generated by JS -->
-            </div>
+            <div class="scores-grid" id="scores-inputs"></div>
           </div>
           <div class="form-group">
             <label>শিক্ষকের মন্তব্য</label>
-            <textarea id="m-remarks" class="form-textarea" placeholder="যেমন: অত্যন্ত মেধাবী, আরও উন্নতি সম্ভব..."></textarea>
+            <textarea id="m-remarks" class="form-textarea" placeholder="মেধাবী, আরও উন্নতি সম্ভব..."></textarea>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn-outline" onclick="closeStudentModal()">বাতিল</button>
           <button class="btn-primary" onclick="saveStudentFromModal()">
-            <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন
+            <i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ========== TOAST NOTIFICATION ========== -->
+    <!-- ========== TOAST ========== -->
     <div class="toast" id="toast"></div>
 
     <script src="script.js"></script>

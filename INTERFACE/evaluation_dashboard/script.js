@@ -1,42 +1,43 @@
 /**
- * সশিবা মূল্যায়ন আর্কিটেক্ট — script.js
- * শিক্ষার্থী মূল্যায়ন, রিপোর্ট কার্ড ও ক্লাস বিশ্লেষণ সিস্টেম
+ * সশিবা মূল্যায়ন আর্কিটেক্ট v2 — script.js
+ * Student Performance · AI Feedback · Rubric Builder · Report Card · Assessment History
  */
 
 // ═══════════════════════════════════════════════════════
-//  ১. STATE / DATA MODEL
+//  ১. STATE
 // ═══════════════════════════════════════════════════════
 let settings = {
   school: 'মাগুরিব স্কুল এন্ড কলেজ',
-  className: 'পঞ্চম',
-  section: 'ক',
-  year: '২০২৫',
+  className: 'পঞ্চম', section: 'ক', year: '২০২৫',
   subjects: ['বাংলা', 'ইংরেজি', 'গণিত', 'বিজ্ঞান', 'সমাজ'],
-  teacherName: 'মাগুরিব আলী',
-  teacherDesignation: 'প্রধান শিক্ষক'
+  teacherName: 'মাগুরিব আলী', teacherDesignation: 'প্রধান শিক্ষক'
 };
-
 let students = [];
+let assessmentHistory = [];
+let savedRubrics = [];
 let currentFilter = 'all';
 let sortField = null;
 let sortAsc = true;
 let selectedReportStudentId = null;
+let currentPerfStudent = null;
+let currentTimeline = 'quiz';
+let historyFilter = 'all';
 
 // ═══════════════════════════════════════════════════════
 //  ২. SAMPLE DATA
 // ═══════════════════════════════════════════════════════
 const sampleStudents = [
-  { name: 'রাহেলা বেগম', roll: 1, scores: { বাংলা: 85, ইংরেজি: 78, গণিত: 90, বিজ্ঞান: 82, সমাজ: 88 }, remarks: 'অত্যন্ত মেধাবী ও পরিশ্রমী। আরও ভালো করার সক্ষমতা আছে।', parentName: 'করিম বেগম', phone: '' },
-  { name: 'মো: আবির হোসেন', roll: 2, scores: { বাংলা: 62, ইংরেজি: 55, গণিত: 70, বিজ্ঞান: 60, সমাজ: 65 }, remarks: 'মনোযোগী, নিয়মিত অনুশীলন প্রয়োজন।', parentName: 'আবুল হোসেন', phone: '' },
-  { name: 'সুমাইয়া আক্তার', roll: 3, scores: { বাংলা: 45, ইংরেজি: 38, গণিত: 42, বিজ্ঞান: 50, সমাজ: 48 }, remarks: 'আরও চেষ্টা ও অভিভাবকের সহায়তা প্রয়োজন।', parentName: 'রহিমা আক্তার', phone: '' },
-  { name: 'তানভীর আহমেদ', roll: 4, scores: { বাংলা: 92, ইংরেজি: 88, গণিত: 95, বিজ্ঞান: 91, সমাজ: 89 }, remarks: 'ক্লাসে প্রথম। অসাধারণ মেধাবী।', parentName: 'রফিক আহমেদ', phone: '' },
-  { name: 'নাফিসা জাহান', roll: 5, scores: { বাংলা: 70, ইংরেজি: 65, গণিত: 68, বিজ্ঞান: 72, সমাজ: 75 }, remarks: 'ভালো করছে, আরও উন্নতি সম্ভব।', parentName: 'জহির উদ্দিন', phone: '' },
-  { name: 'আরিফ বিল্লাহ', roll: 6, scores: { বাংলা: 30, ইংরেজি: 28, গণিত: 35, বিজ্ঞান: 40, সমাজ: 32 }, remarks: 'অতিরিক্ত মনোযোগ ও বিশেষ কোচিং প্রয়োজন।', parentName: 'বিল্লাল হোসেন', phone: '' },
-  { name: 'সাদিয়া ইসলাম', roll: 7, scores: { বাংলা: 78, ইংরেজি: 82, গণিত: 75, বিজ্ঞান: 80, সমাজ: 77 }, remarks: 'চমৎকার অগ্রগতি দেখাচ্ছে।', parentName: 'নজরুল ইসলাম', phone: '' },
+  { name: 'রাহেলা বেগম', roll: 1, scores: { বাংলা: 85, ইংরেজি: 78, গণিত: 90, বিজ্ঞান: 82, সমাজ: 88 }, timeline: { quiz: [80,85,88,90,82], assignment: [90,88,85,92,86], oral: [85,87,83,89,91], practical: [88,82,90,85,87], attendance: [95,90,98,92,96], homework: [88,90,85,92,87] }, remarks: 'অত্যন্ত মেধাবী ও পরিশ্রমী।', parentName: 'করিম বেগম', phone: '' },
+  { name: 'মো: আবির হোসেন', roll: 2, scores: { বাংলা: 62, ইংরেজি: 55, গণিত: 70, বিজ্ঞান: 60, সমাজ: 65 }, timeline: { quiz: [60,58,65,62,70], assignment: [65,62,70,68,60], oral: [55,60,58,62,65], practical: [70,65,68,72,60], attendance: [80,75,85,78,80], homework: [65,70,62,68,72] }, remarks: 'মনোযোগী, নিয়মিত অনুশীলন প্রয়োজন।', parentName: 'আবুল হোসেন', phone: '' },
+  { name: 'সুমাইয়া আক্তার', roll: 3, scores: { বাংলা: 45, ইংরেজি: 38, গণিত: 42, বিজ্ঞান: 50, সমাজ: 48 }, timeline: { quiz: [40,38,45,42,48], assignment: [48,44,50,42,45], oral: [35,38,40,42,45], practical: [50,45,48,42,40], attendance: [70,65,72,68,75], homework: [42,45,40,48,44] }, remarks: 'আরও চেষ্টা ও অভিভাবকের সহায়তা প্রয়োজন।', parentName: 'রহিমা আক্তার', phone: '' },
+  { name: 'তানভীর আহমেদ', roll: 4, scores: { বাংলা: 92, ইংরেজি: 88, গণিত: 95, বিজ্ঞান: 91, সমাজ: 89 }, timeline: { quiz: [90,92,88,95,93], assignment: [95,90,92,88,96], oral: [88,90,92,95,91], practical: [92,95,90,88,94], attendance: [100,98,100,96,100], homework: [95,92,98,90,96] }, remarks: 'ক্লাসে প্রথম। অসাধারণ মেধাবী।', parentName: 'রফিক আহমেদ', phone: '' },
+  { name: 'নাফিসা জাহান', roll: 5, scores: { বাংলা: 70, ইংরেজি: 65, গণিত: 68, বিজ্ঞান: 72, সমাজ: 75 }, timeline: { quiz: [68,70,65,72,74], assignment: [72,68,75,70,65], oral: [65,70,68,72,75], practical: [70,65,72,68,75], attendance: [88,85,90,92,88], homework: [72,68,75,70,65] }, remarks: 'ভালো করছে, আরও উন্নতি সম্ভব।', parentName: 'জহির উদ্দিন', phone: '' },
+  { name: 'আরিফ বিল্লাহ', roll: 6, scores: { বাংলা: 30, ইংরেজি: 28, গণিত: 35, বিজ্ঞান: 40, সমাজ: 32 }, timeline: { quiz: [28,32,30,35,38], assignment: [32,28,35,30,32], oral: [25,28,30,32,35], practical: [38,35,40,32,30], attendance: [60,55,65,58,62], homework: [30,28,32,35,30] }, remarks: 'অতিরিক্ত মনোযোগ ও বিশেষ কোচিং প্রয়োজন।', parentName: 'বিল্লাল হোসেন', phone: '' },
+  { name: 'সাদিয়া ইসলাম', roll: 7, scores: { বাংলা: 78, ইংরেজি: 82, গণিত: 75, বিজ্ঞান: 80, সমাজ: 77 }, timeline: { quiz: [75,78,80,82,77], assignment: [78,82,75,80,85], oral: [80,78,82,75,80], practical: [76,80,78,82,75], attendance: [92,90,95,88,92], homework: [80,78,82,85,77] }, remarks: 'চমৎকার অগ্রগতি দেখাচ্ছে।', parentName: 'নজরুল ইসলাম', phone: '' },
 ];
 
 // ═══════════════════════════════════════════════════════
-//  ৩. GRADE / CATEGORY CALCULATION
+//  ৩. GRADE CALCULATIONS
 // ═══════════════════════════════════════════════════════
 function getGrade(pct) {
   if (pct >= 80) return { grade: 'A+', gp: '৫.০০', cls: 'grade-aplus' };
@@ -47,756 +48,967 @@ function getGrade(pct) {
   if (pct >= 33) return { grade: 'D', gp: '১.০০', cls: 'grade-d' };
   return { grade: 'F', gp: '০.০০', cls: 'grade-f' };
 }
-
 function getCategory(pct) {
   if (pct >= 80) return { label: 'ভালো', cls: 'cat-good', icon: 'fa-star' };
   if (pct >= 50) return { label: 'মধ্যম', cls: 'cat-average', icon: 'fa-circle-half-stroke' };
   return { label: 'দুর্বল', cls: 'cat-weak', icon: 'fa-arrow-trend-down' };
 }
-
 function calcTotals(student) {
   const subjs = settings.subjects;
-  const scores = student.scores || {};
   let total = 0, count = 0;
-  subjs.forEach(s => { const v = parseFloat(scores[s]) || 0; total += v; count++; });
+  subjs.forEach(s => { const v = parseFloat(student.scores?.[s]) || 0; total += v; count++; });
   const maxTotal = count * 100;
   const avg = count ? (total / count) : 0;
   const pct = maxTotal ? Math.round((total / maxTotal) * 100) : 0;
   return { total, maxTotal, avg: avg.toFixed(1), pct };
 }
-
 function getPosition(sid) {
-  const sorted = [...students].sort((a, b) => calcTotals(b).pct - calcTotals(a).pct);
-  return sorted.findIndex(s => s.id === sid) + 1;
+  return [...students].sort((a,b)=>calcTotals(b).pct-calcTotals(a).pct).findIndex(s=>s.id===sid)+1;
+}
+const avatarColors = ['#4f46e5','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e','#84cc16'];
+function getAvatarColor(str) {
+  let h = 0; for(let c of str) h = (h*31+c.charCodeAt(0)) & 0xff;
+  return avatarColors[h % avatarColors.length];
 }
 
 // ═══════════════════════════════════════════════════════
-//  ৪. RENDER: STUDENT TABLE
+//  ৪. STUDENT PERFORMANCE SECTION
 // ═══════════════════════════════════════════════════════
-function renderStudentTable() {
-  const query = (document.getElementById('student-search')?.value || '').toLowerCase();
-  let list = [...students];
-
-  // Filter by category
-  if (currentFilter !== 'all') {
-    list = list.filter(s => getCategory(calcTotals(s).pct).label === { good: 'ভালো', average: 'মধ্যম', weak: 'দুর্বল' }[currentFilter]);
-  }
-
-  // Search filter
-  if (query) list = list.filter(s => s.name.toLowerCase().includes(query) || String(s.roll).includes(query));
-
-  // Sort
-  if (sortField) {
-    list.sort((a, b) => {
-      let va, vb;
-      if (sortField === 'roll') { va = a.roll; vb = b.roll; }
-      else if (sortField === 'name') { va = a.name; vb = b.name; }
-      else if (sortField === 'total') { va = calcTotals(a).pct; vb = calcTotals(b).pct; }
-      else { va = a.scores[sortField] || 0; vb = b.scores[sortField] || 0; }
-      if (va < vb) return sortAsc ? -1 : 1;
-      if (va > vb) return sortAsc ? 1 : -1;
-      return 0;
-    });
-  }
-
-  const thead = document.getElementById('table-header');
-  const tbody = document.getElementById('table-body');
-  const empty = document.getElementById('table-empty');
-  if (!thead || !tbody) return;
-
-  const subjs = settings.subjects;
-
-  // Build header
-  let hCols = `
-    <th class="sortable" onclick="sortBy('roll')">#রোল ${sortField==='roll'?(sortAsc?'↑':'↓'):''}</th>
-    <th class="sortable" onclick="sortBy('name')">নাম ${sortField==='name'?(sortAsc?'↑':'↓'):''}</th>
-  `;
-  subjs.forEach(s => {
-    hCols += `<th class="sortable" onclick="sortBy('${s}')">${s}</th>`;
-  });
-  hCols += `
-    <th class="sortable" onclick="sortBy('total')">মোট ${sortField==='total'?(sortAsc?'↑':'↓'):''}</th>
-    <th>গড়%</th><th>গ্রেড</th><th>অবস্থান</th><th>শ্রেণি</th><th>অ্যাকশন</th>
-  `;
-  thead.innerHTML = `<tr>${hCols}</tr>`;
-
-  if (list.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-
-  tbody.innerHTML = list.map((s, idx) => {
-    const { total, maxTotal, avg, pct } = calcTotals(s);
+function renderPerfStudentList(filter='') {
+  const list = document.getElementById('perf-student-list');
+  if(!list) return;
+  let arr = [...students].sort((a,b)=>a.roll-b.roll);
+  if(filter) arr = arr.filter(s=>s.name.toLowerCase().includes(filter.toLowerCase())||String(s.roll).includes(filter));
+  list.innerHTML = arr.map(s=>{
+    const {pct} = calcTotals(s);
     const grade = getGrade(pct);
-    const cat = getCategory(pct);
-    let scoreCols = subjs.map(sub => `<td>${s.scores[sub] ?? '—'}</td>`).join('');
+    const color = getAvatarColor(s.name);
     return `
-      <tr>
-        <td><strong>${s.roll}</strong></td>
-        <td><span style="font-weight:700;">${s.name}</span></td>
-        ${scoreCols}
-        <td><strong>${total}/${maxTotal}</strong></td>
-        <td>${avg}%</td>
-        <td><span class="grade-badge ${grade.cls}">${grade.grade}</span></td>
-        <td style="font-weight:700; color:var(--primary);">${getPosition(s.id)}র্থ</td>
-        <td><span class="cat-badge ${cat.cls}"><i class="fa-solid ${cat.icon}"></i> ${cat.label}</span></td>
-        <td>
-          <button class="action-btn" onclick="openEditModal('${s.id}')" title="সম্পাদনা"><i class="fa-solid fa-pen"></i></button>
-          <button class="action-btn report" onclick="openReportCardFor('${s.id}')" title="রিপোর্ট কার্ড"><i class="fa-solid fa-id-card"></i></button>
-          <button class="action-btn danger" onclick="deleteStudent('${s.id}')" title="মুছুন"><i class="fa-solid fa-trash"></i></button>
-        </td>
-      </tr>
+      <div class="perf-student-item ${currentPerfStudent===s.id?'active':''}" onclick="loadPerformance('${s.id}')">
+        <div class="psi-avatar" style="background:${color}">${s.name.charAt(0)}</div>
+        <div>
+          <div class="psi-name">${s.name}</div>
+          <div class="psi-roll">রোল: ${s.roll}</div>
+        </div>
+        <div class="psi-grade" style="color:${pct>=80?'var(--success)':pct>=50?'var(--warning)':'var(--danger)'}">${grade.grade}</div>
+      </div>
     `;
   }).join('');
-
-  updateStats();
 }
 
-function sortBy(field) {
-  if (sortField === field) sortAsc = !sortAsc;
-  else { sortField = field; sortAsc = true; }
-  renderStudentTable();
+function filterPerfStudents() {
+  renderPerfStudentList(document.getElementById('perf-search')?.value || '');
 }
 
-function setFilter(cat) {
-  currentFilter = cat;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('chip-active'));
-  document.getElementById('chip-' + cat)?.classList.add('chip-active');
-  renderStudentTable();
+function loadPerformance(id) {
+  currentPerfStudent = id;
+  renderPerfStudentList(document.getElementById('perf-search')?.value || '');
+  const s = students.find(x=>x.id===id);
+  if(!s) return;
+
+  document.getElementById('perf-placeholder').classList.add('hidden');
+  document.getElementById('perf-content').classList.remove('hidden');
+
+  const {total, maxTotal, avg, pct} = calcTotals(s);
+  const grade = getGrade(pct);
+  const pos = getPosition(s.id);
+  const cat = getCategory(pct);
+  const color = getAvatarColor(s.name);
+
+  // Header
+  document.getElementById('perf-header').innerHTML = `
+    <div class="perf-student-avatar" style="background:${color}">${s.name.charAt(0)}</div>
+    <div>
+      <div class="perf-student-name">${s.name}</div>
+      <div class="perf-student-meta">রোল: ${s.roll} | শ্রেণি: ${settings.className} (${settings.section}) | শিক্ষাবর্ষ: ${settings.year}</div>
+      <div style="margin-top:6px;display:flex;gap:8px;">
+        <span class="grade-badge ${grade.cls}">${grade.grade}</span>
+        <span class="cat-badge ${cat.cls}"><i class="fa-solid ${cat.icon}"></i> ${cat.label}</span>
+      </div>
+    </div>
+    <div class="perf-header-actions">
+      <button class="btn-outline btn-sm" onclick="openEditModal('${s.id}')"><i class="fa-solid fa-pen"></i> এডিট</button>
+      <button class="btn-primary btn-sm" onclick="openReportCardFor('${s.id}')"><i class="fa-solid fa-id-card"></i> রিপোর্ট</button>
+    </div>
+  `;
+
+  // Summary stats
+  document.getElementById('perf-summary-grid').innerHTML = `
+    <div class="perf-stat"><div class="perf-stat-val">${total}/${maxTotal}</div><div class="perf-stat-label">মোট নম্বর</div></div>
+    <div class="perf-stat"><div class="perf-stat-val" style="color:${pct>=80?'var(--success)':pct>=50?'var(--warning)':'var(--danger)'}">${pct}%</div><div class="perf-stat-label">গড় শতকরা</div></div>
+    <div class="perf-stat"><div class="perf-stat-val" style="color:var(--purple)">${pos}ম</div><div class="perf-stat-label">শ্রেণিতে অবস্থান</div></div>
+    <div class="perf-stat"><div class="perf-stat-val">${grade.gp}</div><div class="perf-stat-label">গ্রেড পয়েন্ট</div></div>
+  `;
+
+  renderTimeline(s, currentTimeline);
+  renderWeakStrongTopics(s);
+  renderPerfSubjectBars(s);
+  generateAIFeedbackFor(id);
 }
 
-// ═══════════════════════════════════════════════════════
-//  ৫. STATS CARDS
-// ═══════════════════════════════════════════════════════
-function updateStats() {
-  const total = students.length;
-  let good = 0, avg = 0, weak = 0, sumPct = 0;
-  students.forEach(s => {
-    const { pct } = calcTotals(s);
-    sumPct += pct;
-    if (pct >= 80) good++;
-    else if (pct >= 50) avg++;
-    else weak++;
-  });
-  const classAvg = total ? Math.round(sumPct / total) : 0;
-
-  setEl('stat-total', total);
-  setEl('stat-good', good);
-  setEl('stat-avg', avg);
-  setEl('stat-weak', weak);
-  setEl('stat-classavg', classAvg + '%');
+function switchTimeline(type, btn) {
+  currentTimeline = type;
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  if(currentPerfStudent) {
+    const s = students.find(x=>x.id===currentPerfStudent);
+    if(s) renderTimeline(s, type);
+  }
 }
 
-// ═══════════════════════════════════════════════════════
-//  ৬. ADD / EDIT STUDENT MODAL
-// ═══════════════════════════════════════════════════════
-function openAddStudentModal() {
-  document.getElementById('modal-title').innerHTML = '<i class="fa-solid fa-user-plus"></i> নতুন শিক্ষার্থী যোগ করুন';
-  document.getElementById('modal-student-id').value = '';
-  document.getElementById('m-name').value = '';
-  document.getElementById('m-roll').value = '';
-  document.getElementById('m-parent').value = '';
-  document.getElementById('m-phone').value = '';
-  document.getElementById('m-remarks').value = '';
-  buildScoreInputs({});
-  document.getElementById('student-modal').classList.remove('hidden');
+function renderTimeline(s, type) {
+  const el = document.getElementById('timeline-bars');
+  if(!el) return;
+  const data = s.timeline?.[type] || [];
+  const subjs = settings.subjects;
+  const colors = ['#4f46e5','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e'];
+
+  if(data.length === 0) {
+    el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:10px 0;">এই বিভাগে ডেটা নেই।</div>';
+    return;
+  }
+  el.innerHTML = subjs.map((sub, i) => {
+    const val = data[i] !== undefined ? data[i] : (s.scores?.[sub] || 0);
+    const c = colors[i % colors.length];
+    return `
+      <div class="tl-row">
+        <div class="tl-subject">${sub}</div>
+        <div class="tl-track"><div class="tl-fill" style="width:${val}%;background:${c}"></div></div>
+        <div class="tl-val" style="color:${c}">${val}</div>
+      </div>
+    `;
+  }).join('');
 }
 
-function openEditModal(id) {
-  const s = students.find(x => x.id === id);
-  if (!s) return;
-  document.getElementById('modal-title').innerHTML = '<i class="fa-solid fa-pen"></i> শিক্ষার্থী সম্পাদনা করুন';
-  document.getElementById('modal-student-id').value = id;
-  document.getElementById('m-name').value = s.name;
-  document.getElementById('m-roll').value = s.roll;
-  document.getElementById('m-parent').value = s.parentName || '';
-  document.getElementById('m-phone').value = s.phone || '';
-  document.getElementById('m-remarks').value = s.remarks || '';
-  buildScoreInputs(s.scores || {});
-  document.getElementById('student-modal').classList.remove('hidden');
-}
+function renderWeakStrongTopics(s) {
+  const subjs = settings.subjects;
+  const sorted = subjs.map(sub=>({ sub, val: s.scores?.[sub] || 0 })).sort((a,b)=>a.val-b.val);
+  const weak = sorted.slice(0, Math.ceil(sorted.length/2));
+  const strong = sorted.slice(-Math.floor(sorted.length/2)).reverse();
 
-function buildScoreInputs(scores) {
-  const container = document.getElementById('scores-inputs');
-  container.innerHTML = settings.subjects.map(sub => `
-    <div class="score-input-group">
-      <label>${sub}</label>
-      <input type="number" id="score-${sub}" min="0" max="100" value="${scores[sub] ?? ''}" placeholder="০–১০০" />
+  const weakEl = document.getElementById('weak-topics-list');
+  const strongEl = document.getElementById('strong-topics-list');
+  if(weakEl) weakEl.innerHTML = weak.map(({sub,val})=>`
+    <div class="topic-item weak">
+      <div class="topic-name">${sub}</div>
+      <div class="topic-score weak">${val}/১০০</div>
+    </div>
+  `).join('');
+  if(strongEl) strongEl.innerHTML = strong.map(({sub,val})=>`
+    <div class="topic-item strong">
+      <div class="topic-name">${sub}</div>
+      <div class="topic-score strong">${val}/১০০</div>
     </div>
   `).join('');
 }
 
-function saveStudentFromModal() {
-  const name = document.getElementById('m-name').value.trim();
-  const roll = parseInt(document.getElementById('m-roll').value);
-  if (!name) { showToast('শিক্ষার্থীর নাম দিন!', 'error'); return; }
-  if (!roll) { showToast('রোল নম্বর দিন!', 'error'); return; }
-
-  const scores = {};
-  settings.subjects.forEach(sub => {
-    const v = parseFloat(document.getElementById('score-' + sub)?.value);
-    scores[sub] = isNaN(v) ? 0 : Math.min(100, Math.max(0, v));
-  });
-
-  const id = document.getElementById('modal-student-id').value;
-  const studentData = {
-    name,
-    roll,
-    scores,
-    parentName: document.getElementById('m-parent').value.trim(),
-    phone: document.getElementById('m-phone').value.trim(),
-    remarks: document.getElementById('m-remarks').value.trim(),
-  };
-
-  if (id) {
-    const idx = students.findIndex(s => s.id === id);
-    if (idx !== -1) { students[idx] = { ...students[idx], ...studentData }; }
-    showToast('শিক্ষার্থীর তথ্য আপডেট হয়েছে!', 'success');
-  } else {
-    students.push({ id: 'sid_' + Date.now(), ...studentData });
-    showToast('নতুন শিক্ষার্থী যোগ হয়েছে!', 'success');
-  }
-
-  closeStudentModal();
-  saveToStorage();
-  renderStudentTable();
-  refreshReportSelector();
-}
-
-function deleteStudent(id) {
-  if (!confirm('এই শিক্ষার্থীকে মুছে দেবেন?')) return;
-  students = students.filter(s => s.id !== id);
-  saveToStorage();
-  renderStudentTable();
-  refreshReportSelector();
-  showToast('শিক্ষার্থী মুছে দেওয়া হয়েছে।', 'error');
-}
-
-function closeStudentModal() { document.getElementById('student-modal').classList.add('hidden'); }
-function closeModalOnBackdrop(e) { if (e.target === document.getElementById('student-modal')) closeStudentModal(); }
-
-// ═══════════════════════════════════════════════════════
-//  ৭. ANALYTICS
-// ═══════════════════════════════════════════════════════
-function renderAnalytics() {
-  const total = students.length;
-  setEl('analytics-total-badge', total + ' জন');
-
-  let good = 0, avg = 0, weak = 0;
-  const gradeCounts = { 'A+': 0, 'A': 0, 'A-': 0, 'B': 0, 'C': 0, 'D': 0, 'F': 0 };
-  const subjectTotals = {};
-  settings.subjects.forEach(s => { subjectTotals[s] = 0; });
-
-  students.forEach(s => {
-    const { pct } = calcTotals(s);
-    const g = getGrade(pct).grade;
-    if (pct >= 80) good++;
-    else if (pct >= 50) avg++;
-    else weak++;
-    gradeCounts[g] = (gradeCounts[g] || 0) + 1;
-    settings.subjects.forEach(sub => { subjectTotals[sub] += s.scores[sub] || 0; });
-  });
-
-  // Distribution Bars
-  const maxDist = Math.max(good, avg, weak, 1);
-  const distBars = document.getElementById('distribution-bars');
-  if (distBars) {
-    distBars.innerHTML = `
-      <div class="dist-bar-group">
-        <div class="dist-count" style="color:var(--success)">${good}</div>
-        <div class="dist-bar-wrap"><div class="dist-bar dist-good" style="height:${Math.round((good/maxDist)*90)}%"></div></div>
-        <div class="dist-label" style="color:var(--success)">ভালো</div>
-      </div>
-      <div class="dist-bar-group">
-        <div class="dist-count" style="color:var(--warning)">${avg}</div>
-        <div class="dist-bar-wrap"><div class="dist-bar dist-average" style="height:${Math.round((avg/maxDist)*90)}%"></div></div>
-        <div class="dist-label" style="color:var(--warning)">মধ্যম</div>
-      </div>
-      <div class="dist-bar-group">
-        <div class="dist-count" style="color:var(--danger)">${weak}</div>
-        <div class="dist-bar-wrap"><div class="dist-bar dist-weak" style="height:${Math.round((weak/maxDist)*90)}%"></div></div>
-        <div class="dist-label" style="color:var(--danger)">দুর্বল</div>
+function renderPerfSubjectBars(s) {
+  const el = document.getElementById('perf-subject-bars');
+  if(!el) return;
+  const colors = ['#4f46e5','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e'];
+  el.innerHTML = settings.subjects.map((sub,i)=>{
+    const val = s.scores?.[sub] || 0;
+    const c = colors[i % colors.length];
+    const g = getGrade(val);
+    return `
+      <div class="perf-subj-row">
+        <div class="perf-subj-name">${sub}</div>
+        <div class="perf-subj-track"><div class="perf-subj-fill" style="width:${val}%;background:${c}"></div></div>
+        <div class="perf-subj-val" style="color:${c}">${val} <span class="grade-badge ${g.cls}">${g.grade}</span></div>
       </div>
     `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ৫. AI FEEDBACK
+// ═══════════════════════════════════════════════════════
+function generateAIFeedbackFor(id) {
+  const s = students.find(x=>x.id===id);
+  if(!s) return;
+  const fb = buildFeedbackText(s, 'general', 'bn');
+  const el = document.getElementById('perf-ai-feedback');
+  if(el) { el.textContent = ''; typewriterEffect(el, fb, 18); }
+}
+
+function onFeedbackStudentChange(id) {
+  // Just update the student chip if needed
+}
+
+function generateAIFeedback() {
+  const id = document.getElementById('feedback-student-select')?.value;
+  if(!id) { showToast('শিক্ষার্থী নির্বাচন করুন!', 'error'); return; }
+  const s = students.find(x=>x.id===id);
+  if(!s) return;
+
+  const type = document.querySelector('input[name="fb-type"]:checked')?.value || 'general';
+  const lang = document.getElementById('fb-language')?.value || 'bn';
+  const fb = buildFeedbackText(s, type, lang);
+
+  document.getElementById('feedback-placeholder').classList.add('hidden');
+  document.getElementById('feedback-result').classList.remove('hidden');
+
+  const {pct} = calcTotals(s);
+  const grade = getGrade(pct);
+  const color = getAvatarColor(s.name);
+  document.getElementById('fb-student-chip').innerHTML = `
+    <div class="user-avatar" style="background:${color};width:32px;height:32px;font-size:12px;">${s.name.charAt(0)}</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-main);">${s.name}</div>
+      <div style="font-size:11px;color:var(--text-muted);">গড়: ${pct}% | গ্রেড: ${grade.grade}</div>
+    </div>
+  `;
+
+  const outEl = document.getElementById('feedback-text-output');
+  if(outEl) { outEl.textContent = ''; typewriterEffect(outEl, fb, 15); }
+
+  document.getElementById('feedback-meta').textContent = `AI জেনারেটেড • ${new Date().toLocaleString('bn-BD')}`;
+}
+
+function buildFeedbackText(s, type, lang) {
+  const {total, maxTotal, avg, pct} = calcTotals(s);
+  const grade = getGrade(pct);
+  const cat = getCategory(pct);
+  const subjs = settings.subjects;
+  const sorted = subjs.map(sub=>({sub, val:s.scores?.[sub]||0})).sort((a,b)=>a.val-b.val);
+  const weakSub = sorted[0]?.sub || '';
+  const strongSub = sorted[sorted.length-1]?.sub || '';
+
+  if(lang === 'en') {
+    if(type==='general') return `Student: ${s.name} (Roll: ${s.roll})\n\nPerformance Summary:\n• Total: ${total}/${maxTotal} | Average: ${avg}%\n• Grade: ${grade.grade} | Status: ${pct>=80?'Excellent':pct>=50?'Average':'Needs Improvement'}\n\nStrengths: Performs well in ${strongSub} (${s.scores?.[strongSub]||0}/100).\n\nAreas for Improvement: ${weakSub} needs more attention (${s.scores?.[weakSub]||0}/100). Regular practice and revision will help.\n\nTeacher's Note: ${s.remarks || 'Keep up the good work and continue studying regularly.'}`;
+    if(type==='motivational') return `Dear ${s.name},\n\nYou've done a great job this term! Your score of ${pct}% shows your hard work. You excel in ${strongSub}. With a bit more focus on ${weakSub}, you can reach even greater heights!\n\nBelieve in yourself — every small step counts. Keep going! 🌟`;
+    if(type==='guardian') return `Dear Guardian of ${s.name},\n\nWe are pleased to share the academic progress of your child.\n\nResults:\n${subjs.map(sub=>`• ${sub}: ${s.scores?.[sub]||0}/100`).join('\n')}\n\nTotal: ${total}/${maxTotal} | Grade: ${grade.grade}\n\nYour child shows strength in ${strongSub}. Please encourage practice in ${weakSub} at home.\n\nThank you for your continued support.\n\n— ${settings.teacherName}, ${settings.school}`;
+    return `Improvement Plan for ${s.name}:\n\n1. Focus on ${weakSub} — practice daily for 20–30 minutes.\n2. Review past mistakes in tests.\n3. Maintain homework consistency.\n4. Seek help when stuck — do not hesitate to ask the teacher.\n5. Goal: Improve by at least 10% in the next assessment.`;
   }
 
-  // Grade Bars
-  const gradeBarsEl = document.getElementById('grade-bars');
-  const gradeColors = { 'A+': '#10b981', 'A': '#34d399', 'A-': '#60a5fa', 'B': '#818cf8', 'C': '#fbbf24', 'D': '#fb923c', 'F': '#f87171' };
-  if (gradeBarsEl && total) {
-    gradeBarsEl.innerHTML = Object.entries(gradeCounts).map(([g, cnt]) => `
-      <div class="bar-row">
-        <div class="bar-label-row">
-          <span class="bar-subject-name"><span class="grade-badge grade-${g.toLowerCase().replace('+','plus').replace('-','minus')}">${g}</span></span>
-          <span class="bar-pct" style="color:${gradeColors[g]}">${cnt} জন</span>
+  // Bengali versions
+  if(type==='general') return `শিক্ষার্থী: ${s.name} (রোল: ${s.roll})\n\nপারফরম্যান্স সারসংক্ষেপ:\n• মোট: ${total}/${maxTotal} | গড়: ${avg}%\n• গ্রেড: ${grade.grade} | অবস্থান: ${cat.label}\n\nশক্তিশালী দিক: ${strongSub} বিষয়ে ভালো দক্ষতা দেখিয়েছে (${s.scores?.[strongSub]||0}/১০০)। এই ধারা অব্যাহত রাখতে হবে।\n\nউন্নতির সুযোগ: ${weakSub} বিষয়ে আরও মনোযোগ প্রয়োজন (${s.scores?.[weakSub]||0}/১০০)। প্রতিদিন নিয়মিত অনুশীলন করলে দ্রুত উন্নতি হবে।\n\nশিক্ষকের মন্তব্য: ${s.remarks || 'নিয়মিত পড়াশোনা অব্যাহত রাখুন এবং ক্লাসে মনোযোগী হন।'}`;
+
+  if(type==='motivational') return `প্রিয় ${s.name},\n\nতুমি এই মূল্যায়নে ${pct}% নম্বর পেয়েছ — এটি তোমার পরিশ্রমের ফল। ${strongSub} বিষয়ে তুমি সত্যিই দুর্দান্ত! \n\n${pct<80?`${weakSub} বিষয়টিতে আরেকটু মনোযোগ দিলেই তুমি আরও ভালো ফলাফল করতে পারবে। হাল ছেড়ো না — তুমি পারবেই!`:'তুমি সত্যিকারের মেধাবী। এই অসাধারণ ফলাফলের জন্য অভিনন্দন! এভাবেই এগিয়ে যাও।'}\n\nতোমার জন্য শুভকামনা রইল! 🌟`;
+
+  if(type==='guardian') return `শ্রদ্ধেয় অভিভাবক,\n\nআপনার সন্তান ${s.name} (রোল: ${s.roll}) এর একাডেমিক অগ্রগতি জানাতে পারছি।\n\nফলাফল:\n${subjs.map(sub=>`• ${sub}: ${s.scores?.[sub]||0}/১০০`).join('\n')}\n\nমোট: ${total}/${maxTotal} | গ্রেড: ${grade.grade} | গড়: ${pct}%\n\nআপনার সন্তান ${strongSub} বিষয়ে খুব ভালো করছে। বাড়িতে ${weakSub} বিষয়ে সহায়তা করলে সে আরও ভালো ফলাফল করতে পারবে।\n\nআপনার সহযোগিতার জন্য আন্তরিক ধন্যবাদ।\n\n— ${settings.teacherName}\n${settings.school}`;
+
+  return `${s.name} এর উন্নতি পরিকল্পনা:\n\n১. ${weakSub} বিষয়ে প্রতিদিন ২০–৩০ মিনিট অনুশীলন করতে হবে।\n২. পূর্ববর্তী পরীক্ষার ভুলগুলো বারবার দেখতে হবে।\n৩. নিয়মিত হোমওয়ার্ক সম্পন্ন করতে হবে।\n৪. যেকোনো সমস্যায় শিক্ষকের সাহায্য নিতে দ্বিধা করবে না।\n৫. লক্ষ্য: পরবর্তী মূল্যায়নে কমপক্ষে ১০% উন্নতি।\n\nবিশেষ মনোযোগ দরকার: ${weakSub} (বর্তমান: ${s.scores?.[weakSub]||0}%)`;
+}
+
+function typewriterEffect(el, text, speed=12) {
+  let i = 0;
+  const timer = setInterval(()=>{
+    el.textContent += text[i];
+    i++;
+    if(i>=text.length) clearInterval(timer);
+  }, speed);
+}
+
+function copyFeedback() {
+  const text = document.getElementById('feedback-text-output')?.textContent || '';
+  navigator.clipboard.writeText(text).then(()=>showToast('ফিডব্যাক কপি হয়েছে!','success'));
+}
+
+function shareFeedbackWhatsApp() {
+  const text = document.getElementById('feedback-text-output')?.textContent || '';
+  window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ৬. RUBRIC BUILDER
+// ═══════════════════════════════════════════════════════
+const rubricTemplates = {
+  'Presentation': {
+    criteria: ['Content', 'Accuracy', 'Communication', 'Creativity', 'Confidence'],
+    desc: {
+      5: ['বিষয়বস্তু সম্পূর্ণ ও সুশৃঙ্খল', 'সকল তথ্য সঠিক', 'অত্যন্ত স্পষ্ট ও আকর্ষণীয়', 'অনন্য ও মৌলিক ধারণা', 'অত্যন্ত আত্মবিশ্বাসী'],
+      4: ['প্রায় সম্পূর্ণ', 'অধিকাংশ তথ্য সঠিক', 'স্পষ্ট ও বোধগম্য', 'কিছু মৌলিক ধারণা', 'আত্মবিশ্বাসী'],
+      3: ['মূল বিষয় আছে', 'কিছু ভুল আছে', 'মোটামুটি স্পষ্ট', 'প্রচলিত ধারণা', 'সাধারণ'],
+      2: ['অসম্পূর্ণ', 'অনেক ভুল', 'অস্পষ্ট', 'সৃজনশীলতার অভাব', 'দ্বিধান্বিত'],
+      1: ['অপ্রাসঙ্গিক', 'বেশিরভাগ ভুল', 'বোধগম্য নয়', 'নেই বললেই চলে', 'অত্যন্ত নার্ভাস'],
+    }
+  },
+  'Project Work': {
+    criteria: ['Research', 'Analysis', 'Presentation', 'Teamwork', 'Conclusion'],
+    desc: {
+      5: ['গভীর গবেষণা', 'উৎকৃষ্ট বিশ্লেষণ', 'পেশাদার উপস্থাপনা', 'চমৎকার দলগত কাজ', 'সুস্পষ্ট সিদ্ধান্ত'],
+      4: ['ভালো গবেষণা', 'ভালো বিশ্লেষণ', 'সুন্দর উপস্থাপনা', 'ভালো সহযোগিতা', 'স্পষ্ট সিদ্ধান্ত'],
+      3: ['পর্যাপ্ত গবেষণা', 'মোটামুটি বিশ্লেষণ', 'ঠিকঠাক উপস্থাপনা', 'কিছুটা সহযোগিতা', 'মোটামুটি সিদ্ধান্ত'],
+      2: ['সীমিত গবেষণা', 'দুর্বল বিশ্লেষণ', 'দুর্বল উপস্থাপনা', 'কম সহযোগিতা', 'অস্পষ্ট সিদ্ধান্ত'],
+      1: ['গবেষণা নেই', 'বিশ্লেষণ নেই', 'উপস্থাপনা নেই', 'একক কাজ', 'কোনো সিদ্ধান্ত নেই'],
+    }
+  },
+  'Written Assignment': {
+    criteria: ['Content Quality', 'Language & Grammar', 'Structure', 'Originality', 'Completion'],
+    desc: {
+      5: ['অসাধারণ বিষয়বস্তু', 'নিখুঁত ভাষা', 'চমৎকার গঠন', 'সম্পূর্ণ মৌলিক', 'সম্পূর্ণ'],
+      4: ['ভালো বিষয়বস্তু', 'ভালো ভাষা', 'সুগঠিত', 'মূলত মৌলিক', 'প্রায় সম্পূর্ণ'],
+      3: ['পর্যাপ্ত', 'কিছু ভুল', 'ঠিকঠাক গঠন', 'আংশিক মৌলিক', 'মোটামুটি সম্পূর্ণ'],
+      2: ['দুর্বল', 'অনেক ভুল', 'অগোছালো', 'অনেকটা নকল', 'অসম্পূর্ণ'],
+      1: ['অপ্রাসঙ্গিক', 'ভাষা বোধগম্য নয়', 'কোনো গঠন নেই', 'সম্পূর্ণ নকল', 'অদর্পণযোগ্য'],
+    }
+  },
+  'Oral Exam': {
+    criteria: ['Knowledge', 'Clarity', 'Confidence', 'Depth', 'Communication'],
+    desc: {
+      5: ['সম্পূর্ণ জ্ঞান', 'অত্যন্ত স্পষ্ট', 'পূর্ণ আত্মবিশ্বাস', 'গভীর উত্তর', 'চমৎকার যোগাযোগ'],
+      4: ['ভালো জ্ঞান', 'স্পষ্ট', 'আত্মবিশ্বাসী', 'ভালো গভীরতা', 'ভালো যোগাযোগ'],
+      3: ['মোটামুটি জ্ঞান', 'মোটামুটি স্পষ্ট', 'সাধারণ', 'মোটামুটি', 'মোটামুটি'],
+      2: ['সীমিত জ্ঞান', 'অস্পষ্ট', 'অনিশ্চিত', 'অগভীর', 'দুর্বল যোগাযোগ'],
+      1: ['জ্ঞান নেই', 'বোধগম্য নয়', 'নার্ভাস', 'উত্তর নেই', 'যোগাযোগ নেই'],
+    }
+  },
+};
+
+// Generic rubric for unknown types
+function getGenericRubric(type) {
+  return {
+    criteria: ['মানসম্পন্নতা', 'সম্পূর্ণতা', 'সঠিকতা', 'উপস্থাপনা', 'সৃজনশীলতা'],
+    desc: {
+      5: ['অসাধারণ', 'সম্পূর্ণ', 'নিখুঁত', 'চমৎকার', 'অনন্য'],
+      4: ['ভালো', 'প্রায় সম্পূর্ণ', 'সঠিক', 'ভালো', 'মৌলিক'],
+      3: ['গ্রহণযোগ্য', 'মোটামুটি', 'কিছু ভুল', 'ঠিকঠাক', 'সাধারণ'],
+      2: ['দুর্বল', 'অসম্পূর্ণ', 'অনেক ভুল', 'দুর্বল', 'কম'],
+      1: ['অগ্রহণযোগ্য', 'অদর্পণযোগ্য', 'ভুলে ভরা', 'নেই', 'নেই'],
+    }
+  };
+}
+
+function generateRubric() {
+  const type = document.getElementById('rubric-type')?.value || 'Presentation';
+  const topic = document.getElementById('rubric-topic')?.value?.trim() || '';
+  const maxScore = parseInt(document.getElementById('rubric-max-score')?.value || '5');
+
+  const template = rubricTemplates[type] || getGenericRubric(type);
+  const scores = maxScore === 4 ? [4,3,2,1] : maxScore === 10 ? [10,8,6,4,2] : maxScore === 100 ? [100,80,60,40,20] : [5,4,3,2,1];
+
+  // Show result
+  document.getElementById('rubric-placeholder').classList.add('hidden');
+  document.getElementById('rubric-result').classList.remove('hidden');
+  document.getElementById('rubric-result-title').textContent = `${type} Rubric`;
+  document.getElementById('rubric-result-sub').textContent = topic ? `বিষয়: ${topic}` : settings.subjects[0] || '';
+
+  const thead = document.getElementById('rubric-thead');
+  const tbody = document.getElementById('rubric-tbody');
+
+  thead.innerHTML = `<tr>
+    <th>মানদণ্ড</th>
+    ${scores.map(s=>`<th style="min-width:100px;">${s} পয়েন্ট</th>`).join('')}
+  </tr>`;
+
+  tbody.innerHTML = template.criteria.map(crit => `
+    <tr>
+      <td>${crit}</td>
+      ${scores.map((s,i)=>`<td>${template.desc[maxScore===4?[4,3,2,1][i]:maxScore===10?[5,4,3,2,1][i]:maxScore===100?[5,4,3,2,1][i]:s]?.[template.criteria.indexOf(crit)]||template.desc[scores[0]?.[0]]||'—'}</td>`).join('')}
+    </tr>
+  `).join('');
+
+  // Score chips
+  let totalScore = 0;
+  document.getElementById('rubric-scoring').innerHTML = `
+    <div style="background:var(--bg-app);border-radius:var(--radius-sm);padding:16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:10px;"><i class="fa-solid fa-calculator" style="color:var(--primary)"></i> স্কোর নির্ধারণ</div>
+      ${template.criteria.map((crit,ci)=>`
+        <div style="margin-bottom:8px;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:5px;">${crit}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            ${scores.map(s=>`<span class="rubric-score-chip" onclick="selectRubricScore(this,'${crit}',${s})">${s}</span>`).join('')}
+          </div>
         </div>
-        <div class="bar-track">
-          <div class="bar-fill" style="width:${Math.round((cnt/total)*100)}%;background:${gradeColors[g]}"></div>
-        </div>
+      `).join('')}
+      <div id="rubric-total-display" style="margin-top:12px;padding:10px 14px;background:var(--bg-card);border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:var(--primary);">
+        মোট স্কোর: ০ / ${scores[0] * template.criteria.length}
       </div>
-    `).join('');
-  }
+    </div>
+  `;
+  window._rubricScores = {};
+  window._rubricMaxPerCrit = scores[0];
+  window._rubricCritCount = template.criteria.length;
 
-  // Subject Averages
-  const subjBarsEl = document.getElementById('subject-bars');
-  if (subjBarsEl && total) {
-    subjBarsEl.innerHTML = settings.subjects.map(sub => {
-      const avg = total ? Math.round(subjectTotals[sub] / total) : 0;
-      const colors = ['#4f46e5','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e'];
-      const c = colors[settings.subjects.indexOf(sub) % colors.length];
-      return `
-        <div class="bar-row">
-          <div class="bar-label-row">
-            <span class="bar-subject-name">${sub}</span>
-            <span class="bar-pct" style="color:${c}">${avg}/১০০</span>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:${avg}%;background:${c}"></div>
-          </div>
-        </div>
-      `;
+  showToast('Rubric তৈরি হয়েছে!', 'success');
+}
+
+function selectRubricScore(el, crit, score) {
+  el.closest('.rubric-score-chip')?.parentElement?.querySelectorAll('.rubric-score-chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  window._rubricScores[crit] = score;
+  const total = Object.values(window._rubricScores||{}).reduce((a,b)=>a+b,0);
+  const max = (window._rubricMaxPerCrit||5) * (window._rubricCritCount||5);
+  const disp = document.getElementById('rubric-total-display');
+  if(disp) disp.textContent = `মোট স্কোর: ${total} / ${max}`;
+}
+
+function saveRubric() {
+  const title = document.getElementById('rubric-result-title')?.textContent || 'Rubric';
+  const sub = document.getElementById('rubric-result-sub')?.textContent || '';
+  const id = 'rub_'+Date.now();
+  savedRubrics.push({ id, title, sub, savedAt: new Date().toISOString() });
+  saveToStorage();
+  renderSavedRubrics();
+  showToast('Rubric সংরক্ষিত হয়েছে!', 'success');
+}
+
+function renderSavedRubrics() {
+  const el = document.getElementById('saved-rubrics-list');
+  if(!el) return;
+  if(savedRubrics.length === 0) { el.innerHTML = '<div style="color:var(--text-light);font-size:12px;padding:6px 0;">কোনো Rubric সংরক্ষিত নেই।</div>'; return; }
+  el.innerHTML = savedRubrics.map(r=>`
+    <div class="saved-rubric-item">
+      <i class="fa-solid fa-table-list"></i>
+      <span>${r.title} ${r.sub?`(${r.sub})`:''}</span>
+      <button class="action-btn danger" onclick="deleteRubric('${r.id}')"><i class="fa-solid fa-trash"></i></button>
+    </div>
+  `).join('');
+}
+
+function deleteRubric(id) {
+  savedRubrics = savedRubrics.filter(r=>r.id!==id);
+  saveToStorage();
+  renderSavedRubrics();
+}
+
+function printRubric() { window.print(); }
+
+// ═══════════════════════════════════════════════════════
+//  ৭. STUDENT TABLE
+// ═══════════════════════════════════════════════════════
+function renderStudentTable() {
+  const query = (document.getElementById('student-search')?.value||'').toLowerCase();
+  let list = [...students];
+  if(currentFilter!=='all') {
+    const mapLabel = {good:'ভালো',average:'মধ্যম',weak:'দুর্বল'};
+    list = list.filter(s=>getCategory(calcTotals(s).pct).label===mapLabel[currentFilter]);
+  }
+  if(query) list = list.filter(s=>s.name.toLowerCase().includes(query)||String(s.roll).includes(query));
+  if(sortField) {
+    list.sort((a,b)=>{
+      let va,vb;
+      if(sortField==='roll'){va=a.roll;vb=b.roll;}
+      else if(sortField==='name'){va=a.name;vb=b.name;}
+      else if(sortField==='total'){va=calcTotals(a).pct;vb=calcTotals(b).pct;}
+      else{va=a.scores?.[sortField]||0;vb=b.scores?.[sortField]||0;}
+      if(va<vb) return sortAsc?-1:1;
+      if(va>vb) return sortAsc?1:-1;
+      return 0;
+    });
+  }
+  const thead=document.getElementById('table-header');
+  const tbody=document.getElementById('table-body');
+  const empty=document.getElementById('table-empty');
+  if(!thead||!tbody) return;
+  const subjs=settings.subjects;
+  const si = s=>(sortField===s?(sortAsc?'↑':'↓'):'');
+  thead.innerHTML=`<tr>
+    <th onclick="sortBy('roll')">#রোল ${si('roll')}</th>
+    <th onclick="sortBy('name')">নাম ${si('name')}</th>
+    ${subjs.map(s=>`<th onclick="sortBy('${s}')">${s}</th>`).join('')}
+    <th onclick="sortBy('total')">মোট ${si('total')}</th>
+    <th>গড়%</th><th>গ্রেড</th><th>শ্রেণি</th><th>অ্যাকশন</th>
+  </tr>`;
+  if(list.length===0){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=list.map(s=>{
+    const {total,maxTotal,avg,pct}=calcTotals(s);
+    const grade=getGrade(pct);
+    const cat=getCategory(pct);
+    return `<tr>
+      <td><strong>${s.roll}</strong></td>
+      <td><strong>${s.name}</strong></td>
+      ${subjs.map(sub=>`<td>${s.scores?.[sub]??'—'}</td>`).join('')}
+      <td><strong>${total}/${maxTotal}</strong></td>
+      <td>${avg}%</td>
+      <td><span class="grade-badge ${grade.cls}">${grade.grade}</span></td>
+      <td><span class="cat-badge ${cat.cls}"><i class="fa-solid ${cat.icon}"></i> ${cat.label}</span></td>
+      <td>
+        <button class="action-btn perf" onclick="openPerfFor('${s.id}')" title="পারফরম্যান্স"><i class="fa-solid fa-chart-line"></i></button>
+        <button class="action-btn" onclick="openEditModal('${s.id}')" title="এডিট"><i class="fa-solid fa-pen"></i></button>
+        <button class="action-btn report" onclick="openReportCardFor('${s.id}')" title="রিপোর্ট কার্ড"><i class="fa-solid fa-id-card"></i></button>
+        <button class="action-btn danger" onclick="deleteStudent('${s.id}')" title="মুছুন"><i class="fa-solid fa-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+  updateStats();
+}
+function openPerfFor(id) { showSection('performance'); loadPerformance(id); }
+function sortBy(field) { if(sortField===field)sortAsc=!sortAsc; else{sortField=field;sortAsc=true;} renderStudentTable(); }
+function setFilter(cat) {
+  currentFilter=cat;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('chip-active'));
+  document.getElementById('chip-'+cat)?.classList.add('chip-active');
+  renderStudentTable();
+}
+function updateStats() {
+  let good=0,avg=0,weak=0,sum=0;
+  students.forEach(s=>{const {pct}=calcTotals(s);sum+=pct;if(pct>=80)good++;else if(pct>=50)avg++;else weak++;});
+  const ca=students.length?Math.round(sum/students.length):0;
+  setEl('stat-total',students.length); setEl('stat-good',good); setEl('stat-avg',avg); setEl('stat-weak',weak); setEl('stat-classavg',ca+'%');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ৮. ADD/EDIT STUDENT MODAL
+// ═══════════════════════════════════════════════════════
+function openAddStudentModal() {
+  document.getElementById('modal-title').innerHTML='<i class="fa-solid fa-user-plus"></i> নতুন শিক্ষার্থী';
+  document.getElementById('modal-student-id').value='';
+  document.getElementById('m-name').value='';
+  document.getElementById('m-roll').value='';
+  document.getElementById('m-parent').value='';
+  document.getElementById('m-phone').value='';
+  document.getElementById('m-remarks').value='';
+  buildScoreInputs({});
+  document.getElementById('student-modal').classList.remove('hidden');
+}
+function openEditModal(id) {
+  const s=students.find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('modal-title').innerHTML='<i class="fa-solid fa-pen"></i> সম্পাদনা করুন';
+  document.getElementById('modal-student-id').value=id;
+  document.getElementById('m-name').value=s.name;
+  document.getElementById('m-roll').value=s.roll;
+  document.getElementById('m-parent').value=s.parentName||'';
+  document.getElementById('m-phone').value=s.phone||'';
+  document.getElementById('m-remarks').value=s.remarks||'';
+  buildScoreInputs(s.scores||{});
+  document.getElementById('student-modal').classList.remove('hidden');
+}
+function buildScoreInputs(scores) {
+  document.getElementById('scores-inputs').innerHTML=settings.subjects.map(sub=>`
+    <div class="score-input-group">
+      <label>${sub}</label>
+      <input type="number" id="score-${sub}" min="0" max="100" value="${scores[sub]??''}" placeholder="০–১০০" />
+    </div>
+  `).join('');
+}
+function saveStudentFromModal() {
+  const name=document.getElementById('m-name').value.trim();
+  const roll=parseInt(document.getElementById('m-roll').value);
+  if(!name){showToast('নাম দিন!','error');return;}
+  if(!roll){showToast('রোল দিন!','error');return;}
+  const scores={};
+  settings.subjects.forEach(sub=>{
+    const v=parseFloat(document.getElementById('score-'+sub)?.value);
+    scores[sub]=isNaN(v)?0:Math.min(100,Math.max(0,v));
+  });
+  const id=document.getElementById('modal-student-id').value;
+  const data={name,roll,scores,parentName:document.getElementById('m-parent').value.trim(),phone:document.getElementById('m-phone').value.trim(),remarks:document.getElementById('m-remarks').value.trim()};
+  if(id){
+    const idx=students.findIndex(s=>s.id===id);
+    if(idx!==-1) students[idx]={...students[idx],...data};
+    showToast('তথ্য আপডেট হয়েছে!','success');
+  } else {
+    students.push({id:'sid_'+Date.now(),...data,timeline:{quiz:[],assignment:[],oral:[],practical:[],attendance:[],homework:[]}});
+    showToast('শিক্ষার্থী যোগ হয়েছে!','success');
+  }
+  closeStudentModal(); saveToStorage(); renderStudentTable(); refreshReportSelector(); refreshFeedbackSelector();
+}
+function deleteStudent(id) {
+  if(!confirm('মুছে দেবেন?'))return;
+  students=students.filter(s=>s.id!==id);
+  saveToStorage(); renderStudentTable(); refreshReportSelector(); refreshFeedbackSelector();
+  showToast('মুছে দেওয়া হয়েছে।','error');
+}
+function closeStudentModal(){document.getElementById('student-modal').classList.add('hidden');}
+function closeModalOnBackdrop(e){if(e.target===document.getElementById('student-modal'))closeStudentModal();}
+
+// ═══════════════════════════════════════════════════════
+//  ৯. ANALYTICS
+// ═══════════════════════════════════════════════════════
+function renderAnalytics() {
+  const total=students.length;
+  setEl('analytics-total-badge',total+' জন');
+  let good=0,avg=0,weak=0;
+  const gc={'A+':0,'A':0,'A-':0,'B':0,'C':0,'D':0,'F':0};
+  const st={};settings.subjects.forEach(s=>st[s]=0);
+  students.forEach(s=>{
+    const {pct}=calcTotals(s);
+    const g=getGrade(pct).grade;
+    if(pct>=80)good++;else if(pct>=50)avg++;else weak++;
+    gc[g]=(gc[g]||0)+1;
+    settings.subjects.forEach(sub=>{st[sub]+=(s.scores?.[sub]||0);});
+  });
+  const maxD=Math.max(good,avg,weak,1);
+  const dist=document.getElementById('distribution-bars');
+  if(dist) dist.innerHTML=[{label:'ভালো',val:good,cls:'dist-good',color:'var(--success)'},{label:'মধ্যম',val:avg,cls:'dist-average',color:'var(--warning)'},{label:'দুর্বল',val:weak,cls:'dist-weak',color:'var(--danger)'}].map(({label,val,cls,color})=>`
+    <div class="dist-bar-group">
+      <div class="dist-count" style="color:${color}">${val}</div>
+      <div class="dist-bar-wrap"><div class="dist-bar ${cls}" style="height:${Math.round((val/maxD)*90)}%"></div></div>
+      <div class="dist-label" style="color:${color}">${label}</div>
+    </div>
+  `).join('');
+  const gc2=document.getElementById('grade-bars');
+  const gCols={'A+':'#10b981','A':'#34d399','A-':'#60a5fa','B':'#818cf8','C':'#fbbf24','D':'#fb923c','F':'#f87171'};
+  if(gc2&&total) gc2.innerHTML=Object.entries(gc).map(([g,cnt])=>`
+    <div class="bar-row">
+      <div class="bar-label-row"><span class="bar-subject-name"><span class="grade-badge grade-${g.toLowerCase().replace('+','plus').replace('-','minus')}">${g}</span></span><span class="bar-pct" style="color:${gCols[g]}">${cnt} জন</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${total?Math.round((cnt/total)*100):0}%;background:${gCols[g]}"></div></div>
+    </div>
+  `).join('');
+  const sb=document.getElementById('subject-bars');
+  const sCols=['#4f46e5','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f43f5e'];
+  if(sb&&total) sb.innerHTML=settings.subjects.map((sub,i)=>{
+    const a=total?Math.round(st[sub]/total):0;
+    return `<div class="bar-row"><div class="bar-label-row"><span class="bar-subject-name">${sub}</span><span class="bar-pct" style="color:${sCols[i%sCols.length]}">${a}/১০০</span></div><div class="bar-track"><div class="bar-fill" style="width:${a}%;background:${sCols[i%sCols.length]}"></div></div></div>`;
+  }).join('');
+  const pod=document.getElementById('podium');
+  if(pod){
+    const top3=[...students].sort((a,b)=>calcTotals(b).pct-calcTotals(a).pct).slice(0,3);
+    if(!top3.length){pod.innerHTML='<div style="color:var(--text-muted);font-size:14px;">শিক্ষার্থী যোগ করুন।</div>';return;}
+    const order=top3.length>=3?[top3[1],top3[0],top3[2]]:top3;
+    const rankCls=top3.length>=3?['rank-2','rank-1','rank-3']:['rank-1'];
+    const medals=['🥇','🥈','🥉'];
+    const rNums=top3.length>=3?[2,1,3]:[1];
+    pod.innerHTML=order.map((s,i)=>{
+      const {pct}=calcTotals(s);
+      return `<div class="podium-place ${rankCls[i]}"><div class="podium-medal">${medals[rNums[i]-1]}</div><div class="podium-avatar">${s.name.charAt(0)}</div><div class="podium-name">${s.name}</div><div class="podium-score">${pct}%</div><div class="podium-stand">${rNums[i]}ম স্থান</div></div>`;
     }).join('');
   }
-
-  // Podium - Top 3
-  const podiumEl = document.getElementById('podium');
-  if (podiumEl) {
-    const top3 = [...students].sort((a, b) => calcTotals(b).pct - calcTotals(a).pct).slice(0, 3);
-    const medals = ['🥇', '🥈', '🥉'];
-    const ranks = [2, 1, 3]; // podium order: 2nd, 1st, 3rd
-    const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3;
-    const rankClasses = top3.length >= 3 ? ['rank-2', 'rank-1', 'rank-3'] : ['rank-1'];
-    const rankNums = top3.length >= 3 ? [2, 1, 3] : [1];
-
-    if (podiumOrder.length === 0) {
-      podiumEl.innerHTML = '<div style="color:var(--text-muted);font-size:14px;">শিক্ষার্থী যোগ করুন।</div>';
-    } else {
-      podiumEl.innerHTML = podiumOrder.map((s, i) => {
-        const { pct } = calcTotals(s);
-        const initial = s.name.charAt(0);
-        return `
-          <div class="podium-place ${rankClasses[i]}">
-            <div class="podium-medal">${medals[rankNums[i]-1]}</div>
-            <div class="podium-avatar">${initial}</div>
-            <div class="podium-name">${s.name}</div>
-            <div class="podium-score">${pct}%</div>
-            <div class="podium-stand">${rankNums[i]}ম স্থান</div>
-          </div>
-        `;
-      }).join('');
-    }
-  }
-
-  // Weak Students
-  const weakList = document.getElementById('weak-students-list');
-  const weakStudents = students.filter(s => calcTotals(s).pct < 50).sort((a,b) => calcTotals(a).pct - calcTotals(b).pct);
-  setEl('weak-count-badge', weakStudents.length + ' জন');
-  if (weakList) {
-    if (weakStudents.length === 0) {
-      weakList.innerHTML = '<div style="color:var(--success);font-size:14px;padding:10px 0;"><i class="fa-solid fa-circle-check"></i> সকল শিক্ষার্থীর ফলাফল সন্তোষজনক।</div>';
-    } else {
-      weakList.innerHTML = weakStudents.map(s => {
-        const { pct } = calcTotals(s);
-        const suggestions = getSuggestion(pct);
-        return `
-          <div class="weak-item">
-            <div class="user-avatar" style="background:linear-gradient(135deg,#ef4444,#f87171);width:36px;height:36px;font-size:13px;">${s.name.charAt(0)}</div>
-            <div>
-              <div class="weak-item-name">${s.name} (রোল: ${s.roll})</div>
-              <div class="weak-item-score">গড়: ${pct}% | গ্রেড: ${getGrade(pct).grade}</div>
-            </div>
-            <div class="weak-item-suggestion">${suggestions}</div>
-            <button class="btn-outline btn-sm" onclick="openReportCardFor('${s.id}')">
-              <i class="fa-solid fa-id-card"></i>
-            </button>
-          </div>
-        `;
-      }).join('');
-    }
-  }
-}
-
-function getSuggestion(pct) {
-  if (pct < 33) return 'জরুরি বিশেষ মনোযোগ প্রয়োজন। অভিভাবক সঙ্গে আলোচনা করুন।';
-  if (pct < 40) return 'প্রতিদিন অতিরিক্ত অনুশীলন দরকার। পড়ার অভ্যাস গড়ে তুলুন।';
-  if (pct < 50) return 'দুর্বল বিষয়গুলোতে বিশেষ মনোযোগ দিতে হবে।';
-  return 'নিয়মিত অনুশীলনে আরও উন্নতি সম্ভব।';
+  const wl=document.getElementById('weak-students-list');
+  const ws=students.filter(s=>calcTotals(s).pct<50).sort((a,b)=>calcTotals(a).pct-calcTotals(b).pct);
+  setEl('weak-count-badge',ws.length+' জন');
+  if(wl) wl.innerHTML=ws.length?ws.map(s=>{
+    const {pct}=calcTotals(s);
+    return `<div class="weak-item"><div class="user-avatar" style="background:var(--danger);width:36px;height:36px;font-size:13px;">${s.name.charAt(0)}</div><div><div class="weak-item-name">${s.name} (রোল: ${s.roll})</div><div class="weak-item-score">গড়: ${pct}%</div></div><div class="weak-item-suggestion">${pct<33?'জরুরি সহায়তা প্রয়োজন':pct<50?'নিয়মিত অনুশীলন দরকার':'উন্নতির সুযোগ আছে'}</div><button class="btn-outline btn-sm" onclick="openReportCardFor('${s.id}')"><i class="fa-solid fa-id-card"></i></button></div>`;
+  }).join(''):'<div style="color:var(--success);font-size:14px;"><i class="fa-solid fa-circle-check"></i> সকল শিক্ষার্থীর ফলাফল সন্তোষজনক।</div>';
 }
 
 // ═══════════════════════════════════════════════════════
-//  ৮. REPORT CARD
+//  ১০. REPORT CARD
 // ═══════════════════════════════════════════════════════
 function refreshReportSelector() {
-  const sel = document.getElementById('report-student-select');
-  if (!sel) return;
-  const prev = sel.value;
-  sel.innerHTML = '<option value="">-- শিক্ষার্থী বেছে নিন --</option>';
-  [...students].sort((a,b)=>a.roll-b.roll).forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = `${s.roll}. ${s.name}`;
+  const sel=document.getElementById('report-student-select');
+  if(!sel) return;
+  const prev=sel.value;
+  sel.innerHTML='<option value="">-- শিক্ষার্থী বেছে নিন --</option>';
+  [...students].sort((a,b)=>a.roll-b.roll).forEach(s=>{
+    const opt=document.createElement('option');
+    opt.value=s.id; opt.textContent=`${s.roll}. ${s.name}`;
     sel.appendChild(opt);
   });
-  if (prev) sel.value = prev;
+  if(prev) sel.value=prev;
 }
-
+function refreshFeedbackSelector() {
+  const sel=document.getElementById('feedback-student-select');
+  if(!sel) return;
+  const prev=sel.value;
+  sel.innerHTML='<option value="">-- শিক্ষার্থী বেছে নিন --</option>';
+  [...students].sort((a,b)=>a.roll-b.roll).forEach(s=>{
+    const opt=document.createElement('option');
+    opt.value=s.id; opt.textContent=`${s.roll}. ${s.name}`;
+    sel.appendChild(opt);
+  });
+  if(prev) sel.value=prev;
+}
 function openReportCardFor(id) {
   showSection('report');
   refreshReportSelector();
-  document.getElementById('report-student-select').value = id;
+  document.getElementById('report-student-select').value=id;
   renderReportCard(id);
 }
-
 function renderReportCard(id) {
-  selectedReportStudentId = id;
-  const preview = document.getElementById('report-preview');
-  if (!id) {
-    preview.innerHTML = `<div class="report-placeholder"><i class="fa-solid fa-id-card"></i><p>একজন শিক্ষার্থী নির্বাচন করুন রিপোর্ট কার্ড দেখতে।</p></div>`;
-    return;
-  }
-  const s = students.find(x => x.id === id);
-  if (!s) return;
-
-  const { total, maxTotal, avg, pct } = calcTotals(s);
-  const grade = getGrade(pct);
-  const pos = getPosition(s.id);
-  const subjs = settings.subjects;
-
-  const progressBars = subjs.map(sub => {
-    const sc = s.scores[sub] || 0;
-    const g = getGrade(sc);
-    return `
-      <div class="prog-row">
-        <div class="prog-label">${sub}</div>
-        <div class="prog-track"><div class="prog-fill" style="width:${sc}%"></div></div>
-        <div class="prog-val">${sc}</div>
-      </div>
-    `;
+  selectedReportStudentId=id;
+  const preview=document.getElementById('report-preview');
+  if(!id){preview.innerHTML=`<div class="report-placeholder"><i class="fa-solid fa-id-card"></i><p>একজন শিক্ষার্থী নির্বাচন করুন।</p></div>`;return;}
+  const s=students.find(x=>x.id===id);
+  if(!s) return;
+  const {total,maxTotal,avg,pct}=calcTotals(s);
+  const grade=getGrade(pct);
+  const pos=getPosition(s.id);
+  const subjs=settings.subjects;
+  const marksRows=subjs.map(sub=>{
+    const sc=s.scores?.[sub]??0;
+    const g=getGrade(sc);
+    return `<tr><td>${sub}</td><td style="text-align:center">১০০</td><td style="text-align:center;font-weight:700;">${sc}</td><td style="text-align:center">${sc}%</td><td style="text-align:center"><span class="grade-badge ${g.cls}">${g.grade}</span></td><td>${sc>=80?'চমৎকার':sc>=60?'ভালো':sc>=40?'গড়মানের':'উন্নতি দরকার'}</td></tr>`;
   }).join('');
-
-  const marksRows = subjs.map(sub => {
-    const sc = s.scores[sub] ?? 0;
-    const g = getGrade(sc);
-    return `
-      <tr>
-        <td>${sub}</td>
-        <td style="text-align:center">১০০</td>
-        <td style="text-align:center;font-weight:700;">${sc}</td>
-        <td style="text-align:center">${sc}%</td>
-        <td style="text-align:center"><span class="grade-badge ${g.cls}">${g.grade}</span></td>
-        <td>${sc >= 80 ? 'চমৎকার' : sc >= 60 ? 'ভালো' : sc >= 40 ? 'গড়মানের' : 'উন্নতি দরকার'}</td>
-      </tr>
-    `;
-  }).join('');
-
-  preview.innerHTML = `
+  const progressBars=subjs.map(sub=>{const sc=s.scores?.[sub]||0;return `<div class="prog-row"><div class="prog-label">${sub}</div><div class="prog-track"><div class="prog-fill" style="width:${sc}%"></div></div><div class="prog-val">${sc}</div></div>`;}).join('');
+  preview.innerHTML=`
     <div class="report-card-container">
       <div class="report-card" id="printable-report">
         <div class="report-card-header">
-          <div style="font-size:36px;margin-bottom:8px;">🏫</div>
+          <div style="font-size:34px;margin-bottom:8px;">🏫</div>
           <div class="report-school-name">${settings.school}</div>
           <div class="report-school-sub">শ্রেণি: ${settings.className} | শাখা: ${settings.section} | শিক্ষাবর্ষ: ${settings.year}</div>
           <div class="report-card-title">একাডেমিক মূল্যায়ন রিপোর্ট কার্ড</div>
         </div>
         <div class="report-student-info">
           <div class="report-info-row"><span class="info-label">নাম</span><span class="info-value">${s.name}</span></div>
-          <div class="report-info-row"><span class="info-label">রোল নম্বর</span><span class="info-value">${s.roll}</span></div>
+          <div class="report-info-row"><span class="info-label">রোল</span><span class="info-value">${s.roll}</span></div>
           <div class="report-info-row"><span class="info-label">শ্রেণি</span><span class="info-value">${settings.className} (${settings.section})</span></div>
           <div class="report-info-row"><span class="info-label">শিক্ষাবর্ষ</span><span class="info-value">${settings.year}</span></div>
-          <div class="report-info-row"><span class="info-label">অভিভাবক</span><span class="info-value">${s.parentName || '—'}</span></div>
+          <div class="report-info-row"><span class="info-label">অভিভাবক</span><span class="info-value">${s.parentName||'—'}</span></div>
           <div class="report-info-row"><span class="info-label">অবস্থান</span><span class="info-value" style="color:#4f46e5;font-weight:800;">${pos}ম</span></div>
         </div>
         <div class="report-marks-table">
-          <table>
-            <thead>
-              <tr><th>বিষয়</th><th>পূর্ণমান</th><th>প্রাপ্তমান</th><th>শতকরা</th><th>গ্রেড</th><th>মন্তব্য</th></tr>
-            </thead>
-            <tbody>${marksRows}</tbody>
-          </table>
+          <table><thead><tr><th>বিষয়</th><th>পূর্ণমান</th><th>প্রাপ্তমান</th><th>শতকরা</th><th>গ্রেড</th><th>মন্তব্য</th></tr></thead><tbody>${marksRows}</tbody></table>
         </div>
         <div class="report-summary">
-          <div class="summary-cell">
-            <div class="summary-value">${total}/${maxTotal}</div>
-            <div class="summary-label">মোট নম্বর</div>
-          </div>
-          <div class="summary-cell">
-            <div class="summary-value">${pct}%</div>
-            <div class="summary-label">গড় শতকরা</div>
-          </div>
-          <div class="summary-cell">
-            <div class="summary-value">${grade.grade}</div>
-            <div class="summary-label">চূড়ান্ত গ্রেড</div>
-          </div>
-          <div class="summary-cell">
-            <div class="summary-value">${grade.gp}</div>
-            <div class="summary-label">গ্রেড পয়েন্ট</div>
-          </div>
+          <div class="summary-cell"><div class="summary-value">${total}/${maxTotal}</div><div class="summary-label">মোট নম্বর</div></div>
+          <div class="summary-cell"><div class="summary-value">${pct}%</div><div class="summary-label">গড় শতকরা</div></div>
+          <div class="summary-cell"><div class="summary-value">${grade.grade}</div><div class="summary-label">চূড়ান্ত গ্রেড</div></div>
+          <div class="summary-cell"><div class="summary-value">${grade.gp}</div><div class="summary-label">গ্রেড পয়েন্ট</div></div>
         </div>
-        <div class="report-progress-bars">
-          <h4>বিষয়ভিত্তিক পারফরম্যান্স</h4>
-          ${progressBars}
-        </div>
-        <div class="report-remarks">
-          <h4>শিক্ষকের মন্তব্য</h4>
-          <p>${s.remarks || 'উত্তম পারফরম্যান্স। ভবিষ্যতে আরও ভালো করার প্রত্যাশা রাখি।'}</p>
-        </div>
+        <div class="report-progress-bars"><h4>বিষয়ভিত্তিক পারফরম্যান্স</h4>${progressBars}</div>
+        <div class="report-remarks"><h4>শিক্ষকের মন্তব্য</h4><p>${s.remarks||'উত্তম পারফরম্যান্স।'}</p></div>
         <div class="report-footer">
-          <div class="signature-block">
-            <div class="signature-line"></div>
-            <div class="signature-label">অভিভাবকের স্বাক্ষর</div>
-          </div>
-          <div style="text-align:center;font-size:12px;color:#64748b;">
-            <div style="font-weight:600;">তারিখ: ${new Date().toLocaleDateString('bn-BD')}</div>
-          </div>
-          <div class="signature-block">
-            <div class="signature-line"></div>
-            <div class="signature-label">${settings.teacherName}<br>${settings.teacherDesignation}</div>
-          </div>
+          <div class="signature-block"><div class="signature-line"></div><div class="signature-label">অভিভাবকের স্বাক্ষর</div></div>
+          <div style="text-align:center;font-size:12px;color:#64748b;"><div style="font-weight:600;">তারিখ: ${new Date().toLocaleDateString('bn-BD')}</div></div>
+          <div class="signature-block"><div class="signature-line"></div><div class="signature-label">${settings.teacherName}<br>${settings.teacherDesignation}</div></div>
         </div>
       </div>
     </div>
   `;
 }
-
-function printReportCard() {
-  if (!selectedReportStudentId) { showToast('আগে একজন শিক্ষার্থী নির্বাচন করুন!', 'error'); return; }
-  window.print();
+function printReportCard(){if(!selectedReportStudentId){showToast('শিক্ষার্থী নির্বাচন করুন!','error');return;}window.print();}
+function saveReportCard(){if(!selectedReportStudentId){showToast('শিক্ষার্থী নির্বাচন করুন!','error');return;}saveToStorage();showToast('সংরক্ষিত হয়েছে!','success');}
+function archiveCurrentReport(){if(!selectedReportStudentId){showToast('শিক্ষার্থী নির্বাচন করুন!','error');return;}saveCurrentSnapshot();showToast('আর্কাইভ হয়েছে!','success');}
+function shareWhatsApp(){
+  if(!selectedReportStudentId){showToast('শিক্ষার্থী নির্বাচন করুন!','error');return;}
+  const s=students.find(x=>x.id===selectedReportStudentId);
+  if(!s) return;
+  const {total,maxTotal,pct}=calcTotals(s);
+  const grade=getGrade(pct);
+  const lines=settings.subjects.map(sub=>`  ${sub}: ${s.scores?.[sub]||0}/১০০`).join('\n');
+  const msg=encodeURIComponent(`প্রিয় অভিভাবক,\n\n${s.name} (রোল: ${s.roll}) এর মূল্যায়ন:\n\n${lines}\n\nমোট: ${total}/${maxTotal} | গড়: ${pct}% | গ্রেড: ${grade.grade}\n\nমন্তব্য: ${s.remarks||'ভালো পারফরম্যান্স।'}\n\n— ${settings.teacherName}\n${settings.school}`);
+  window.open(`https://wa.me/?text=${msg}`,'_blank');
 }
 
-function saveReportCard() {
-  if (!selectedReportStudentId) { showToast('আগে একজন শিক্ষার্থী নির্বাচন করুন!', 'error'); return; }
+// ═══════════════════════════════════════════════════════
+//  ১১. ASSESSMENT HISTORY
+// ═══════════════════════════════════════════════════════
+function saveCurrentSnapshot() {
+  const snap = {
+    id: 'snap_'+Date.now(),
+    title: `মূল্যায়ন — ${settings.className} (${settings.section})`,
+    date: new Date().toLocaleDateString('bn-BD'),
+    savedAt: new Date().toISOString(),
+    studentCount: students.length,
+    classAvg: students.length?Math.round(students.reduce((s,x)=>s+calcTotals(x).pct,0)/students.length):0,
+    status: 'active',
+    students: JSON.parse(JSON.stringify(students)),
+  };
+  assessmentHistory.unshift(snap);
   saveToStorage();
-  showToast('রিপোর্ট কার্ড সংরক্ষিত হয়েছে!', 'success');
+  renderHistory();
+  showToast('স্ন্যাপশট সংরক্ষিত!','success');
 }
-
-function shareWhatsApp() {
-  if (!selectedReportStudentId) { showToast('আগে একজন শিক্ষার্থী নির্বাচন করুন!', 'error'); return; }
-  const s = students.find(x => x.id === selectedReportStudentId);
-  if (!s) return;
-  const { total, maxTotal, pct } = calcTotals(s);
-  const grade = getGrade(pct);
-  const cat = getCategory(pct);
-  const lines = settings.subjects.map(sub => `  ${sub}: ${s.scores[sub] || 0}/১০০`).join('\n');
-  const msg = encodeURIComponent(
-    `প্রিয় অভিভাবক,\n\nআপনার সন্তান ${s.name} (রোল: ${s.roll}) এর মূল্যায়ন ফলাফল:\n\n${lines}\n\nমোট: ${total}/${maxTotal}\nগড়: ${pct}%\nগ্রেড: ${grade.grade} (GPA: ${grade.gp})\nঅবস্থান: ${cat.label}\n\nমন্তব্য: ${s.remarks || 'ভালো পারফরম্যান্স।'}\n\n— ${settings.teacherName}\n${settings.school}`
-  );
-  window.open(`https://wa.me/?text=${msg}`, '_blank');
+function setHistoryFilter(f){
+  historyFilter=f;
+  document.querySelectorAll('[id^="hchip-"]').forEach(c=>c.classList.remove('chip-active'));
+  document.getElementById('hchip-'+f)?.classList.add('chip-active');
+  renderHistory();
 }
-
-// ═══════════════════════════════════════════════════════
-//  ৯. SETTINGS
-// ═══════════════════════════════════════════════════════
-function loadSettingsUI() {
-  setVal('set-school', settings.school);
-  setVal('set-class', settings.className);
-  setVal('set-section', settings.section);
-  setVal('set-year', settings.year);
-  setVal('set-teacher', settings.teacherName);
-  setVal('set-designation', settings.teacherDesignation);
-  renderSubjectsList();
-}
-
-function renderSubjectsList() {
-  const el = document.getElementById('subjects-list');
-  if (!el) return;
-  el.innerHTML = settings.subjects.map((s, i) => `
-    <span class="subject-tag">
-      ${s}
-      <button onclick="removeSubject(${i})"><i class="fa-solid fa-xmark"></i></button>
-    </span>
+function renderHistory(){
+  const q=(document.getElementById('history-search')?.value||'').toLowerCase();
+  let list=[...assessmentHistory];
+  if(historyFilter==='active') list=list.filter(h=>h.status==='active');
+  if(historyFilter==='archived') list=list.filter(h=>h.status==='archived');
+  if(q) list=list.filter(h=>h.title.toLowerCase().includes(q)||h.date.includes(q));
+  const el=document.getElementById('history-list');
+  if(!el) return;
+  if(list.length===0){el.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:40px;"><i class="fa-solid fa-clock-rotate-left" style="font-size:40px;opacity:.2;display:block;margin-bottom:12px;"></i><p>কোনো ইতিহাস নেই। স্ন্যাপশট সংরক্ষণ করুন।</p></div>';return;}
+  el.innerHTML=list.map(h=>`
+    <div class="history-item ${h.status==='archived'?'archived':''}">
+      <div class="history-icon" style="background:rgba(79,70,229,.1);color:var(--primary)"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <div>
+        <div class="history-title">${h.title}</div>
+        <div class="history-meta">${h.date} • ${h.studentCount} জন শিক্ষার্থী • ক্লাস গড়: ${h.classAvg}%</div>
+      </div>
+      <span class="history-badge ${h.status==='active'?'hbadge-active':'hbadge-archived'}">${h.status==='active'?'সক্রিয়':'আর্কাইভ'}</span>
+      <div class="history-actions">
+        <button class="action-btn" onclick="restoreSnapshot('${h.id}')" title="পুনরুদ্ধার"><i class="fa-solid fa-rotate-left"></i></button>
+        <button class="action-btn" onclick="duplicateSnapshot('${h.id}')" title="ডুপ্লিকেট"><i class="fa-solid fa-copy"></i></button>
+        <button class="action-btn" onclick="archiveSnapshot('${h.id}')" title="${h.status==='active'?'আর্কাইভ':'আনআর্কাইভ'}"><i class="fa-solid fa-box-archive"></i></button>
+        <button class="action-btn danger" onclick="deleteSnapshot('${h.id}')" title="মুছুন"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>
   `).join('');
 }
-
-function addSubject() {
-  const inp = document.getElementById('new-subject');
-  const val = inp?.value.trim();
-  if (!val) return;
-  if (settings.subjects.includes(val)) { showToast('এই বিষয় ইতিমধ্যে আছে!', 'error'); return; }
-  settings.subjects.push(val);
-  inp.value = '';
-  renderSubjectsList();
-  showToast(val + ' যোগ হয়েছে!', 'success');
+function restoreSnapshot(id){
+  const snap=assessmentHistory.find(h=>h.id===id);
+  if(!snap||!confirm('এই স্ন্যাপশট থেকে শিক্ষার্থীর তথ্য পুনরুদ্ধার করবেন?')) return;
+  students=JSON.parse(JSON.stringify(snap.students));
+  saveToStorage(); renderStudentTable(); refreshReportSelector(); refreshFeedbackSelector();
+  showToast('পুনরুদ্ধার সম্পন্ন!','success');
 }
-
-function removeSubject(idx) {
-  settings.subjects.splice(idx, 1);
-  renderSubjectsList();
+function duplicateSnapshot(id){
+  const snap=assessmentHistory.find(h=>h.id===id);
+  if(!snap) return;
+  const dup={...JSON.parse(JSON.stringify(snap)),id:'snap_'+Date.now(),title:snap.title+' (কপি)',savedAt:new Date().toISOString()};
+  assessmentHistory.unshift(dup);
+  saveToStorage(); renderHistory();
+  showToast('ডুপ্লিকেট তৈরি হয়েছে!','success');
 }
-
-function saveSettings() {
-  settings.school = getVal('set-school') || settings.school;
-  settings.className = getVal('set-class') || settings.className;
-  settings.section = getVal('set-section') || settings.section;
-  settings.year = getVal('set-year') || settings.year;
-  settings.teacherName = getVal('set-teacher') || settings.teacherName;
-  settings.teacherDesignation = getVal('set-designation') || settings.teacherDesignation;
-  saveToStorage();
-  showToast('সেটিংস সংরক্ষিত হয়েছে!', 'success');
+function archiveSnapshot(id){
+  const snap=assessmentHistory.find(h=>h.id===id);
+  if(snap){snap.status=snap.status==='active'?'archived':'active';}
+  saveToStorage(); renderHistory();
+  showToast(snap?.status==='archived'?'আর্কাইভ হয়েছে!':'সক্রিয় করা হয়েছে!','success');
+}
+function deleteSnapshot(id){
+  if(!confirm('মুছে দেবেন?')) return;
+  assessmentHistory=assessmentHistory.filter(h=>h.id!==id);
+  saveToStorage(); renderHistory();
+  showToast('মুছে দেওয়া হয়েছে।','error');
 }
 
 // ═══════════════════════════════════════════════════════
-//  ১০. DATA PERSISTENCE
+//  ১২. SETTINGS
 // ═══════════════════════════════════════════════════════
-function saveToStorage() {
-  try {
-    localStorage.setItem('sashiba_eval_students', JSON.stringify(students));
-    localStorage.setItem('sashiba_eval_settings', JSON.stringify(settings));
-  } catch(e) {}
+function loadSettingsUI(){
+  setVal('set-school',settings.school); setVal('set-class',settings.className);
+  setVal('set-section',settings.section); setVal('set-year',settings.year);
+  setVal('set-teacher',settings.teacherName); setVal('set-designation',settings.teacherDesignation);
+  renderSubjectsList();
+}
+function renderSubjectsList(){
+  const el=document.getElementById('subjects-list');
+  if(!el) return;
+  el.innerHTML=settings.subjects.map((s,i)=>`<span class="subject-tag">${s}<button onclick="removeSubject(${i})"><i class="fa-solid fa-xmark"></i></button></span>`).join('');
+}
+function addSubject(){
+  const inp=document.getElementById('new-subject');
+  const val=inp?.value.trim();
+  if(!val) return;
+  if(settings.subjects.includes(val)){showToast('ইতিমধ্যে আছে!','error');return;}
+  settings.subjects.push(val); inp.value='';
+  renderSubjectsList(); showToast(val+' যোগ হয়েছে!','success');
+}
+function removeSubject(idx){settings.subjects.splice(idx,1);renderSubjectsList();}
+function saveSettings(){
+  settings.school=getVal('set-school')||settings.school;
+  settings.className=getVal('set-class')||settings.className;
+  settings.section=getVal('set-section')||settings.section;
+  settings.year=getVal('set-year')||settings.year;
+  settings.teacherName=getVal('set-teacher')||settings.teacherName;
+  settings.teacherDesignation=getVal('set-designation')||settings.teacherDesignation;
+  saveToStorage(); showToast('সেটিংস সংরক্ষিত!','success');
 }
 
-function loadFromStorage() {
-  try {
-    const savedStudents = localStorage.getItem('sashiba_eval_students');
-    const savedSettings = localStorage.getItem('sashiba_eval_settings');
-    if (savedStudents) students = JSON.parse(savedStudents);
-    if (savedSettings) settings = { ...settings, ...JSON.parse(savedSettings) };
-  } catch(e) {}
-
-  if (students.length === 0) {
-    students = sampleStudents.map((s, i) => ({
-      id: 'sid_sample_' + (i + 1),
-      name: s.name,
-      roll: s.roll,
-      scores: { ...s.scores },
-      remarks: s.remarks,
-      parentName: s.parentName,
-      phone: s.phone || ''
-    }));
+// ═══════════════════════════════════════════════════════
+//  ১৩. STORAGE
+// ═══════════════════════════════════════════════════════
+function saveToStorage(){
+  try{
+    localStorage.setItem('sashiba_eval_students',JSON.stringify(students));
+    localStorage.setItem('sashiba_eval_settings',JSON.stringify(settings));
+    localStorage.setItem('sashiba_eval_history',JSON.stringify(assessmentHistory));
+    localStorage.setItem('sashiba_eval_rubrics',JSON.stringify(savedRubrics));
+  }catch(e){}
+}
+function loadFromStorage(){
+  try{
+    const ss=localStorage.getItem('sashiba_eval_students');
+    const set=localStorage.getItem('sashiba_eval_settings');
+    const hist=localStorage.getItem('sashiba_eval_history');
+    const rub=localStorage.getItem('sashiba_eval_rubrics');
+    if(ss) students=JSON.parse(ss);
+    if(set) settings={...settings,...JSON.parse(set)};
+    if(hist) assessmentHistory=JSON.parse(hist);
+    if(rub) savedRubrics=JSON.parse(rub);
+  }catch(e){}
+  if(students.length===0){
+    students=sampleStudents.map((s,i)=>({id:'sid_sample_'+(i+1),...s,scores:{...s.scores},timeline:{...s.timeline}}));
     saveToStorage();
   }
 }
-
-function exportData() {
-  const data = { settings, students, exportedAt: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `মূল্যায়ন_${settings.className}_${settings.year}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('ডেটা এক্সপোর্ট সম্পন্ন!', 'success');
+function exportData(){
+  const blob=new Blob([JSON.stringify({settings,students,assessmentHistory,savedRubrics,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`মূল্যায়ন_${settings.className}_${settings.year}.json`; a.click();
+  URL.revokeObjectURL(url); showToast('এক্সপোর্ট সম্পন্ন!','success');
 }
-
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.students) students = data.students;
-      if (data.settings) settings = { ...settings, ...data.settings };
-      saveToStorage();
-      renderStudentTable();
-      loadSettingsUI();
-      refreshReportSelector();
-      showToast('ডেটা আমদানি সম্পন্ন!', 'success');
-    } catch(err) {
-      showToast('ডেটা ফাইলে ত্রুটি আছে!', 'error');
-    }
+function importData(event){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.students) students=data.students;
+      if(data.settings) settings={...settings,...data.settings};
+      if(data.assessmentHistory) assessmentHistory=data.assessmentHistory;
+      if(data.savedRubrics) savedRubrics=data.savedRubrics;
+      saveToStorage(); renderStudentTable(); loadSettingsUI(); refreshReportSelector(); refreshFeedbackSelector();
+      showToast('ইম্পোর্ট সম্পন্ন!','success');
+    }catch(err){showToast('ফাইলে ত্রুটি!','error');}
   };
   reader.readAsText(file);
-  event.target.value = '';
+  event.target.value='';
 }
-
-function clearAllData() {
-  if (!confirm('সমস্ত শিক্ষার্থীর ডেটা মুছে দেবেন? এটি পুনরুদ্ধার করা যাবে না।')) return;
-  students = [];
-  saveToStorage();
-  renderStudentTable();
-  refreshReportSelector();
-  showToast('সব ডেটা মুছে গেছে।', 'error');
+function clearAllData(){
+  if(!confirm('সব ডেটা মুছবেন?')) return;
+  students=[];
+  saveToStorage(); renderStudentTable(); refreshReportSelector(); refreshFeedbackSelector();
+  showToast('মুছে গেছে।','error');
 }
 
 // ═══════════════════════════════════════════════════════
-//  ১১. UI CONTROLS
+//  ১৪. UI CONTROLS
 // ═══════════════════════════════════════════════════════
-const sectionConfig = {
-  students: { title: 'মূল্যায়ন আর্কিটেক্ট', subtitle: 'শিক্ষার্থী তালিকা ও নম্বর এন্ট্রি' },
-  analytics: { title: 'ক্লাস বিশ্লেষণ', subtitle: 'পারফরম্যান্স ওভারভিউ ও পরিসংখ্যান' },
-  report: { title: 'রিপোর্ট কার্ড', subtitle: 'শিক্ষার্থীর মূল্যায়ন রিপোর্ট ও অভিভাবক যোগাযোগ' },
-  settings: { title: 'সেটিংস', subtitle: 'বিদ্যালয় ও সিস্টেম কনফিগারেশন' },
+const sectionConfig={
+  performance:{title:'শিক্ষার্থী পারফরম্যান্স',subtitle:'ব্যক্তিগত পারফরম্যান্স ও AI ফিডব্যাক'},
+  students:{title:'মূল্যায়ন আর্কিটেক্ট',subtitle:'শিক্ষার্থী তালিকা ও নম্বর এন্ট্রি'},
+  analytics:{title:'ক্লাস বিশ্লেষণ',subtitle:'পারফরম্যান্স ওভারভিউ ও পরিসংখ্যান'},
+  rubric:{title:'Rubric নির্মাতা',subtitle:'AI দিয়ে মূল্যায়ন মানদণ্ড তৈরি করুন'},
+  feedback:{title:'AI ফিডব্যাক জেনারেটর',subtitle:'ফলাফল দেখে AI লিখে দেবে'},
+  report:{title:'রিপোর্ট কার্ড',subtitle:'প্রিন্ট, PDF ও অভিভাবক শেয়ার'},
+  history:{title:'মূল্যায়ন ইতিহাস',subtitle:'সংরক্ষিত মূল্যায়নের রেকর্ড'},
+  settings:{title:'সেটিংস',subtitle:'সিস্টেম কনফিগারেশন'},
 };
-
-function showSection(name) {
-  document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
-  document.getElementById('section-' + name)?.classList.remove('hidden');
-
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  document.getElementById('nav-' + name)?.classList.add('active');
-
-  const cfg = sectionConfig[name];
-  if (cfg) {
-    setEl('section-title', cfg.title);
-    setEl('section-subtitle', cfg.subtitle);
-  }
-
-  if (name === 'analytics') renderAnalytics();
-  if (name === 'report') { refreshReportSelector(); }
-  if (name === 'settings') loadSettingsUI();
+function showSection(name){
+  document.querySelectorAll('.content-section').forEach(el=>el.classList.add('hidden'));
+  document.getElementById('section-'+name)?.classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-'+name)?.classList.add('active');
+  const cfg=sectionConfig[name];
+  if(cfg){setEl('section-title',cfg.title);setEl('section-subtitle',cfg.subtitle);}
+  if(name==='analytics') renderAnalytics();
+  if(name==='report'){refreshReportSelector();}
+  if(name==='settings') loadSettingsUI();
+  if(name==='history') renderHistory();
+  if(name==='performance') renderPerfStudentList();
+  if(name==='feedback'){refreshFeedbackSelector();renderSavedRubrics();}
+  if(name==='rubric') renderSavedRubrics();
 }
-
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('collapsed');
-}
-
-function toggleDarkMode() {
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');}
+function toggleDarkMode(){
   document.body.classList.toggle('dark-mode');
-  const isDark = document.body.classList.contains('dark-mode');
-  const btn = document.getElementById('dark-mode-btn');
-  if (btn) btn.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-  try { localStorage.setItem('sashiba_eval_theme', isDark ? 'dark' : 'light'); } catch(e) {}
+  const isDark=document.body.classList.contains('dark-mode');
+  const btn=document.getElementById('dark-mode-btn');
+  if(btn) btn.innerHTML=isDark?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';
+  try{localStorage.setItem('sashiba_eval_theme',isDark?'dark':'light');}catch(e){}
 }
+function goHome(){try{window.parent.showHome();}catch(e){try{window.top.showHome();}catch(e2){}}}
 
-function goHome() {
-  try { window.parent.showHome(); } catch(e) {
-    try { window.top.showHome(); } catch(e2) {}
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-//  ১২. UTILITY
-// ═══════════════════════════════════════════════════════
-function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
-function getVal(id) { return document.getElementById(id)?.value?.trim() || ''; }
-function setVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
-
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  setTimeout(() => { t.classList.remove('show'); }, 3000);
+// ── Utility ──
+function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function getVal(id){return document.getElementById(id)?.value?.trim()||'';}
+function setVal(id,val){const el=document.getElementById(id);if(el)el.value=val;}
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  if(!t) return;
+  t.textContent=msg; t.className='toast show '+type;
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 
 // ═══════════════════════════════════════════════════════
-//  ১৩. INIT
+//  ১৫. INIT
 // ═══════════════════════════════════════════════════════
-window.addEventListener('load', () => {
+window.addEventListener('load',()=>{
   loadFromStorage();
-
-  // Apply saved theme
-  try {
-    const savedTheme = localStorage.getItem('sashiba_eval_theme') || localStorage.getItem('sashiba_theme');
-    if (savedTheme === 'dark') {
+  try{
+    const th=localStorage.getItem('sashiba_eval_theme')||localStorage.getItem('sashiba_theme');
+    if(th==='dark'){
       document.body.classList.add('dark-mode');
-      const btn = document.getElementById('dark-mode-btn');
-      if (btn) btn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+      const btn=document.getElementById('dark-mode-btn');
+      if(btn) btn.innerHTML='<i class="fa-solid fa-sun"></i>';
     }
-  } catch(e) {}
-
-  // PostMessage theme sync from parent
-  window.addEventListener('message', (e) => {
-    if (e.data?.type === 'THEME_CHANGE') {
-      if (e.data.theme === 'dark') document.body.classList.add('dark-mode');
+  }catch(e){}
+  window.addEventListener('message',e=>{
+    if(e.data?.type==='THEME_CHANGE'){
+      if(e.data.theme==='dark') document.body.classList.add('dark-mode');
       else document.body.classList.remove('dark-mode');
     }
   });
-
   renderStudentTable();
   refreshReportSelector();
+  refreshFeedbackSelector();
+  renderSavedRubrics();
   showSection('students');
 });
