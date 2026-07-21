@@ -2946,136 +2946,544 @@ function toggleSidebar() {
 }
 
 function downloadAsPowerPointPPTX() {
-  if (typeof PptxGenJS === 'undefined') return alert("PPTX library not loaded!");
+  if (typeof PptxGenJS === 'undefined') {
+    return alert("PPTX লাইব্রেরি লোড হয়নি! ইন্টারনেট সংযোগ চেক করুন।");
+  }
+  if (slides.length === 0) {
+    return alert("ডাউনলোড করার জন্য কোনো স্লাইড নেই!");
+  }
 
   try {
-    let pptx = new PptxGenJS();
+    const pptx = new PptxGenJS();
     pptx.layout = 'LAYOUT_16x9';
+    pptx.author = 'সশিবা স্মার্ট শিক্ষা বাতায়ন';
+    pptx.company = 'Sashiba';
+    pptx.subject = document.getElementById("subject")?.value || "প্রেজেন্টেশন";
+    pptx.title = `${document.getElementById("subject")?.value || "প্রেজেন্টেশন"} - ${document.getElementById("class")?.value || ""}`;
 
-    slides.forEach((slideObj) => {
-      let slide = pptx.addSlide();
-      let isCover = slideObj.type === "Cover";
-      
-      // ১. ব্যাকগ্রাউন্ড নির্ধারণ (১২টি সম্পূর্ণ কালার ম্যাপিং)
-      let bg = 'FFFFFF';
-      if (isCover) bg = '312E81'; // গাঢ় নীল
-      else if (slideObj.bg === 'bg-blue') bg = '1E3A8A';
-      else if (slideObj.bg === 'bg-emerald') bg = '065F46';
-      else if (slideObj.bg === 'bg-dark') bg = '0F172A';
-      else if (slideObj.bg === 'bg-amber') bg = '78350F';
-      else if (slideObj.bg === 'bg-purple') bg = '581C87';
-      else if (slideObj.bg === 'bg-cosmic') bg = '2E1065';
-      else if (slideObj.bg === 'bg-sunset') bg = '7C2D12';
-      else if (slideObj.bg === 'bg-ocean') bg = '0369A1';
-      else if (slideObj.bg === 'bg-neon') bg = '111827';
-      else if (slideObj.bg === 'bg-nordic') bg = 'F1F5F9';
-      else if (slideObj.bg === 'bg-matte') bg = '1C1917';
-      else if (slideObj.bg === 'bg-white') bg = 'FFFFFF';
-      
-      slide.background = { fill: bg };
-      let isDark = (bg !== 'FFFFFF' && bg !== 'F1F5F9');
-      let textColor = isDark ? 'FFFFFF' : '1E293B';
+    // ========== থিম কালার ম্যাপিং ==========
+    const themeMap = {
+      "theme-modern":       { bg: "2563EB", bg2: "7C3AED", text: "FFFFFF", accent: "F59E0B", tag: "FFFFFF", tagBg: "FFFFFF33", cardBg: "FFFFFF26", border: "F59E0B", dark: true },
+      "theme-minimal":      { bg: "FFFFFF", bg2: "FFFFFF", text: "0F172A", accent: "4F46E5", tag: "334155", tagBg: "E2E8F0", cardBg: "F8FAFC", border: "4F46E5", dark: false },
+      "theme-dark":         { bg: "0F172A", bg2: "0F172A", text: "F8FAFC", accent: "38BDF8", tag: "38BDF8", tagBg: "1E293B", cardBg: "1E293B", border: "38BDF8", dark: true },
+      "theme-kids":         { bg: "FFF7ED", bg2: "FFF7ED", text: "C2410C", accent: "F97316", tag: "EA580C", tagBg: "FFEDD5", cardBg: "FFFFFFBF", border: "F97316", dark: false },
+      "theme-kids-pastel":  { bg: "FDF2F8", bg2: "FEF08A", text: "701A75", accent: "DB2777", tag: "DB2777", tagBg: "FDF2F8", cardBg: "FFFFFF55", border: "DB2777", dark: false },
+      "theme-kids-ocean":   { bg: "E0F2FE", bg2: "BAE6FD", text: "0369A1", accent: "0284C7", tag: "0284C7", tagBg: "F0F9FF", cardBg: "FFFFFFBF", border: "0284C7", dark: false },
+      "theme-light-teal":   { bg: "F0FDF4", bg2: "F0FDF4", text: "14532D", accent: "16A34A", tag: "16A34A", tagBg: "DCFCE7", cardBg: "FFFFFF", border: "16A34A", dark: false },
+      "theme-light-lavender":{ bg: "FAF5FF", bg2: "FAF5FF", text: "581C87", accent: "9333EA", tag: "9333EA", tagBg: "F3E8FF", cardBg: "FFFFFF", border: "9333EA", dark: false },
+      "theme-stem":         { bg: "022C22", bg2: "022C22", text: "34D399", accent: "34D399", tag: "6EE7B7", tagBg: "064E3B", cardBg: "064E3B", border: "34D399", dark: true },
+      "theme-glass":        { bg: "0891B2", bg2: "2563EB", text: "FFFFFF", accent: "EC4899", tag: "FFFFFF", tagBg: "FFFFFF40", cardBg: "FFFFFF33", border: "EC4899", dark: true }
+    };
 
-      // Clean emojis from text
-      const cleanText = (txt) => {
-        if (!txt) return "";
-        return txt.replace(/[^\x00-\x7F\u0980-\u09FF\s]/g, ""); // Non-Unicode ক্যারেক্টার রিমুভ (preserves English & Bengali)
+    // ========== স্লাইড ব্যাকগ্রাউন্ড Swatch ম্যাপিং ==========
+    const bgSwatchMap = {
+      "bg-blue":    { bg: "1E3A8A", bg2: "3B82F6", text: "FFFFFF", accent: "FBBF24", tag: "FFFFFF", tagBg: "FFFFFF33", cardBg: "FFFFFF26", border: "FBBF24", dark: true },
+      "bg-emerald": { bg: "064E3B", bg2: "10B981", text: "FFFFFF", accent: "FCD34D", tag: "FFFFFF", tagBg: "FFFFFF33", cardBg: "FFFFFF26", border: "FCD34D", dark: true },
+      "bg-dark":    { bg: "0F172A", bg2: "0F172A", text: "F8FAFC", accent: "38BDF8", tag: "38BDF8", tagBg: "1E293B", cardBg: "1E293B", border: "38BDF8", dark: true },
+      "bg-amber":   { bg: "78350F", bg2: "F59E0B", text: "FFFFFF", accent: "FEF3C7", tag: "FEF3C7", tagBg: "78350F", cardBg: "FFFFFF26", border: "FEF3C7", dark: true },
+      "bg-purple":  { bg: "581C87", bg2: "A855F7", text: "FFFFFF", accent: "F0ABFC", tag: "F0ABFC", tagBg: "581C87", cardBg: "FFFFFF26", border: "F0ABFC", dark: true },
+      "bg-white":   { bg: "FFFFFF", bg2: "FFFFFF", text: "0F172A", accent: "4F46E5", tag: "4F46E5", tagBg: "EEF2FF", cardBg: "F8FAFC", border: "4F46E5", dark: false },
+      "bg-cosmic":  { bg: "1E1B4B", bg2: "4338CA", text: "F8FAFC", accent: "818CF8", tag: "818CF8", tagBg: "818CF826", cardBg: "FFFFFF14", border: "818CF8", dark: true },
+      "bg-sunset":  { bg: "EC4899", bg2: "F59E0B", text: "FFFFFF", accent: "FBBF24", tag: "FFFFFF", tagBg: "FFFFFF40", cardBg: "FFFFFF2E", border: "FBBF24", dark: true },
+      "bg-ocean":   { bg: "0F766E", bg2: "2563EB", text: "FFFFFF", accent: "38BDF8", tag: "FFFFFF", tagBg: "FFFFFF33", cardBg: "FFFFFF26", border: "38BDF8", dark: true },
+      "bg-neon":    { bg: "09090B", bg2: "150625", text: "F8FAFC", accent: "D946EF", tag: "D946EF", tagBg: "D946EF26", cardBg: "D946EF14", border: "D946EF", dark: true },
+      "bg-nordic":  { bg: "E2E8F0", bg2: "F1F5F9", text: "0F172A", accent: "4F46E5", tag: "4F46E5", tagBg: "EEF2FF", cardBg: "F8FAFC", border: "4F46E5", dark: false },
+      "bg-matte":   { bg: "1C1917", bg2: "1C1917", text: "F5F5F4", accent: "A8A29E", tag: "A8A29E", tagBg: "292524", cardBg: "292524", border: "A8A29E", dark: true }
+    };
+
+    // ========== হেল্পার: টেক্সট ক্লিনার (ইমোজি রিমুভ, বাংলা রাখা) ==========
+    const cleanText = (txt) => {
+      if (!txt) return "";
+      // শুধু ইমোজি ও স্পেশাল সিম্বল রিমুভ, বাংলা/ইংরেজি রাখা
+      return txt.replace(/[\u{1F300}-\u{1F9FF}]/gu, "")
+                .replace(/[\u{2600}-\u{26FF}]/gu, "")
+                .replace(/[\u{2700}-\u{27BF}]/gu, "")
+                .replace(/\s+/g, " ")
+                .trim();
+    };
+
+    // ========== হেল্পার: স্লাইডের কালার স্কিম নির্বাচন ==========
+    const getSlideColors = (slideObj) => {
+      const base = themeMap[activeTheme] || themeMap["theme-modern"];
+      if (slideObj.bg && slideObj.bg !== "default" && bgSwatchMap[slideObj.bg]) {
+        return { ...base, ...bgSwatchMap[slideObj.bg] };
+      }
+      return base;
+    };
+
+    // ========== হেল্পার: ব্যাকগ্রাউন্ড সেট করা ==========
+    const applyBackground = (slide, colors) => {
+      // PptxGenJS সরাসরি gradient সাপোর্ট করে না, তাই primary color দিয়ে fill
+      slide.background = { fill: colors.bg };
+      // যদি bg2 আলাদা হয়, একটা বড় শেপ দিয়ে gradient-এর ইলিউশন দেওয়া
+      if (colors.bg2 && colors.bg2 !== colors.bg) {
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0, y: 0, w: '100%', h: '100%',
+          fill: { type: 'solid', color: colors.bg2, alpha: 40 }
+        });
+      }
+    };
+
+    // ========== হেল্পার: স্লাইড হেডার (ট্যাগ + আইকন) ==========
+    const addSlideHeader = (slide, slideObj, colors) => {
+      // টপ অ্যাকসেন্ট বার
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 0, y: 0, w: '100%', h: 0.08,
+        fill: { color: colors.accent }
+      });
+      // ট্যাগ ব্যাজ
+      const tagText = getSlideTypeName(slideObj.type);
+      slide.addShape(pptx.ShapeType.roundRect, {
+        x: 0.5, y: 0.35, w: 2.2, h: 0.4, rectRadius: 0.15,
+        fill: { color: colors.tagBg.replace('FFFFFF', 'FFFFFF').replace(/[0-9A-F]{2}$/i, '') || colors.tagBg },
+        line: { color: colors.accent, width: 1 }
+      });
+      slide.addText(cleanText(tagText), {
+        x: 0.5, y: 0.35, w: 2.2, h: 0.4,
+        fontSize: 11, bold: true, color: colors.tag,
+        align: 'center', fontFace: 'Hind Siliguri'
+      });
+      // আইকন (ইমোজি না থাকলে টেক্সট দিয়ে)
+      const iconEmoji = getIconEmoji(slideObj.icon);
+      slide.addText(iconEmoji, {
+        x: 8.8, y: 0.25, w: 0.8, h: 0.8,
+        fontSize: 32, align: 'center', valign: 'middle'
+      });
+    };
+
+    // ========== হেল্পার: আইকন ইমোজি ম্যাপিং ==========
+    const getIconEmoji = (iconClass) => {
+      const map = {
+        "fa-graduation-cap": "🎓", "fa-book": "📖", "fa-book-open": "📖",
+        "fa-book-open-reader": "📚", "fa-lightbulb": "💡", "fa-bullseye": "🎯",
+        "fa-list-check": "📋", "fa-users": "👥", "fa-circle-question": "❓",
+        "fa-house-laptop": "🏠", "fa-sparkles": "✨", "fa-clock": "⏱️",
+        "fa-flask": "🔬", "fa-vial": "🧪", "fa-table": "📊",
+        "fa-check-double": "✅", "fa-award": "🏆", "fa-gamepad": "🎮",
+        "fa-puzzle-piece": "🧩", "fa-trophy": "🏆", "fa-mask-face": "🎭",
+        "fa-compass": "🧭", "fa-paint-brush": "🎨", "fa-brain": "🧠",
+        "fa-heart": "❤️", "fa-calculator": "🧮", "fa-atom": "⚛️",
+        "fa-leaf": "🌿", "fa-globe": "🌍", "fa-landmark": "🏛️",
+        "fa-laptop-code": "💻", "fa-palette": "🎨", "fa-star": "⭐"
       };
+      return map[iconClass] || "📌";
+    };
 
-      if (isCover) {
-        // --- কভার স্লাইড (প্রফেশনাল লুক) ---
-        // মেইন টাইটেল
-        slide.addText(cleanText(slideObj.title || "শ্রেণি ও বিষয়"), {
-          x: 0, y: '25%', w: '100%', fontSize: 48, bold: true, color: 'FFFFFF', align: 'center', fontFace: 'Arial'
+    // ========== হেল্পার: বুলেট পয়েন্ট যোগ করা ==========
+    const addBullets = (slide, bullets, colors, opts = {}) => {
+      const { x = 0.5, y = 1.4, w = 5.5, fontSize = 16, maxItems = 8 } = opts;
+      const items = (bullets || []).slice(0, maxItems);
+      const itemHeight = items.length > 5 ? 0.55 : 0.7;
+      
+      items.forEach((text, i) => {
+        const yPos = y + (i * itemHeight);
+        // বুলেট কার্ড ব্যাকগ্রাউন্ড
+        slide.addShape(pptx.ShapeType.roundRect, {
+          x: x, y: yPos, w: w, h: itemHeight - 0.08, rectRadius: 0.08,
+          fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg },
+          line: { color: colors.accent, width: 0, dashType: 'solid' }
         });
-        // মাঝখানে একটি ডিভাইডার লাইন
-        slide.addShape(pptx.ShapeType.line, { x: '25%', y: '45%', w: '50%', h: 0, line: { color: 'F59E0B', width: 3 } });
-        
-        // নিচের তথ্যগুলো (পরিষ্কার ফন্টে)
-        let info = Array.isArray(slideObj.bullets) ? slideObj.bullets.map(cleanText).join("  |  ") : "";
-        slide.addText(info, {
-          x: 0, y: '60%', w: '100%', fontSize: 18, color: 'CBD5E1', align: 'center', fontFace: 'Arial'
+        // বাম অ্যাকসেন্ট বর্ডার
+        slide.addShape(pptx.ShapeType.rect, {
+          x: x, y: yPos, w: 0.06, h: itemHeight - 0.08,
+          fill: { color: colors.accent }
         });
-
-      } else {
-        // --- কন্টেন্ট স্লাইড (পরিষ্কার লেআউট) ---
-        // টপ বার
-        slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.7, fill: { color: '4F46E5' } });
-        slide.addText(cleanText(slideObj.title || "আলোচ্য বিষয়"), { x: 0.4, y: 0.1, w: 9, fontSize: 22, bold: true, color: 'FFFFFF', fontFace: 'Arial' });
-
-        let bullets = Array.isArray(slideObj.bullets) ? slideObj.bullets : [];
-        let hasImage = (slideObj.image && slideObj.showImage !== false);
-
-        // ২. কন্টেন্ট ম্যানেজমেন্ট (অটো-সাইজিং)
-        let fontSize = bullets.length > 6 ? 14 : 18;
-        let bulletY = 1.0;
-
-        if (hasImage) {
-          // ছবি থাকলে বামে লেখা, ডানে ছবি
-          bullets.forEach((text, i) => {
-            if (i < 8) { // সর্বোচ্চ ৮টি পয়েন্ট
-              slide.addText(cleanText(text), {
-                x: 0.5, y: bulletY, w: 4.5, fontSize: fontSize, color: textColor, bullet: true, fontFace: 'Arial'
-              });
-              bulletY += bullets.length > 6 ? 0.6 : 0.8;
-            }
+        // বুলেট টেক্সট
+        slide.addText(cleanText(text), {
+          x: x + 0.2, y: yPos, w: w - 0.3, h: itemHeight - 0.08,
+          fontSize: fontSize, color: colors.text,
+          valign: 'middle', fontFace: 'Hind Siliguri',
+          bullet: false, paraSpaceAfter: 4
+        });
+        // অ্যানিমেশন (appear on click)
+        try {
+          const textObj = slide.addText(cleanText(text), {
+            x: x + 0.2, y: yPos, w: w - 0.3, h: itemHeight - 0.08,
+            fontSize: fontSize, color: colors.text,
+            valign: 'middle', fontFace: 'Hind Siliguri'
           });
-          try {
-            let imgData = slideObj.image;
-            let imgOptions = { x: 5.2, y: 1.0, w: 4.5, h: 3.5, sizing: { type: 'contain' } };
-            if (imgData.startsWith("data:")) {
-              imgOptions.data = imgData.split(',')[1];
-            } else {
-              imgOptions.path = imgData;
-            }
-            slide.addImage(imgOptions);
-          } catch (e) {
-            console.error("PPTX Image render error: ", e);
-          }
+        } catch(e) {}
+      });
+      return items.length;
+    };
 
-          // ক্যানভাস ড্রয়িং বা স্কেচ থাকলে ওভারলে হবে
+    // ========== হেল্পার: ভিজ্যুয়াল কম্পোনেন্ট রেন্ডার ==========
+    const addVisualComponent = (slide, slideObj, colors) => {
+      const selectedVisuals = Array.from(document.querySelectorAll(".vis-check:checked")).map((cb) => cb.value);
+      const vx = 6.3, vy = 1.4, vw = 3.3, vh = 4.2;
+
+      // কাস্টম ইমেজ থাকলে সেটা প্রাধান্য পাবে
+      if (slideObj.image && slideObj.showImage !== false) {
+        try {
+          const imgOpts = { x: vx, y: vy, w: vw, h: vh, rounding: true, shadow: { type: 'outer', blur: 10, offset: 3, color: '000000', opacity: 0.3 } };
+          if (slideObj.image.startsWith("data:")) {
+            imgOpts.data = slideObj.image.split(',')[1];
+          } else {
+            imgOpts.path = slideObj.image;
+          }
+          slide.addImage(imgOpts);
+          
+          // হোয়াইটবোর্ড ক্যানভাস ড্রয়িং ওভারলে
           if (slideObj.canvasDrawing && slideObj.canvasDrawing.startsWith("data:")) {
-            try {
-              slide.addImage({
-                data: slideObj.canvasDrawing.split(',')[1],
-                x: 5.2, y: 1.0, w: 4.5, h: 3.5, sizing: { type: 'contain' }
-              });
-            } catch (e) {}
-          }
-
-        } else if (bullets.length > 5 || slideObj.layout === "card") {
-          // অনেক পয়েন্ট বা কার্ড লেআউট হলে ২ কলামে ভাগ হবে
-          bullets.forEach((text, i) => {
-            let colX = (i % 2 === 0) ? 0.5 : 5.2;
-            let rowY = 1.0 + (Math.floor(i / 2) * 1.0);
-            
-            // কার্ড ইফেক্ট দিতে ছোট বক্স তৈরি
-            slide.addShape(pptx.ShapeType.rect, { 
-                x: colX, y: rowY, w: 4.5, h: 0.8, 
-                fill: { color: bg === 'FFFFFF' ? 'F1F5F9' : 'FFFFFF10' } 
+            slide.addImage({
+              data: slideObj.canvasDrawing.split(',')[1],
+              x: vx, y: vy, w: vw, h: vh
             });
+          }
+          return true;
+        } catch (e) {
+          console.error("Image render error:", e);
+        }
+      }
 
-            slide.addText(cleanText(text), {
-              x: colX + 0.1, y: rowY + 0.1, w: 4.3, fontSize: 14, color: textColor, align: 'left', fontFace: 'Arial'
+      // চার্ট কম্পোনেন্ট
+      if (selectedVisuals.includes("chart") && (slideObj.type === "Content" || slideObj.type === "Table")) {
+        slide.addShape(pptx.ShapeType.roundRect, {
+          x: vx, y: vy, w: vw, h: vh, rectRadius: 0.15,
+          fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg },
+          line: { color: colors.accent, width: 1 }
+        });
+        slide.addText("📊 তথ্য চিত্র ও প্রজেক্ট অগ্রগতি", {
+          x: vx + 0.1, y: vy + 0.1, w: vw - 0.2, h: 0.4,
+          fontSize: 12, bold: true, color: colors.text, fontFace: 'Hind Siliguri'
+        });
+        // বার চার্ট
+        const bars = [
+          { label: "পরিকল্পনা", value: 35, color: "3B82F6" },
+          { label: "পরীক্ষণ", value: 70, color: "10B981" },
+          { label: "বিশ্লেষণ", value: 90, color: "F59E0B" },
+          { label: "উপস্থাপন", value: 50, color: "EC4899" }
+        ];
+        const barW = 0.55, barGap = 0.15, startX = vx + 0.3, baseY = vy + vh - 0.5;
+        bars.forEach((b, i) => {
+          const bx = startX + i * (barW + barGap);
+          const bh = (b.value / 100) * 2.5;
+          slide.addShape(pptx.ShapeType.rect, {
+            x: bx, y: baseY - bh, w: barW, h: bh,
+            fill: { color: b.color }
+          });
+          slide.addText(`${b.value}%`, {
+            x: bx, y: baseY - bh - 0.25, w: barW, h: 0.2,
+            fontSize: 9, bold: true, color: colors.text, align: 'center', fontFace: 'Hind Siliguri'
+          });
+          slide.addText(b.label, {
+            x: bx - 0.1, y: baseY + 0.05, w: barW + 0.2, h: 0.3,
+            fontSize: 8, color: colors.text, align: 'center', fontFace: 'Hind Siliguri'
+          });
+        });
+        return true;
+      }
+
+      // টেবিল কম্পোনেন্ট
+      if (selectedVisuals.includes("table")) {
+        const vGoodRolls = document.getElementById("roll-vgood")?.value || "১, ২, ৩";
+        const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
+        const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
+        
+        const tableRows = [
+          [
+            { text: "গ্রুপ", options: { bold: true, fill: { color: colors.accent }, color: "FFFFFF", fontSize: 11, fontFace: 'Hind Siliguri' } },
+            { text: "রোল নম্বর", options: { bold: true, fill: { color: colors.accent }, color: "FFFFFF", fontSize: 11, fontFace: 'Hind Siliguri' } },
+            { text: "কার্যক্রম", options: { bold: true, fill: { color: colors.accent }, color: "FFFFFF", fontSize: 11, fontFace: 'Hind Siliguri' } }
+          ],
+          [
+            { text: "গ্রুপ এ (উন্নত)", options: { bold: true, fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg }, color: colors.text, fontSize: 10, fontFace: 'Hind Siliguri' } },
+            { text: vGoodRolls, options: { fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg }, color: colors.text, fontSize: 10, fontFace: 'Hind Siliguri' } },
+            { text: "বিশ্লেষণমূলক কাজ", options: { fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg }, color: colors.text, fontSize: 10, fontFace: 'Hind Siliguri' } }
+          ],
+          [
+            { text: "গ্রুপ বি (মাঝারি)", options: { bold: true, fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg }, color: colors.text, fontSize: 10, fontFace: 'Hind Siliguri' } },
+            { text: avgRolls, options: { fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg }, color: colors.text, fontSize: 10, fontFace: 'Hind Siliguri' } },
+            { text: "পাঠ্যবইয়ের অনুশীলন", options: { fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg }, color: colors.text, fontSize: 10, fontFace: 'Hind Siliguri' } }
+          ],
+          [
+            { text: "গ্রুপ সি (বিশেষ)", options: { bold: true, fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg }, color: colors.text, fontSize: 10, fontFace: 'Hind Siliguri' } },
+            { text: lowRolls, options: { fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg }, color: colors.text, fontSize: 10, fontFace: 'Hind Siliguri' } },
+            { text: "শিক্ষকের সহায়তায়", options: { fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg }, color: colors.text, fontSize: 10, fontFace: 'Hind Siliguri' } }
+          ]
+        ];
+        slide.addTable(tableRows, {
+          x: vx, y: vy, w: vw,
+          border: { type: 'solid', pt: 1, color: colors.accent },
+          colW: [1.1, 1.0, 1.2],
+          rowH: [0.4, 0.5, 0.5, 0.5],
+          autoPage: false
+        });
+        return true;
+      }
+
+      // ইনফোগ্রাফিক স্টেপস
+      if (selectedVisuals.includes("info")) {
+        const steps = [
+          { num: "১", text: "ধারণা গ্রহণ" },
+          { num: "২", text: "শ্রেণি অনুশীলন" },
+          { num: "৩", text: "মূল্যায়ন ও কুইজ" }
+        ];
+        slide.addShape(pptx.ShapeType.roundRect, {
+          x: vx, y: vy, w: vw, h: vh, rectRadius: 0.15,
+          fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg },
+          line: { color: colors.accent, width: 1 }
+        });
+        slide.addText("💡 শিখন ধাপসমূহ", {
+          x: vx + 0.1, y: vy + 0.1, w: vw - 0.2, h: 0.4,
+          fontSize: 13, bold: true, color: colors.text, fontFace: 'Hind Siliguri'
+        });
+        steps.forEach((s, i) => {
+          const sy = vy + 0.7 + i * 1.1;
+          // নম্বর সার্কেল
+          slide.addShape(pptx.ShapeType.ellipse, {
+            x: vx + 0.3, y: sy, w: 0.6, h: 0.6,
+            fill: { color: colors.accent }
+          });
+          slide.addText(s.num, {
+            x: vx + 0.3, y: sy, w: 0.6, h: 0.6,
+            fontSize: 18, bold: true, color: "FFFFFF", align: 'center', valign: 'middle', fontFace: 'Hind Siliguri'
+          });
+          // টেক্সট
+          slide.addText(s.text, {
+            x: vx + 1.1, y: sy + 0.1, w: vw - 1.4, h: 0.4,
+            fontSize: 14, bold: true, color: colors.text, fontFace: 'Hind Siliguri'
+          });
+          // সংযোগকারী লাইন
+          if (i < steps.length - 1) {
+            slide.addShape(pptx.ShapeType.rect, {
+              x: vx + 0.57, y: sy + 0.6, w: 0.06, h: 0.5,
+              fill: { color: colors.accent }
+            });
+          }
+        });
+        return true;
+      }
+
+      // ডায়াগ্রাম নোড
+      if (selectedVisuals.includes("img") || selectedVisuals.includes("geo")) {
+        const nodes = [
+          { text: "সংজ্ঞা ও সূচনা", color: colors.accent },
+          { text: "বিশ্লেষণ ও প্রয়োগ", color: "10B981" },
+          { text: "সিদ্ধান্ত গ্রহণ", color: "F59E0B" }
+        ];
+        nodes.forEach((n, i) => {
+          const ny = vy + 0.3 + i * 1.3;
+          slide.addShape(pptx.ShapeType.roundRect, {
+            x: vx + 0.3, y: ny, w: vw - 0.6, h: 0.8, rectRadius: 0.1,
+            fill: { color: n.color },
+            shadow: { type: 'outer', blur: 6, offset: 2, color: '000000', opacity: 0.2 }
+          });
+          slide.addText(cleanText(n.text), {
+            x: vx + 0.3, y: ny, w: vw - 0.6, h: 0.8,
+            fontSize: 14, bold: true, color: "FFFFFF", align: 'center', valign: 'middle', fontFace: 'Hind Siliguri'
+          });
+          if (i < nodes.length - 1) {
+            slide.addText("↓", {
+              x: vx + (vw/2) - 0.2, y: ny + 0.8, w: 0.4, h: 0.5,
+              fontSize: 20, color: colors.accent, align: 'center', valign: 'middle'
+            });
+          }
+        });
+        return true;
+      }
+
+      // কুইজ অপশনカード
+      if (slideObj.type === "Quiz" || slideObj.layout === "quiz") {
+        const options = ["ক) প্রথম বিকল্প", "খ) দ্বিতীয় উত্তর", "গ) তৃতীয় বিকল্প", "ঘ) চতুর্থ বিকল্প"];
+        const optColors = ["3B82F6", "10B981", "F59E0B", "EC4899"];
+        options.forEach((opt, i) => {
+          const row = Math.floor(i / 2), col = i % 2;
+          const ox = vx + col * 1.7;
+          const oy = vy + row * 2.0;
+          slide.addShape(pptx.ShapeType.roundRect, {
+            x: ox, y: oy, w: 1.5, h: 1.7, rectRadius: 0.12,
+            fill: { color: optColors[i] },
+            shadow: { type: 'outer', blur: 8, offset: 3, color: '000000', opacity: 0.25 }
+          });
+          slide.addText(cleanText(opt), {
+            x: ox, y: oy, w: 1.5, h: 1.7,
+            fontSize: 13, bold: true, color: "FFFFFF", align: 'center', valign: 'middle', fontFace: 'Hind Siliguri'
+          });
+        });
+        return true;
+      }
+
+      return false;
+    };
+
+    // ========== হেল্পার: শিক্ষক নোট ব্যাজ ==========
+    const addTeacherNote = (slide, note, colors) => {
+      if (!note) return;
+      slide.addShape(pptx.ShapeType.roundRect, {
+        x: 0.5, y: 6.6, w: 9, h: 0.6, rectRadius: 0.08,
+        fill: { color: "000000", alpha: 30 }
+      });
+      slide.addText(`👨🏫 শিক্ষক নোট: ${cleanText(note).substring(0, 120)}`, {
+        x: 0.7, y: 6.6, w: 8.6, h: 0.6,
+        fontSize: 11, italic: true, color: colors.text, valign: 'middle', fontFace: 'Hind Siliguri'
+      });
+    };
+
+    // ========== হেল্পার: ফুটার (পেজ নম্বর) ==========
+    const addFooter = (slide, idx, total, colors) => {
+      slide.addText(`${idx + 1} / ${total}`, {
+        x: 8.5, y: 7.1, w: 1.2, h: 0.3,
+        fontSize: 10, color: colors.text, align: 'right', fontFace: 'Hind Siliguri', italic: true
+      });
+      // নিচের অ্যাকসেন্ট লাইন
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 0, y: 7.42, w: '100%', h: 0.08,
+        fill: { color: colors.accent }
+      });
+    };
+
+    // ================================================
+    // মূল স্লাইড জেনারেশন লুপ
+    // ================================================
+    slides.forEach((slideObj, idx) => {
+      const slide = pptx.addSlide();
+      const colors = getSlideColors(slideObj);
+      applyBackground(slide, colors);
+
+      const isCover = slideObj.type === "Cover";
+      const isQA = slideObj.type === "Q&A";
+
+      // ===== কভার স্লাইড =====
+      if (isCover) {
+        // বড় ডেকোরেティブ সার্কেল
+        slide.addShape(pptx.ShapeType.ellipse, {
+          x: -1.5, y: -1.5, w: 4, h: 4,
+          fill: { color: colors.accent, alpha: 20 }
+        });
+        slide.addShape(pptx.ShapeType.ellipse, {
+          x: 7.5, y: 5, w: 3.5, h: 3.5,
+          fill: { color: colors.accent, alpha: 15 }
+        });
+        // আইকন
+        slide.addText(getIconEmoji(slideObj.icon), {
+          x: 0, y: 1.2, w: '100%', h: 1.2,
+          fontSize: 60, align: 'center', valign: 'middle'
+        });
+        // মেইন টাইটেল
+        slide.addText(cleanText(slideObj.title || "প্রেজেন্টেশন"), {
+          x: 0.5, y: 2.5, w: 9, h: 1.2,
+          fontSize: 42, bold: true, color: colors.text, align: 'center', fontFace: 'Hind Siliguri'
+        });
+        // ডিভাইডার লাইন
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 3, y: 3.9, w: 4, h: 0.06,
+          fill: { color: colors.accent }
+        });
+        // সাব-টাইটেল / বুলেট তথ্য
+        const infoText = (slideObj.bullets || []).map(cleanText).join("  •  ");
+        slide.addText(infoText, {
+          x: 0.5, y: 4.2, w: 9, h: 1.5,
+          fontSize: 16, color: colors.text, align: 'center', fontFace: 'Hind Siliguri', valign: 'top'
+        });
+        // ফুটার ব্যান্ড
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0, y: 6.8, w: '100%', h: 0.7,
+          fill: { color: colors.accent, alpha: 30 }
+        });
+        slide.addText("সশিবা স্মার্ট শিক্ষা বাতায়ন", {
+          x: 0, y: 6.8, w: '100%', h: 0.7,
+          fontSize: 14, bold: true, color: colors.text, align: 'center', valign: 'middle', fontFace: 'Hind Siliguri'
+        });
+      }
+      // ===== Q&A / সমাপ্তি স্লাইড =====
+      else if (isQA) {
+        slide.addText("🎉", {
+          x: 0, y: 1.5, w: '100%', h: 1.5,
+          fontSize: 80, align: 'center', valign: 'middle'
+        });
+        slide.addText(cleanText(slideObj.title || "ধন্যবাদ"), {
+          x: 0.5, y: 3.0, w: 9, h: 1,
+          fontSize: 40, bold: true, color: colors.text, align: 'center', fontFace: 'Hind Siliguri'
+        });
+        const bulletsText = (slideObj.bullets || []).map(b => cleanText(b)).join("\n");
+        slide.addText(bulletsText, {
+          x: 1.5, y: 4.2, w: 7, h: 2,
+          fontSize: 18, color: colors.text, align: 'center', fontFace: 'Hind Siliguri', valign: 'top', lineSpacingMultiple: 1.5
+        });
+        addFooter(slide, idx, slides.length, colors);
+      }
+      // ===== কন্টেন্ট স্লাইড =====
+      else {
+        addSlideHeader(slide, slideObj, colors);
+        
+        // টাইটেল
+        slide.addText(cleanText(slideObj.title || ""), {
+          x: 0.5, y: 0.9, w: 8.5, h: 0.5,
+          fontSize: 26, bold: true, color: colors.text, fontFace: 'Hind Siliguri'
+        });
+
+        // লেআউট অনুযায়ী বুলেট ও ভিজ্যুয়াল
+        const hasVisual = slideObj.image || 
+                         (slideObj.type === "Quiz") ||
+                         (slideObj.type === "Table") ||
+                         Array.from(document.querySelectorAll(".vis-check:checked")).length > 0;
+
+        if (slideObj.layout === "card") {
+          // কার্ড লেআউট - ২ কলাম গ্রিড
+          const bullets = slideObj.bullets || [];
+          const cols = 2;
+          const cardW = 4.3, cardH = 1.0, gapX = 0.4, gapY = 0.2;
+          bullets.slice(0, 6).forEach((b, i) => {
+            const col = i % cols, row = Math.floor(i / cols);
+            const cx = 0.5 + col * (cardW + gapX);
+            const cy = 1.6 + row * (cardH + gapY);
+            slide.addShape(pptx.ShapeType.roundRect, {
+              x: cx, y: cy, w: cardW, h: cardH, rectRadius: 0.1,
+              fill: { color: colors.cardBg.replace(/[A-F0-9]{2}$/i, '') || colors.cardBg },
+              line: { color: colors.accent, width: 1.5 }
+            });
+            slide.addShape(pptx.ShapeType.rect, {
+              x: cx, y: cy, w: 0.08, h: cardH,
+              fill: { color: colors.accent }
+            });
+            slide.addText(getIconEmoji(slideObj.icon), {
+              x: cx + 0.2, y: cy + 0.15, w: 0.4, h: 0.4,
+              fontSize: 20, color: colors.accent
+            });
+            slide.addText(cleanText(b), {
+              x: cx + 0.7, y: cy + 0.1, w: cardW - 0.9, h: cardH - 0.2,
+              fontSize: 13, color: colors.text, valign: 'middle', fontFace: 'Hind Siliguri'
             });
           });
         } else {
-          // সাধারণ সিঙ্গেল কলাম
-          bullets.forEach((text) => {
-            slide.addText(cleanText(text), {
-              x: 0.7, y: bulletY, w: 8.5, fontSize: fontSize + 2, color: textColor, bullet: true, fontFace: 'Arial'
-            });
-            bulletY += 1.0;
+          // স্ট্যান্ডার্ড লেআউট - বামে বুলেট, ডানে ভিজ্যুয়াল
+          const bulletWidth = hasVisual ? 5.5 : 9;
+          addBullets(slide, slideObj.bullets, colors, {
+            x: 0.5, y: 1.6, w: bulletWidth, fontSize: 15, maxItems: hasVisual ? 6 : 9
           });
+          if (hasVisual) {
+            addVisualComponent(slide, slideObj, colors);
+          }
         }
+
+        addTeacherNote(slide, slideObj.notes, colors);
+        addFooter(slide, idx, slides.length, colors);
       }
-      // পেজ নম্বর
-      slide.addText("Page: " + (slides.indexOf(slideObj) + 1), { x: 8.5, y: 7.1, fontSize: 10, color: '94A3B8', fontFace: 'Arial' });
+
+      // স্লাইড ট্রানজিশন অ্যানিমেশন
+      try {
+        slide.slideNumber = { x: '95%', y: '95%', fontSize: 8, color: colors.text };
+      } catch(e) {}
     });
 
-    pptx.writeFile({ fileName: `Smart_Class_${new Date().getTime()}.pptx` });
+    // ========== ফাইল সেভ ==========
+    const subject = document.getElementById("subject")?.value || "Presentation";
+    const className = document.getElementById("class")?.value || "";
+    const fileName = `SmartClass_${subject}_${className}_${Date.now()}.pptx`.replace(/\s+/g, '_');
+    
+    pptx.writeFile({ fileName: fileName })
+      .then(() => {
+        if (typeof toggleExportMenu === "function") toggleExportMenu();
+      })
+      .catch(err => {
+        console.error("PPTX save error:", err);
+        alert("PPTX সেভ করতে সমস্যা হয়েছে: " + err.message);
+      });
+
   } catch (err) {
-    alert("Error: " + err.message);
+    console.error("PPTX generation error:", err);
+    alert("PPTX তৈরিতে সমস্যা: " + err.message);
   }
 }
 
