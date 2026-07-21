@@ -2955,83 +2955,100 @@ function downloadAsPowerPointPPTX() {
     let pptx = new PptxGenJS();
     pptx.layout = 'LAYOUT_16x9';
 
+    // ১. কালার প্যালেট (আপনার অ্যাপের থিম অনুযায়ী)
+    const APP_THEME_COLOR = '4F46E5'; // Indigo
+    const DARK_BG = '1E293B';
+    const WHITE = 'FFFFFF';
+
     slides.forEach((slideObj, index) => {
       let slide = pptx.addSlide();
       
-      // ১. ব্যাকগ্রাউন্ড কালার ম্যাপিং
-      let bgFill = 'FFFFFF'; 
-      if (slideObj.bg === 'bg-blue') bgFill = '1E3A8A';
-      else if (slideObj.bg === 'bg-emerald') bgFill = '065F46';
-      else if (slideObj.bg === 'bg-dark') bgFill = '0F172A';
-      else if (slideObj.type === "Cover") bgFill = '3730A3';
+      // ২. ব্যাকগ্রাউন্ড সেট করা
+      let bgFill = WHITE;
+      if (slideObj.type === "Cover") bgFill = '312E81'; // ডার্ক নেভি ব্লু
+      else if (slideObj.bg === 'bg-blue') bgFill = '1E3A8A';
+      else if (slideObj.bg === 'bg-dark') bgFill = DARK_BG;
       
       slide.background = { fill: bgFill };
-
-      // ২. টেক্সট কালার নির্ধারণ
-      let isDark = (bgFill !== 'FFFFFF');
-      let textColor = isDark ? 'FFFFFF' : '1E293B';
+      let isDark = (bgFill !== WHITE);
+      let textColor = isDark ? WHITE : '0F172A';
 
       if (slideObj.type === "Cover") {
-        // কভার স্লাইড শিরোনাম
-        slide.addText(slideObj.title || "শ্রেণি ও বিষয়", {
-          x: 0.5, y: 1.5, w: 9, h: 1, fontSize: 40, bold: true, color: textColor, align: 'left'
+        // --- কভার স্লাইড ডিজাইন ---
+        // মেইন টাইটেল (মাঝখানে বড় করে)
+        slide.addText(slideObj.title || "", {
+          x: '5%', y: '30%', w: '90%', fontSize: 44, bold: true, 
+          color: WHITE, align: 'center', fontFace: 'Arial'
         });
-        
-        let bullets = Array.isArray(slideObj.bullets) ? slideObj.bullets : [];
-        if (bullets.length > 0) {
-            slide.addText(bullets.join("\n"), {
-              x: 0.5, y: 3.5, w: 9, h: 2, fontSize: 20, color: isDark ? 'C7D2FE' : '475569', align: 'left'
-            });
-        }
+
+        // নিচের ইনফো বক্স (একটি হালকা শেড এর ওপর)
+        slide.addShape(pptx.ShapeType.rect, {
+          x: '10%', y: '60%', w: '80%', h: '25%', 
+          fill: { color: 'FFFFFF', transparency: 85 } 
+        });
+
+        let infoText = Array.isArray(slideObj.bullets) ? slideObj.bullets.join("  |  ") : "";
+        slide.addText(infoText, {
+          x: '12%', y: '65%', w: '76%', fontSize: 16, 
+          color: WHITE, align: 'center', fontFace: 'Arial'
+        });
+
       } else {
-        // ৩. কন্টেন্ট স্লাইড হেডার (সংশোধিত অংশ: addShape ব্যবহার করা হয়েছে)
+        // --- কন্টেন্ট স্লাইড ডিজাইন ---
+        // উপরের নীল হেডার বার
         slide.addShape(pptx.ShapeType.rect, { 
-            x: 0, y: 0, w: '100%', h: 0.7, 
-            fill: { color: '4F46E5' } 
+          x: 0, y: 0, w: '100%', h: 0.8, 
+          fill: { color: APP_THEME_COLOR } 
         });
 
-        slide.addText(slideObj.title || "আলোচ্য বিষয়", {
-          x: 0.4, y: 0.1, w: 9, h: 0.5, fontSize: 24, bold: true, color: 'FFFFFF'
+        // হেডার টাইটেল
+        slide.addText(slideObj.title || "", {
+          x: 0.5, y: 0.15, w: 9, fontSize: 24, bold: true, 
+          color: WHITE, fontFace: 'Arial'
         });
 
-        // ৪. ইমেজ হ্যান্ডেলিং
+        // ছবি থাকলে ডান পাশে দেখানোর লজিক
         let hasImage = (slideObj.image && slideObj.showImage !== false);
-        
+        let bulletWidth = hasImage ? '50%' : '90%';
+
         if (hasImage) {
-          try {
-            let imgData = slideObj.image;
-            if (imgData.includes("base64,")) {
-              imgData = imgData.split("base64,")[1];
-            }
-            slide.addImage({ data: imgData, x: 5.5, y: 1.2, w: 4, h: 3 });
-          } catch (e) {
-            console.log("Image Error: ", e);
-          }
+            try {
+                let imgData = slideObj.image.includes("base64,") ? slideObj.image.split("base64,")[1] : slideObj.image;
+                slide.addImage({ 
+                    data: imgData, x: '55%', y: '20%', w: '40%', h: '60%',
+                    sizing: { type: 'contain' } 
+                });
+            } catch (e) { console.error("Image Error", e); }
         }
 
-        // ৫. টেক্সট বা বুলেট পয়েন্ট
+        // বুলেট পয়েন্টগুলো (বাম পাশে এবং লাইন স্পেসিং দিয়ে)
+        let bulletY = 1.3;
         let bullets = Array.isArray(slideObj.bullets) ? slideObj.bullets : [];
-        let bulletY = 1.2;
-        let bulletWidth = hasImage ? 4.5 : 9;
 
         bullets.forEach((text) => {
-          slide.addText(text, {
-            x: 0.5, y: bulletY, w: bulletWidth, fontSize: 18, color: textColor, bullet: true, align: 'left'
+          // ইমোজি বা আইকন থাকলে সেগুলো পাওয়ারপয়েন্টে সমস্যা করে, তাই সিম্পল টেক্সট রাখা ভালো
+          let cleanText = text.replace(/[^\x00-\x7F\u0980-\u09FF\s]/g, ""); // Non-Unicode ক্যারেক্টার রিমুভ
+          
+          slide.addText(cleanText, {
+            x: 0.6, y: bulletY, w: bulletWidth, fontSize: 18, 
+            color: textColor, bullet: { code: '2022' }, 
+            lineSpacing: 30, fontFace: 'Arial', align: 'left'
           });
-          bulletY += 0.7;
+          bulletY += 0.8; // প্রতিটি লাইনের মাঝে গ্যাপ
+        });
+
+        // নিচের দিকে পেজ নম্বর বা ব্র্যান্ডিং
+        slide.addText("স্মার্ট শিক্ষা বাতায়ন | সশিবা পোর্টাল", {
+          x: 0.5, y: 7.0, fontSize: 10, color: '94A3B8', fontFace: 'Arial'
         });
       }
     });
 
-    // ৬. ফাইল সেভ
-    pptx.writeFile({ fileName: `Presentation_${new Date().getTime()}.pptx` })
-      .catch(err => {
-        alert("ডাউনলোড এরর: " + err);
-      });
+    // ফাইল সেভ করা
+    pptx.writeFile({ fileName: `Lesson_Presentation_${new Date().getTime()}.pptx` });
 
   } catch (err) {
-    console.error(err);
-    alert("পিপিটি তৈরি করা যাচ্ছে না: " + err.message);
+    alert("ডিজাইন জেনারেট করতে সমস্যা হয়েছে: " + err.message);
   }
 }
 
