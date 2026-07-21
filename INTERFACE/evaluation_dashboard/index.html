@@ -559,10 +559,37 @@
         <!-- ========== SECTION: ASSESSMENT HISTORY ========== -->
         <section class="content-section hidden" id="section-history">
           <div class="history-controls">
-            <div class="search-box" style="flex:1;max-width:340px;">
+            <div class="search-box" style="flex:1;max-width:300px;">
               <i class="fa-solid fa-magnifying-glass"></i>
               <input type="text" id="history-search" placeholder="নাম বা তারিখ দিয়ে খুঁজুন..." oninput="renderHistory()" />
             </div>
+
+            <!-- নতুন ফিল্টার: শ্রেণি ও শাখা -->
+            <select id="history-class" class="form-input" style="width:130px;padding:8px 12px;font-size:13px;" onchange="renderHistory()">
+                <option value="">সকল শ্রেণি</option>
+                <option value="প্রথম">প্রথম শ্রেণি</option>
+                <option value="দ্বিতীয়">দ্বিতীয় শ্রেণি</option>
+                <option value="তৃতীয়">তৃতীয় শ্রেণি</option>
+                <option value="চতুর্থ">চতুর্থ শ্রেণি</option>
+                <option value="পঞ্চম">পঞ্চম শ্রেণি</option>
+                <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
+                <option value="সপ্তম">সপ্তম শ্রেণি</option>
+                <option value="অষ্টম">অষ্টম শ্রেণি</option>
+                <option value="নবম">নবম শ্রেণি</option>
+                <option value="দশম">দশম শ্রেণি</option>
+                <option value="একাদশ">একাদশ শ্রেণি</option>
+                <option value="দ্বাদশ">দ্বাদশ শ্রেণি</option>
+            </select>
+
+            <select id="history-section" class="form-input" style="width:100px;padding:8px 12px;font-size:13px;" onchange="renderHistory()">
+                <option value="">সব শাখা</option>
+                <option value="ক">শাখা: ক</option>
+                <option value="খ">শাখা: খ</option>
+                <option value="গ">শাখা: গ</option>
+                <option value="ঘ">শাখা: ঘ</option>
+                <option value="ঙ">শাখা: ঙ</option>
+            </select>
+
             <div class="filter-chips">
               <button class="chip chip-active" onclick="setHistoryFilter('all')" id="hchip-all">সকল</button>
               <button class="chip" onclick="setHistoryFilter('active')" id="hchip-active">সক্রিয়</button>

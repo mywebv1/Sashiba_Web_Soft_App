@@ -1176,6 +1176,8 @@ function saveCurrentSnapshot() {
   const snap = {
     id: 'snap_'+Date.now(),
     title: `মূল্যায়ন — ${settings.className} (${settings.section})`,
+    className: settings.className,
+    section: settings.section,
     date: new Date().toLocaleDateString('bn-BD'),
     savedAt: new Date().toISOString(),
     studentCount: students.length,
@@ -1196,17 +1198,23 @@ function setHistoryFilter(f){
 }
 function renderHistory(){
   const q=(document.getElementById('history-search')?.value||'').toLowerCase();
+  const classFilter=document.getElementById('history-class')?.value||'';
+  const sectionFilter=document.getElementById('history-section')?.value||'';
+  
   let list=[...assessmentHistory];
   if(historyFilter==='active') list=list.filter(h=>h.status==='active');
   if(historyFilter==='archived') list=list.filter(h=>h.status==='archived');
+  if(classFilter) list=list.filter(h=>(h.className||settings.className)===classFilter);
+  if(sectionFilter) list=list.filter(h=>(h.section||settings.section)===sectionFilter);
   if(q) list=list.filter(h=>h.title.toLowerCase().includes(q)||h.date.includes(q));
+
   const el=document.getElementById('history-list');
   if(!el) return;
-  if(list.length===0){el.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:40px;"><i class="fa-solid fa-clock-rotate-left" style="font-size:40px;opacity:.2;display:block;margin-bottom:12px;"></i><p>কোনো ইতিহাস নেই। স্ন্যাপশট সংরক্ষণ করুন।</p></div>';return;}
+  if(list.length===0){el.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:40px;"><i class="fa-solid fa-clock-rotate-left" style="font-size:40px;opacity:.2;display:block;margin-bottom:12px;"></i><p>কোনো ইতিহাস পাওয়া যায়নি।</p></div>';return;}
   el.innerHTML=list.map(h=>`
     <div class="history-item ${h.status==='archived'?'archived':''}">
       <div class="history-icon" style="background:rgba(79,70,229,.1);color:var(--primary)"><i class="fa-solid fa-clock-rotate-left"></i></div>
-      <div>
+      <div style="flex:1;">
         <div class="history-title">${h.title}</div>
         <div class="history-meta">${h.date} • ${h.studentCount} জন শিক্ষার্থী • ক্লাস গড়: ${h.classAvg}%</div>
       </div>
