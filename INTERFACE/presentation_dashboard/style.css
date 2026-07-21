@@ -666,6 +666,11 @@ body {
   grid-template-columns: 190px 1fr 310px;
   overflow: hidden;
   background: #ffffff;
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.studio-layout.editor-collapsed {
+  grid-template-columns: 190px 1fr 0px;
 }
 
 /* Thumbnails Sidebar */
@@ -814,6 +819,16 @@ body {
   border-left: 1px solid var(--border);
   padding: 16px;
   overflow-y: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0;
+}
+
+.studio-layout.editor-collapsed .slide-editor-panel {
+  padding: 0;
+  border-left-width: 0;
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .editor-title {
@@ -1685,16 +1700,63 @@ body {
 
 /* Print Hide */
 @media print {
-  .sidebar, .input-panel, .top-bar, .slide-toolbar, .slide-editor-panel, .slide-thumbnails-sidebar, .canvas-nav {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  /* Hide all editor UI wrappers */
+  .sidebar, 
+  .top-bar, 
+  .input-panel, 
+  .slide-thumbnails-sidebar, 
+  .slide-toolbar, 
+  .canvas-nav,
+  .teacher-notes-badge,
+  .whiteboard-toolbar {
     display: none !important;
   }
-  .presentation-workspace {
-    background: white;
+  
+  /* Reset container layouts */
+  .app-container,
+  .main-content,
+  .workspace,
+  .presentation-workspace,
+  .slide-editor-panel,
+  .slide-canvas-container {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: none !important;
   }
+
+  /* Make slide-frame print beautifully */
   .slide-frame {
-    box-shadow: none;
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16/9 !important;
+    margin: 0 auto !important;
+    padding: 30px !important;
+    box-shadow: none !important;
+    border: none !important;
+    page-break-inside: avoid;
     break-after: page;
+    background-size: cover !important;
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important; /* Force print backgrounds */
+  }
+  
+  /* Ensure whiteboard wrapper is transparent and centered */
+  .whiteboard-wrapper {
+    height: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
   }
 }
 
@@ -2034,7 +2096,7 @@ body.dark-mode .visual-component-box {
 }
 
 body.dark-mode .slide-data-table th {
-  background: #0f172a;
+  background: #1e293b;
   color: #f1f5f9;
   border-color: #334155;
 }
@@ -2045,13 +2107,13 @@ body.dark-mode .slide-data-table td {
 }
 
 body.dark-mode .info-step-card {
-  background: #0f172a;
+  background: #1e293b;
   border-color: #334155;
   color: #ffffff;
 }
 
 body.dark-mode .quiz-opt-card {
-  background: #1e293b;
+  background: #0f172a;
   border-color: #334155;
   color: #ffffff;
 }
@@ -2063,7 +2125,399 @@ body.dark-mode .quiz-opt-card:hover {
 }
 
 body.dark-mode .slide-bullet-card {
-  background: #1e293b;
+  background: #0f172a;
   border-color: #334155;
   color: #ffffff;
+}
+
+/* ==========================================
+   [১০] অ্যানিমেশন ও ট্রানজিশন ইফেক্টস
+   ========================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceEffect {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Animation Classes */
+.anim-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.anim-slide-up {
+  animation: slideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.anim-slide-left {
+  animation: slideLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.anim-zoom-in {
+  animation: zoomIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.anim-bounce {
+  animation: slideUp 0.6s ease-out, bounceEffect 1.2s ease-in-out 0.6s;
+}
+
+/* Delay classes to stagger content animations */
+.slide-bullet-item:nth-child(1),
+.slide-bullet-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.slide-bullet-item:nth-child(2),
+.slide-bullet-card:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.slide-bullet-item:nth-child(3),
+.slide-bullet-card:nth-child(3) {
+  animation-delay: 0.5s;
+}
+.slide-bullet-item:nth-child(4),
+.slide-bullet-card:nth-child(4) {
+  animation-delay: 0.7s;
+}
+
+.slide-image-container img {
+  transition: transform 0.3s ease;
+}
+.slide-image-container img:hover {
+  transform: scale(1.02);
+}
+
+
+
+/* ==========================================
+   [১১] স্মার্ট হোয়াইটবোর্ড ও ইমেজ এডিটর
+   ========================================== */
+.whiteboard-wrapper {
+  position: relative;
+  width: 100%;
+  height: 450px; /* Increased height for higher image visibility */
+  background: rgba(255, 255, 255, 0.05); /* Glassmorphic transparent base */
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  margin-top: 10px;
+}
+
+.whiteboard-toolbar {
+  height: 44px;
+  background: rgba(255, 255, 255, 0.85); /* Frosted glass toolbar */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  z-index: 20;
+  user-select: none;
+}
+
+.wb-tools-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wb-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.wb-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.wb-btn.active {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+
+.wb-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-left: 1px solid var(--border);
+  padding-left: 6px;
+  margin-left: 2px;
+}
+
+.wb-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.15);
+  transition: transform 0.1s ease;
+}
+
+.wb-color-dot.active {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 3px var(--primary);
+}
+
+.whiteboard-canvas-area {
+  position: relative;
+  flex-grow: 1;
+  width: 100%;
+  height: calc(100% - 44px);
+  background: transparent; /* Fully transparent canvas area! */
+  overflow: hidden;
+}
+
+/* Base style for elements that can be dragged */
+.wb-element {
+  position: absolute;
+  cursor: move;
+  user-select: none;
+  z-index: 5;
+}
+
+.wb-element.selected {
+  outline: 2px dashed var(--primary);
+  outline-offset: 2px;
+}
+
+/* Image container inside whiteboard */
+.wb-image-container {
+  display: inline-block;
+  pointer-events: auto;
+}
+
+.wb-image-el {
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Text box annotations */
+.wb-text-box {
+  min-width: 50px;
+  min-height: 24px;
+  padding: 4px 8px;
+  font-size: 16px;
+  font-weight: 700;
+  word-break: break-word;
+  outline: none;
+  border: 1.5px dashed transparent;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  pointer-events: auto;
+  user-select: text;
+  font-family: 'Hind Siliguri', 'Outfit', sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.wb-text-box:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Shape annotations */
+.wb-shape {
+  min-width: 15px;
+  min-height: 15px;
+  border-style: solid;
+  pointer-events: auto;
+}
+
+.wb-shape-rect {
+  border-width: 3px;
+  background: transparent;
+}
+
+.wb-shape-circle {
+  border-width: 3px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.wb-shape-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: bold;
+  border: none !important;
+  background: transparent;
+}
+
+/* Resize handle */
+.wb-resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--primary);
+  border: 1px solid var(--white);
+  bottom: -4px;
+  right: -4px;
+  cursor: se-resize;
+  display: none;
+  z-index: 10;
+}
+
+.wb-element.selected .wb-resize-handle {
+  display: block;
+}
+
+/* Delete button for selected items */
+.wb-delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 18px;
+  height: 18px;
+  background: var(--white);
+  color: #ef4444;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  z-index: 12;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  border: 1px solid #cbd5e1;
+}
+
+.wb-delete-btn:hover {
+  background: #fee2e2;
+}
+
+.wb-element.selected .wb-delete-btn {
+  display: flex;
+}
+
+/* Editing state for text boxes */
+.wb-text-box.editing {
+  cursor: text !important;
+  user-select: text !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #0f172a !important;
+  text-shadow: none !important;
+  outline: 2px solid var(--primary) !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.wb-text-box.editing .wb-resize-handle,
+.wb-text-box.editing .wb-delete-btn {
+  display: none !important;
+}
+
+/* Drawing Canvas overlay */
+.wb-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 8;
+  pointer-events: none;
+}
+
+/* Presenter viewport height override */
+.presenter-slide-frame .whiteboard-wrapper {
+  height: 520px; /* Larger vertical height for slideshow */
+  margin-top: 15px;
+}
+
+
+
+/* Accordion Styling */
+.editor-accordion summary::-webkit-details-marker {
+  display: none;
+}
+.editor-accordion[open] .accordion-arrow {
+  transform: rotate(180deg);
+}
+
+/* Collapsible Right Editor Toggle Button */
+.editor-toggle-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 48px;
+  background: var(--primary);
+  color: white;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.editor-toggle-btn:hover {
+  background: var(--primary-dark);
+  width: 28px;
 }

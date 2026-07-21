@@ -1260,10 +1260,15 @@ function renderActiveCanvas() {
 
   if (navInfo) navInfo.innerText = `${currentLang === "bn" ? "স্লাইড" : "Slide"} ${activeSlideIndex + 1} ${currentLang === "bn" ? "এর" : "of"} ${slides.length}`;
 
+  // Get animations from slide object
+  const titleAnimClass = slide.titleAnimation && slide.titleAnimation !== "none" ? `anim-${slide.titleAnimation}` : "";
+  const contentAnimClass = slide.contentAnimation && slide.contentAnimation !== "none" ? `anim-${slide.contentAnimation}` : "";
+  const imgAnimClass = slide.imageAnimation && slide.imageAnimation !== "none" ? `anim-${slide.imageAnimation}` : "";
+
   const bulletsHtml = slide.bullets
     .map(
       (b, bIdx) => `
-      <div class="slide-bullet-item editable-element" contenteditable="true" onblur="onCanvasContentEdit(event, 'bullet', ${bIdx})">
+      <div class="slide-bullet-item editable-element ${contentAnimClass}" contenteditable="true" onblur="onCanvasContentEdit(event, 'bullet', ${bIdx})">
         <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.7;"></i> 
         <span>${b}</span>
       </div>`
@@ -1277,22 +1282,79 @@ function renderActiveCanvas() {
   let visualComponentHtml = "";
   const selectedVisuals = Array.from(document.querySelectorAll(".vis-check:checked")).map((cb) => cb.value);
 
-  if (slide.type === "Quiz" || slide.layout === "quiz") {
+  // Custom Image rendering with Whiteboard Editor OR Default Visual Components
+  if (slide.image && slide.showImage !== false) {
     visualComponentHtml = `
-      <div class="quiz-options-grid">
-        <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>ক)</span> প্রথম বিকল্প</div>
-        <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>খ)</span> দ্বিতীয় উত্তর (সঠিক)</div>
-        <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>গ)</span> তৃতীয় বিকল্প</div>
-        <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>ঘ)</span> চতুর্থ বিকল্প</div>
+      <div class="whiteboard-wrapper ${imgAnimClass}" id="wb_wrapper_${slide.id}">
+        <!-- Whiteboard Toolbar -->
+        <div class="whiteboard-toolbar">
+          <div class="wb-tools-group">
+            <button class="wb-btn active" onclick="setWbTool(this, 'select')" title="ছবির অবজেক্ট বা শেপ সিলেক্ট ও মুভ করুন"><i class="fa-solid fa-arrows-up-down-left-right"></i> মুভ</button>
+            <button class="wb-btn" onclick="setWbTool(this, 'pen')" title="পেন দিয়ে ড্রয়িং করুন"><i class="fa-solid fa-pen"></i> পেন</button>
+            <button class="wb-btn" onclick="setWbTool(this, 'eraser')" title="ড্রয়িং মুছুন"><i class="fa-solid fa-eraser"></i> ইরেজার</button>
+            <button class="wb-btn" onclick="addWbText()" title="Draggable টেক্সট বক্স যোগ করুন"><i class="fa-solid fa-font"></i> টেক্সট</button>
+            <button class="wb-btn" onclick="addWbShape('rect')" title="আয়তক্ষেত্র যোগ করুন"><i class="fa-regular fa-square"></i> আয়ত</button>
+            <button class="wb-btn" onclick="addWbShape('circle')" title="বৃত্ত যোগ করুন"><i class="fa-regular fa-circle"></i> বৃত্ত</button>
+            <button class="wb-btn" onclick="addWbShape('arrow')" title="তীরচিহ্ন যোগ করুন"><i class="fa-solid fa-arrow-right"></i> তীর</button>
+          </div>
+          <!-- Text formatting tools -->
+          <div class="wb-tools-group" style="border-left: 1px solid rgba(0,0,0,0.1); padding-left: 6px;">
+            <button class="wb-btn" onclick="changeWbTextSize(2)" title="লেখা বড় করুন"><i class="fa-solid fa-magnifying-glass-plus"></i> বড়</button>
+            <button class="wb-btn" onclick="changeWbTextSize(-2)" title="লেখা ছোট করুন"><i class="fa-solid fa-magnifying-glass-minus"></i> ছোট</button>
+            <button class="wb-btn" onclick="toggleWbTextBold()" title="বোল্ড / রেগুলার"><i class="fa-solid fa-bold"></i> বোল্ড</button>
+          </div>
+          <div class="wb-tools-group" style="gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px;">
+              <span>সাইজ:</span>
+              <input type="range" class="wb-img-size-slider" min="20" max="150" value="${slide.imageWidth || 60}" style="width: 40px; height:4px; cursor:pointer;" oninput="updateWbImageSize(this.value)">
+            </div>
+            <div class="wb-color-picker">
+              <span class="wb-color-dot active" style="background:#ef4444;" onclick="setWbColor(this, '#ef4444')"></span>
+              <span class="wb-color-dot" style="background:#3b82f6;" onclick="setWbColor(this, '#3b82f6')"></span>
+              <span class="wb-color-dot" style="background:#10b981;" onclick="setWbColor(this, '#10b981')"></span>
+              <span class="wb-color-dot" style="background:#f59e0b;" onclick="setWbColor(this, '#f59e0b')"></span>
+              <span class="wb-color-dot" style="background:#0f172a;" onclick="setWbColor(this, '#0f172a')"></span>
+              <span class="wb-color-dot" style="background:#ffffff;" onclick="setWbColor(this, '#ffffff')"></span>
+            </div>
+            <button class="wb-btn" onclick="clearWbDrawing()" style="color: var(--danger); font-weight:bold; padding: 2px 6px;"><i class="fa-solid fa-trash-can"></i> রিসেট</button>
+          </div>
+        </div>
+
+        <!-- Canvas and Element Area -->
+        <div class="whiteboard-canvas-area" id="wb_canvas_area_edit">
+          <!-- Image Element (Draggable/Resizable) -->
+          <div class="wb-element wb-image-container" id="wb_image_container_edit" style="left: ${slide.imageX || 20}%; top: ${slide.imageY || 10}%; width: ${slide.imageWidth || 60}%;">
+            <img src="${slide.image}" class="wb-image-el" style="width: 100%; display: block;" alt="Slide Image">
+            <div class="wb-resize-handle"></div>
+          </div>
+
+          <!-- Drawing Canvas Overlay -->
+          <canvas class="wb-canvas" id="wb_canvas_edit"></canvas>
+
+          <!-- Annotations container for shapes and text boxes -->
+          <div class="wb-annotations-layer" id="wb_annotations_layer_edit" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:9;">
+            <!-- Saved annotations loaded here -->
+          </div>
+        </div>
       </div>
     `;
-  } else if (slide.type === "Table" && selectedVisuals.includes("table")) {
-    const vGoodRolls = document.getElementById("roll-vgood")?.value || "১, ২, ৩";
-    const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
-    const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
-    visualComponentHtml = `
-      <div class="visual-component-box">
-        <strong style="font-size:12.5px; display:block; margin-bottom:6px;"><i class="fa-solid fa-users-gear"></i> স্মার্ট শিক্ষার্থী গ্রুপিং:</strong>
+  } else {
+    let visualInner = "";
+    if (slide.type === "Quiz" || slide.layout === "quiz") {
+      visualInner = `
+        <div class="quiz-options-grid">
+          <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>ক)</span> প্রথম বিকল্প</div>
+          <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>খ)</span> দ্বিতীয় উত্তর (সঠিক)</div>
+          <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>গ)</span> তৃতীয় বিকল্প</div>
+          <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>ঘ)</span> চতুর্থ বিকল্প</div>
+        </div>
+      `;
+    } else if (slide.type === "Table" && selectedVisuals.includes("table")) {
+      const vGoodRolls = document.getElementById("roll-vgood")?.value || "১, ২, ৩";
+      const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
+      const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
+      visualInner = `
+        <strong style="font-size:12.5px; display:block; margin-bottom:6px;"><i class="fa-solid fa-users-gear"></i> スマート শিক্ষার্থী গ্রুপিং:</strong>
         <table class="slide-data-table">
           <thead>
             <tr><th>গ্রুপ</th><th>রোল নম্বর</th><th>কার্যক্রম</th></tr>
@@ -1303,11 +1365,9 @@ function renderActiveCanvas() {
             <tr style="border-left: 4px solid #ef4444;"><td><strong>গ্রুপ সি (বিশেষ যত্ন)</strong></td><td>${lowRolls}</td><td>শিক্ষকের সহায়তায় বেসিক পুনরাবৃত্তি</td></tr>
           </tbody>
         </table>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("chart")) {
-    visualComponentHtml = `
-      <div class="visual-component-box">
+      `;
+    } else if (selectedVisuals.includes("chart")) {
+      visualInner = `
         <strong style="font-size:12px; display:block; margin-bottom:4px;"><i class="fa-solid fa-chart-simple"></i> তথ্য চিত্র ও প্রজেক্ট অগ্রগতি:</strong>
         <div class="chart-bars-wrap">
           <div class="chart-bar-fill" style="height: 35%;"></div><span class="chart-bar-label">পরিকল্পনা (৩৫%)</span>
@@ -1315,11 +1375,9 @@ function renderActiveCanvas() {
           <div class="chart-bar-fill" style="height: 90%;"></div><span class="chart-bar-label">বিশ্লেষণ (৯০%)</span>
           <div class="chart-bar-fill" style="height: 50%;"></div><span class="chart-bar-label">উপস্থাপন (৫০%)</span>
         </div>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("table")) {
-    visualComponentHtml = `
-      <div class="visual-component-box">
+      `;
+    } else if (selectedVisuals.includes("table")) {
+      visualInner = `
         <strong style="font-size:12px; display:block; margin-bottom:4px;"><i class="fa-solid fa-table"></i> বিষয় সারণি:</strong>
         <table class="slide-data-table">
           <thead>
@@ -1330,32 +1388,26 @@ function renderActiveCanvas() {
             <tr><td>২য় পর্ব</td><td>দলগত কাজ ও উপস্থাপনা</td><td>২০ মিনিট</td></tr>
           </tbody>
         </table>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("info")) {
-    visualComponentHtml = `
-      <div class="visual-component-box">
+      `;
+    } else if (selectedVisuals.includes("info")) {
+      visualInner = `
         <strong style="font-size:12px; display:block; margin-bottom:8px;"><i class="fa-solid fa-lightbulb"></i> শিখন ধাপসমূহ:</strong>
         <div class="infographic-steps-wrap">
           <div class="info-step-card"><div class="step-num">১</div><div class="step-txt">ধারণা গ্রহণ</div></div>
           <div class="info-step-card"><div class="step-num">২</div><div class="step-txt">শ্রেণি অনুশীলন</div></div>
           <div class="info-step-card"><div class="step-num">৩</div><div class="step-txt">মূল্যায়ন ও কুইজ</div></div>
         </div>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("vid")) {
-    visualComponentHtml = `
-      <div class="visual-component-box mock-video-container">
+      `;
+    } else if (selectedVisuals.includes("vid")) {
+      visualInner = `
         <div class="mock-video-player">
           <i class="fa-solid fa-play play-icon"></i>
           <span class="video-duration">03:45</span>
         </div>
         <span class="video-title"><i class="fa-solid fa-video"></i> ${slide.title} সম্পর্কিত মাল্টিমিডিয়া কন্টেন্ট</span>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("img") || selectedVisuals.includes("geo")) {
-    visualComponentHtml = `
-      <div class="visual-component-box">
+      `;
+    } else if (selectedVisuals.includes("img") || selectedVisuals.includes("geo")) {
+      visualInner = `
         <div class="diagram-graphic-box">
           <div class="diagram-node">সংজ্ঞা ও সূচনা</div>
           <i class="fa-solid fa-arrow-right"></i>
@@ -1363,8 +1415,16 @@ function renderActiveCanvas() {
           <i class="fa-solid fa-arrow-right"></i>
           <div class="diagram-node" style="background:#f59e0b;">সিদ্ধান্ত গ্রহণ</div>
         </div>
-      </div>
-    `;
+      `;
+    }
+
+    if (visualInner) {
+      visualComponentHtml = `
+        <div class="visual-component-box ${imgAnimClass}">
+          ${visualInner}
+        </div>
+      `;
+    }
   }
 
   inner.className = `slide-inner-content`;
@@ -1386,7 +1446,7 @@ function renderActiveCanvas() {
       <div class="slide-body-grid layout-card">
         <div class="card-layout-wrapper">
           ${slide.bullets.map((b, bIdx) => `
-            <div class="slide-bullet-card editable-element" contenteditable="true" onblur="onCanvasContentEdit(event, 'bullet', ${bIdx})">
+            <div class="slide-bullet-card editable-element ${contentAnimClass}" contenteditable="true" onblur="onCanvasContentEdit(event, 'bullet', ${bIdx})">
               <i class="fa-solid ${slide.icon || 'fa-star'}" style="color:var(--primary); font-size:16px;"></i>
               <div class="bullet-card-text">${b}</div>
             </div>
@@ -1424,11 +1484,17 @@ function renderActiveCanvas() {
       <span class="slide-tag">${getSlideTypeName(slide.type)}</span>
       <i class="fa-solid ${slide.icon || "fa-graduation-cap"} slide-icon-lg"></i>
     </div>
-    <h2 class="slide-main-title editable-element" contenteditable="true" onblur="onCanvasContentEdit(event, 'title')">${slide.title}</h2>
+    <h2 class="slide-main-title editable-element ${titleAnimClass}" contenteditable="true" onblur="onCanvasContentEdit(event, 'title')">${slide.title}</h2>
     ${bodyContentHtml}
     ${teacherNotesHtml}
   `;
+
+  // Init whiteboard if image is visible
+  if (slide.image && slide.showImage !== false) {
+    initWhiteboard(slide, false);
+  }
 }
+
 
 function toggleQuizAnswer(el) {
   el.classList.toggle("selected-answer");
@@ -1453,6 +1519,25 @@ function onCanvasContentEdit(event, field, index) {
   renderThumbnails();
 }
 
+
+// হোয়াইটবোর্ড গ্লোবাল ভ্যারিয়েবলসমূহ
+let wbActiveTool = 'select'; // select, pen, eraser
+let wbActiveColor = '#ef4444';
+let wbBrushSize = 3;
+let wbIsDrawing = false;
+let wbLastX = 0;
+let wbLastY = 0;
+let wbActiveElement = null; // element being dragged/resized
+let wbLastActiveElement = null; // last interacted/selected text or shape element
+let wbIsDragging = false;
+let wbIsResizing = false;
+let wbDragStartX = 0;
+let wbDragStartY = 0;
+let wbElementStartX = 0;
+let wbElementStartY = 0;
+let wbElementStartWidth = 0;
+let wbElementStartHeight = 0;
+
 function syncEditorForm() {
   if (slides.length === 0) return;
   const slide = slides[activeSlideIndex];
@@ -1463,6 +1548,28 @@ function syncEditorForm() {
   if (document.getElementById("editTeacherNotes")) document.getElementById("editTeacherNotes").value = slide.notes || "";
   if (document.getElementById("editSlideIcon")) document.getElementById("editSlideIcon").value = slide.icon || "fa-graduation-cap";
   if (document.getElementById("editSlideBg")) document.getElementById("editSlideBg").value = slide.bg || "default";
+
+  // sync animations
+  if (document.getElementById("editTitleAnim")) document.getElementById("editTitleAnim").value = slide.titleAnimation || "none";
+  if (document.getElementById("editContentAnim")) document.getElementById("editContentAnim").value = slide.contentAnimation || "none";
+  if (document.getElementById("editImageAnim")) document.getElementById("editImageAnim").value = slide.imageAnimation || "none";
+
+  // sync image
+  if (document.getElementById("editShowImage")) document.getElementById("editShowImage").checked = slide.showImage !== false;
+  if (document.getElementById("editImageUrl")) document.getElementById("editImageUrl").value = (slide.image && !slide.image.startsWith("data:")) ? slide.image : "";
+  if (document.getElementById("editPresetImage")) document.getElementById("editPresetImage").value = "";
+
+  const previewArea = document.getElementById("imagePreviewArea");
+  const previewImg = document.getElementById("editImagePreview");
+  if (previewArea && previewImg) {
+    if (slide.image) {
+      previewImg.src = slide.image;
+      previewArea.style.display = "block";
+    } else {
+      previewImg.src = "";
+      previewArea.style.display = "none";
+    }
+  }
 }
 
 function updateActiveSlideFromEditor() {
@@ -1477,6 +1584,12 @@ function updateActiveSlideFromEditor() {
   const iconVal = document.getElementById("editSlideIcon")?.value;
   const bgVal = document.getElementById("editSlideBg")?.value;
 
+  const titleAnimVal = document.getElementById("editTitleAnim")?.value || "none";
+  const contentAnimVal = document.getElementById("editContentAnim")?.value || "none";
+  const imageAnimVal = document.getElementById("editImageAnim")?.value || "none";
+  const showImageVal = document.getElementById("editShowImage")?.checked ?? false;
+  const imageUrlVal = document.getElementById("editImageUrl")?.value || "";
+
   slide.title = titleVal || "শিরোনামহীন স্লাইড";
   slide.type = typeVal || "Content";
   slide.layout = layoutVal || "single";
@@ -1484,11 +1597,636 @@ function updateActiveSlideFromEditor() {
   slide.notes = notesVal || "";
   slide.icon = iconVal || "fa-graduation-cap";
   slide.bg = bgVal || "default";
+
+  slide.titleAnimation = titleAnimVal;
+  slide.contentAnimation = contentAnimVal;
+  slide.imageAnimation = imageAnimVal;
+  slide.showImage = showImageVal;
+  if (imageUrlVal) {
+    slide.image = imageUrlVal;
+  }
   slide.isCustomized = true;
 
   renderThumbnails();
   renderActiveCanvas();
 }
+
+// ছবি আপলোড ও প্রিসেট হ্যান্ডলারসমূহ এবং অ্যানিমেশন প্রিভিউ ফাংশন
+function handleImageUpload(event) {
+  if (slides.length === 0) return;
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const slide = slides[activeSlideIndex];
+    slide.image = e.target.result;
+    slide.showImage = true;
+    slide.isCustomized = true;
+
+    // Reset default whiteboard coordinates for new image
+    slide.imageX = 20;
+    slide.imageY = 10;
+    slide.imageWidth = 60;
+    delete slide.canvasDrawing;
+    slide.annotations = [];
+    wbLastActiveElement = null;
+
+    // Update preview
+    const previewArea = document.getElementById("imagePreviewArea");
+    const previewImg = document.getElementById("editImagePreview");
+    if (previewArea && previewImg) {
+      previewImg.src = e.target.result;
+      previewArea.style.display = "block";
+    }
+    const showImageCheckbox = document.getElementById("editShowImage");
+    if (showImageCheckbox) showImageCheckbox.checked = true;
+
+    // Clear URL input
+    const urlInput = document.getElementById("editImageUrl");
+    if (urlInput) urlInput.value = "";
+
+    updateActiveSlideFromEditor();
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyPresetImage() {
+  if (slides.length === 0) return;
+  const presetSel = document.getElementById("editPresetImage");
+  if (!presetSel) return;
+  const val = presetSel.value;
+  if (!val) return;
+
+  const slide = slides[activeSlideIndex];
+  slide.image = val;
+  slide.showImage = true;
+  slide.isCustomized = true;
+
+  // Reset default whiteboard coordinates
+  slide.imageX = 20;
+  slide.imageY = 10;
+  slide.imageWidth = 60;
+  delete slide.canvasDrawing;
+  slide.annotations = [];
+  wbLastActiveElement = null;
+
+  // Clear file input
+  const fileInput = document.getElementById("editImageFile");
+  if (fileInput) fileInput.value = "";
+
+  // Update URL input
+  const urlInput = document.getElementById("editImageUrl");
+  if (urlInput) urlInput.value = val;
+
+  // Update checkbox
+  const showImageCheckbox = document.getElementById("editShowImage");
+  if (showImageCheckbox) showImageCheckbox.checked = true;
+
+  updateActiveSlideFromEditor();
+}
+
+function removeSlideImage() {
+  if (slides.length === 0) return;
+  const slide = slides[activeSlideIndex];
+  delete slide.image;
+  slide.showImage = false;
+  slide.isCustomized = true;
+  
+  delete slide.canvasDrawing;
+  slide.annotations = [];
+  wbLastActiveElement = null;
+
+  // Clear inputs
+  const fileInput = document.getElementById("editImageFile");
+  if (fileInput) fileInput.value = "";
+  const urlInput = document.getElementById("editImageUrl");
+  if (urlInput) urlInput.value = "";
+  const presetSel = document.getElementById("editPresetImage");
+  if (presetSel) presetSel.value = "";
+  const showImageCheckbox = document.getElementById("editShowImage");
+  if (showImageCheckbox) showImageCheckbox.checked = false;
+
+  updateActiveSlideFromEditor();
+}
+
+function replayCanvasAnimations() {
+  renderActiveCanvas();
+}
+
+// =================== হোয়াইটবোর্ড ইন্টারেক্টিভ ফাংশনসমূহ ===================
+
+function initWhiteboard(slide, isPresenter) {
+  const suffix = isPresenter ? "_pres" : "_edit";
+  const canvas = document.getElementById("wb_canvas" + suffix);
+  const area = document.getElementById("wb_canvas_area" + suffix);
+  const wrapper = document.getElementById("wb_image_container" + suffix);
+  const annotLayer = document.getElementById("wb_annotations_layer" + suffix);
+  if (!canvas || !area) return;
+
+  // সেটআপ ক্যানভাস রেজোলিউশন
+  setTimeout(() => {
+    const rect = area.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    const ctx = canvas.getContext("2d");
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // লোড ক্যানভাস ড্রয়িং (PNG)
+    if (slide.canvasDrawing) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.src = slide.canvasDrawing;
+    }
+
+    // লোড কাস্টম টেক্সট এবং শেপ অ্যানোটেশন
+    if (annotLayer && slide.annotations) {
+      annotLayer.innerHTML = "";
+      slide.annotations.forEach((ann, index) => {
+        const el = document.createElement("div");
+        el.className = `wb-element ${ann.type === 'text' ? 'wb-text-box' : 'wb-shape wb-shape-' + ann.type}`;
+        el.style.left = `${ann.x}%`;
+        el.style.top = `${ann.y}%`;
+        el.style.width = ann.width ? `${ann.width}%` : 'auto';
+        el.style.height = ann.height ? `${ann.height}%` : 'auto';
+        el.style.color = ann.color || '#ef4444';
+        el.style.borderColor = ann.color || '#ef4444';
+        el.dataset.id = ann.id || `ann_${index}`;
+
+        if (ann.type === 'text') {
+          el.contentEditable = !isPresenter;
+          el.innerText = ann.text || 'টেক্সট';
+          el.style.color = ann.color || '#ef4444';
+          el.style.fontSize = ann.fontSize ? `${ann.fontSize}px` : '18px';
+          el.style.fontWeight = ann.fontWeight || 'bold';
+          el.onblur = () => {
+            el.classList.remove("editing");
+            saveWhiteboardState(slide);
+          };
+          el.onfocus = () => {
+            el.classList.add("editing");
+            wbLastActiveElement = el;
+          };
+        } else if (ann.type === 'arrow') {
+          el.innerHTML = `<i class="fa-solid fa-arrow-right-long"></i>`;
+        }
+
+        // রিলিজ হ্যান্ডেল
+        if (!isPresenter) {
+          const handle = document.createElement("div");
+          handle.className = "wb-resize-handle";
+          el.appendChild(handle);
+        }
+
+        // মুছে ফেলার বাটন (delete button)
+        if (!isPresenter) {
+          const delBtn = document.createElement("div");
+          delBtn.className = "wb-delete-btn";
+          delBtn.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+          delBtn.onclick = (e) => {
+            e.stopPropagation();
+            el.remove();
+            if (wbLastActiveElement === el) wbLastActiveElement = null;
+            saveWhiteboardState(slide);
+          };
+          el.appendChild(delBtn);
+        }
+
+        annotLayer.appendChild(el);
+        if (!isPresenter) {
+          makeElementInteractable(el, slide);
+        }
+      });
+    }
+
+    if (!isPresenter) {
+      makeElementInteractable(wrapper, slide);
+    }
+  }, 100);
+
+  // Set initial tool pointer-events
+  updateWbPointerEvents(isPresenter);
+
+  // মাউস ও টাচ ইভেন্টস যুক্তকরণ
+  canvas.addEventListener("mousedown", (e) => startDrawing(e, canvas));
+  canvas.addEventListener("mousemove", (e) => draw(e, canvas, slide));
+  canvas.addEventListener("mouseup", () => stopDrawing(slide));
+  canvas.addEventListener("mouseout", () => stopDrawing(slide));
+
+  canvas.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const mouseEvent = new MouseEvent("mousedown", {
+      clientX: t.clientX,
+      clientY: t.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    const mouseEvent = new MouseEvent("mousemove", {
+      clientX: t.clientX,
+      clientY: t.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener("touchend", () => {
+    const mouseEvent = new MouseEvent("mouseup", {});
+    canvas.dispatchEvent(mouseEvent);
+  });
+}
+
+function makeElementInteractable(el, slide) {
+  if (!el) return;
+
+  // Determine suffix based on context
+  const isPres = document.getElementById("fullscreenOverlay").style.display !== "none";
+  const suffix = isPres ? "_pres" : "_edit";
+
+  const handle = el.querySelector(".wb-resize-handle");
+  let clickTime = 0;
+
+  // ড্র্যাগিং ইভেন্ট লিসেনার
+  el.addEventListener("mousedown", (e) => {
+    if (wbActiveTool !== 'select') return;
+    if (e.target === handle) return;
+    if (e.target.closest(".wb-delete-btn")) return;
+    if (document.activeElement === el) return; // Allow caret editing when focused
+
+    clickTime = Date.now();
+    wbActiveElement = el;
+    wbLastActiveElement = el;
+    wbIsDragging = true;
+    wbDragStartX = e.clientX;
+    wbDragStartY = e.clientY;
+
+    const area = document.getElementById("wb_canvas_area" + suffix);
+    const areaRect = area.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+
+    wbElementStartX = ((elRect.left - areaRect.left) / areaRect.width) * 100;
+    wbElementStartY = ((elRect.top - areaRect.top) / areaRect.height) * 100;
+
+    document.querySelectorAll(".wb-element").forEach(item => item.classList.remove("selected"));
+    el.classList.add("selected");
+
+    // Sync color picker to this elements current color
+    const currentColor = el.style.color || el.style.borderColor || '#ef4444';
+    document.querySelectorAll(".wb-color-dot").forEach(d => {
+      d.classList.remove("active");
+      const rgbColor = d.style.backgroundColor;
+      if (rgbColor === currentColor) d.classList.add("active");
+    });
+
+    e.stopPropagation();
+    e.preventDefault();
+  });
+
+  // mouseup for focusing contenteditable text box on short clicks
+  el.addEventListener("mouseup", (e) => {
+    if (wbActiveTool !== 'select') return;
+    if (document.activeElement === el) return;
+
+    const dragDuration = Date.now() - clickTime;
+    if (dragDuration < 250 && el.contentEditable === "true") {
+      el.focus();
+      if (el.innerText === 'নতুন টেক্সট') {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  });
+
+  // ডাবল ক্লিক করলে টেক্সট ফোকাস হবে
+  el.addEventListener("dblclick", (e) => {
+    if (el.contentEditable === "true") {
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      e.stopPropagation();
+    }
+  });
+
+  // সাইজ পরিবর্তন ইভেন্ট লিসেনার
+  if (handle) {
+    handle.addEventListener("mousedown", (e) => {
+      wbActiveElement = el;
+      wbLastActiveElement = el;
+      wbIsResizing = true;
+      wbDragStartX = e.clientX;
+      wbDragStartY = e.clientY;
+
+      const area = document.getElementById("wb_canvas_area" + suffix);
+      const areaRect = area.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+
+      wbElementStartWidth = (elRect.width / areaRect.width) * 100;
+      wbElementStartHeight = (elRect.height / areaRect.height) * 100;
+
+      e.stopPropagation();
+      e.preventDefault();
+    });
+  }
+
+  // গ্লোবাল ড্র্যাগ লিসেনার
+  if (!window.wbListenersAttached) {
+    window.wbListenersAttached = true;
+    
+    document.addEventListener("mousemove", (e) => {
+      if (!wbActiveElement) return;
+
+      const isPresActive = document.getElementById("fullscreenOverlay").style.display !== "none";
+      const activeSuffix = isPresActive ? "_pres" : "_edit";
+
+      const area = document.getElementById("wb_canvas_area" + activeSuffix);
+      if (!area) return;
+      const areaRect = area.getBoundingClientRect();
+
+      if (wbIsDragging) {
+        const dx = ((e.clientX - wbDragStartX) / areaRect.width) * 100;
+        const dy = ((e.clientY - wbDragStartY) / areaRect.height) * 100;
+
+        let newX = wbElementStartX + dx;
+        let newY = wbElementStartY + dy;
+
+        newX = Math.max(0, Math.min(95, newX));
+        newY = Math.max(0, Math.min(95, newY));
+
+        wbActiveElement.style.left = `${newX}%`;
+        wbActiveElement.style.top = `${newY}%`;
+      } else if (wbIsResizing) {
+        const dx = ((e.clientX - wbDragStartX) / areaRect.width) * 100;
+        const dy = ((e.clientY - wbDragStartY) / areaRect.height) * 100;
+
+        const newW = Math.max(5, wbElementStartWidth + dx);
+        const newH = Math.max(5, wbElementStartHeight + dy);
+
+        wbActiveElement.style.width = `${newW}%`;
+        if (!wbActiveElement.classList.contains("wb-image-container")) {
+          wbActiveElement.style.height = `${newH}%`;
+        }
+      }
+    });
+
+    document.addEventListener("mouseup", () => {
+      if (wbActiveElement) {
+        const currentSlide = slides[activeSlideIndex];
+        saveWhiteboardState(currentSlide);
+        wbActiveElement = null;
+        wbIsDragging = false;
+        wbIsResizing = false;
+      }
+    });
+  }
+}
+
+function startDrawing(e, canvas) {
+  if (wbActiveTool !== 'pen' && wbActiveTool !== 'eraser') return;
+  wbIsDrawing = true;
+  const rect = canvas.getBoundingClientRect();
+  wbLastX = e.clientX - rect.left;
+  wbLastY = e.clientY - rect.top;
+}
+
+function draw(e, canvas, slide) {
+  if (!wbIsDrawing || (wbActiveTool !== 'pen' && wbActiveTool !== 'eraser')) return;
+  const ctx = canvas.getContext("2d");
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  ctx.beginPath();
+  ctx.moveTo(wbLastX, wbLastY);
+  ctx.lineTo(x, y);
+
+  if (wbActiveTool === 'pen') {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = wbActiveColor;
+    ctx.lineWidth = wbBrushSize;
+  } else if (wbActiveTool === 'eraser') {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineWidth = wbBrushSize * 5;
+  }
+
+  ctx.stroke();
+  wbLastX = x;
+  wbLastY = y;
+}
+
+function stopDrawing(slide) {
+  if (wbIsDrawing) {
+    wbIsDrawing = false;
+    saveWhiteboardState(slide);
+  }
+}
+
+function saveWhiteboardState(slide) {
+  if (!slide) return;
+
+  const isPres = document.getElementById("fullscreenOverlay").style.display !== "none";
+  const suffix = isPres ? "_pres" : "_edit";
+
+  const canvas = document.getElementById("wb_canvas" + suffix);
+  const wrapper = document.getElementById("wb_image_container" + suffix);
+  const annotLayer = document.getElementById("wb_annotations_layer" + suffix);
+
+  // ক্যানভাস ড্রয়িং সংরক্ষণ
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    const blank = document.createElement('canvas');
+    blank.width = canvas.width;
+    blank.height = canvas.height;
+    if (canvas.toDataURL() === blank.toDataURL()) {
+      delete slide.canvasDrawing;
+    } else {
+      slide.canvasDrawing = canvas.toDataURL();
+    }
+  }
+
+  // কাস্টম ইমেজ সাইজ ও পজিশন সংরক্ষণ
+  if (wrapper) {
+    slide.imageX = parseFloat(wrapper.style.left) || 20;
+    slide.imageY = parseFloat(wrapper.style.top) || 10;
+    slide.imageWidth = parseFloat(wrapper.style.width) || 60;
+  }
+
+  // কাস্টম টেক্সট ও শেপসমূহ সংরক্ষণ
+  if (annotLayer) {
+    const annList = [];
+    const elements = annotLayer.querySelectorAll(".wb-element");
+    elements.forEach((el, index) => {
+      const type = el.classList.contains("wb-text-box") ? "text" : 
+                   el.classList.contains("wb-shape-rect") ? "rect" :
+                   el.classList.contains("wb-shape-circle") ? "circle" : "arrow";
+
+      const annObj = {
+        id: el.dataset.id || `ann_${index}_${Date.now()}`,
+        type: type,
+        x: parseFloat(el.style.left) || 40,
+        y: parseFloat(el.style.top) || 40,
+        width: parseFloat(el.style.width) || 15,
+        height: parseFloat(el.style.height) || 10,
+        color: el.style.color || el.style.borderColor || '#ef4444',
+      };
+
+      if (type === "text") {
+        annObj.text = el.innerText;
+        annObj.fontSize = parseInt(el.style.fontSize) || 18;
+        annObj.fontWeight = el.style.fontWeight || 'bold';
+      }
+      annList.push(annObj);
+    });
+
+    slide.annotations = annList;
+  }
+
+  slide.isCustomized = true;
+
+  // স্লাইডার সিনক্রোনাইজেশন
+  const sizeSlider = document.querySelector(".wb-img-size-slider");
+  if (sizeSlider && wrapper) {
+    sizeSlider.value = parseFloat(wrapper.style.width);
+  }
+}
+
+function setWbTool(btn, tool) {
+  wbActiveTool = tool;
+  document.querySelectorAll(".wb-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  
+  const isPres = document.getElementById("fullscreenOverlay").style.display !== "none";
+  updateWbPointerEvents(isPres);
+}
+
+function updateWbPointerEvents(isPresenter) {
+  const suffix = isPresenter ? "_pres" : "_edit";
+  const canvas = document.getElementById("wb_canvas" + suffix);
+  if (!canvas) return;
+
+  if (wbActiveTool === 'pen' || wbActiveTool === 'eraser') {
+    canvas.style.pointerEvents = 'auto';
+    canvas.style.cursor = wbActiveTool === 'eraser' ? 'crosshair' : 'pencil';
+  } else {
+    canvas.style.pointerEvents = 'none';
+    canvas.style.cursor = 'default';
+  }
+}
+
+function setWbColor(dot, color) {
+  wbActiveColor = color;
+  document.querySelectorAll(".wb-color-dot").forEach(d => d.classList.remove("active"));
+  if (dot) dot.classList.add("active");
+
+  const selectedEl = document.querySelector(".wb-element.selected") || wbLastActiveElement;
+  if (selectedEl && !selectedEl.classList.contains("wb-image-container")) {
+    selectedEl.style.color = color;
+    selectedEl.style.borderColor = color;
+    const slide = slides[activeSlideIndex];
+    saveWhiteboardState(slide);
+  }
+}
+
+function changeWbTextSize(amount) {
+  const selectedEl = document.querySelector(".wb-element.selected") || wbLastActiveElement;
+  if (selectedEl && selectedEl.classList.contains("wb-text-box")) {
+    let currentSize = parseInt(selectedEl.style.fontSize) || 18;
+    let newSize = Math.max(10, Math.min(60, currentSize + amount));
+    selectedEl.style.fontSize = `${newSize}px`;
+    const slide = slides[activeSlideIndex];
+    saveWhiteboardState(slide);
+  }
+}
+
+function toggleWbTextBold() {
+  const selectedEl = document.querySelector(".wb-element.selected") || wbLastActiveElement;
+  if (selectedEl && selectedEl.classList.contains("wb-text-box")) {
+    let currentWeight = selectedEl.style.fontWeight;
+    let isBold = currentWeight === 'bold' || currentWeight === '700';
+    selectedEl.style.fontWeight = isBold ? 'normal' : 'bold';
+    const slide = slides[activeSlideIndex];
+    saveWhiteboardState(slide);
+  }
+}
+
+function addWbText() {
+  const slide = slides[activeSlideIndex];
+  if (!slide) return;
+
+  if (!slide.annotations) slide.annotations = [];
+  slide.annotations.push({
+    id: `ann_txt_${Date.now()}`,
+    type: 'text',
+    x: 40,
+    y: 40,
+    width: 20,
+    height: 8,
+    color: wbActiveColor,
+    fontSize: 18,
+    fontWeight: 'bold',
+    text: 'নতুন টেক্সট'
+  });
+  
+  renderActiveCanvas();
+}
+
+function addWbShape(type) {
+  const slide = slides[activeSlideIndex];
+  if (!slide) return;
+
+  if (!slide.annotations) slide.annotations = [];
+  slide.annotations.push({
+    id: `ann_shp_${Date.now()}`,
+    type: type,
+    x: 45,
+    y: 45,
+    width: type === 'arrow' ? 8 : 15,
+    height: type === 'arrow' ? 8 : 12,
+    color: wbActiveColor
+  });
+
+  renderActiveCanvas();
+}
+
+function updateWbImageSize(val) {
+  const isPres = document.getElementById("fullscreenOverlay").style.display !== "none";
+  const suffix = isPres ? "_pres" : "_edit";
+  const wrapper = document.getElementById("wb_image_container" + suffix);
+  if (wrapper) {
+    wrapper.style.width = `${val}%`;
+    const slide = slides[activeSlideIndex];
+    saveWhiteboardState(slide);
+  }
+}
+
+function clearWbDrawing() {
+  if (confirm("আপনি কি নিশ্চিতভাবে এই স্লাইডের সব ক্যানভাস অঙ্কন ও অবজেক্ট মুছে ফেলতে চান?")) {
+    const slide = slides[activeSlideIndex];
+    if (slide) {
+      delete slide.canvasDrawing;
+      slide.annotations = [];
+      slide.imageX = 20;
+      slide.imageY = 10;
+      slide.imageWidth = 60;
+      wbLastActiveElement = null;
+      renderActiveCanvas();
+    }
+  }
+}
+
 
 // [৭] স্লাইড যোগ, ডুপ্লিকেট, ডিলিট ও রি-অর্ডার
 function addNewSlide() {
@@ -1595,6 +2333,7 @@ function exitPresentationMode() {
   const overlay = document.getElementById("fullscreenOverlay");
   if (overlay) overlay.style.display = "none";
   if (presenterTimer) clearInterval(presenterTimer);
+  stopAutoplay();
   if (document.fullscreenElement && document.exitFullscreen) {
     document.exitFullscreen().catch(() => {});
   }
@@ -1613,29 +2352,91 @@ function renderPresenterSlide() {
 
   if (counter) counter.innerText = `${currentLang === "bn" ? "স্লাইড" : "Slide"} ${activeSlideIndex + 1} / ${slides.length}`;
 
+  // Get animations from slide object
+  const titleAnimClass = slide.titleAnimation && slide.titleAnimation !== "none" ? `anim-${slide.titleAnimation}` : "";
+  const contentAnimClass = slide.contentAnimation && slide.contentAnimation !== "none" ? `anim-${slide.contentAnimation}` : "";
+  const imgAnimClass = slide.imageAnimation && slide.imageAnimation !== "none" ? `anim-${slide.imageAnimation}` : "";
+
   const bulletsHtml = slide.bullets
-    .map((b) => `<div class="slide-bullet-item" style="font-size: 20px; padding: 10px 16px;"><i class="fa-solid fa-chevron-right" style="font-size: 14px; opacity:0.8;"></i> <span>${b}</span></div>`)
+    .map((b) => `<div class="slide-bullet-item ${contentAnimClass}" style="font-size: 20px; padding: 10px 16px;"><i class="fa-solid fa-chevron-right" style="font-size: 14px; opacity:0.8;"></i> <span>${b}</span></div>`)
     .join("");
 
   let visualComponentHtml = "";
   const selectedVisuals = Array.from(document.querySelectorAll(".vis-check:checked")).map((cb) => cb.value);
 
-  if (slide.type === "Quiz" || slide.layout === "quiz") {
+  // Custom Image rendering with Whiteboard Editor in Fullscreen slideshow mode
+  if (slide.image && slide.showImage !== false) {
     visualComponentHtml = `
-      <div class="quiz-options-grid" style="margin-top: 20px;">
-        <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>ক)</span> প্রথম বিকল্প</div>
-        <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>খ)</span> দ্বিতীয় উত্তর (সঠিক)</div>
-        <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>গ)</span> তৃতীয় বিকল্প</div>
-        <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>ঘ)</span> চতুর্থ বিকল্প</div>
+      <div class="whiteboard-wrapper ${imgAnimClass}" id="wb_wrapper_${slide.id}">
+        <!-- Whiteboard Toolbar (Fullscreen layout) -->
+        <div class="whiteboard-toolbar">
+          <div class="wb-tools-group">
+            <button class="wb-btn active" onclick="setWbTool(this, 'select')" title="মুভ অবজেক্ট"><i class="fa-solid fa-arrows-up-down-left-right"></i> মুভ</button>
+            <button class="wb-btn" onclick="setWbTool(this, 'pen')" title="পেন"><i class="fa-solid fa-pen"></i> পেন</button>
+            <button class="wb-btn" onclick="setWbTool(this, 'eraser')" title="ইরেজার"><i class="fa-solid fa-eraser"></i> ইরেজার</button>
+            <button class="wb-btn" onclick="addWbText()" title="টেক্সট"><i class="fa-solid fa-font"></i> টেক্সট</button>
+            <button class="wb-btn" onclick="addWbShape('rect')" title="আয়তক্ষেত্র"><i class="fa-regular fa-square"></i> আয়ত</button>
+            <button class="wb-btn" onclick="addWbShape('circle')" title="বৃত্ত"><i class="fa-regular fa-circle"></i> বৃত্ত</button>
+            <button class="wb-btn" onclick="addWbShape('arrow')" title="তীর"><i class="fa-solid fa-arrow-right"></i> তীর</button>
+          </div>
+          <!-- Text formatting tools -->
+          <div class="wb-tools-group" style="border-left: 1px solid rgba(0,0,0,0.1); padding-left: 6px;">
+            <button class="wb-btn" onclick="changeWbTextSize(2)" title="লেখা বড় করুন"><i class="fa-solid fa-magnifying-glass-plus"></i> বড়</button>
+            <button class="wb-btn" onclick="changeWbTextSize(-2)" title="লেখা ছোট করুন"><i class="fa-solid fa-magnifying-glass-minus"></i> ছোট</button>
+            <button class="wb-btn" onclick="toggleWbTextBold()" title="বোল্ড / রেগুলার"><i class="fa-solid fa-bold"></i> বোল্ড</button>
+          </div>
+          <div class="wb-tools-group" style="gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px;">
+              <span>সাইজ:</span>
+              <input type="range" class="wb-img-size-slider" min="20" max="150" value="${slide.imageWidth || 60}" style="width: 40px; height:4px; cursor:pointer;" oninput="updateWbImageSize(this.value)">
+            </div>
+            <div class="wb-color-picker">
+              <span class="wb-color-dot active" style="background:#ef4444;" onclick="setWbColor(this, '#ef4444')"></span>
+              <span class="wb-color-dot" style="background:#3b82f6;" onclick="setWbColor(this, '#3b82f6')"></span>
+              <span class="wb-color-dot" style="background:#10b981;" onclick="setWbColor(this, '#10b981')"></span>
+              <span class="wb-color-dot" style="background:#f59e0b;" onclick="setWbColor(this, '#f59e0b')"></span>
+              <span class="wb-color-dot" style="background:#0f172a;" onclick="setWbColor(this, '#0f172a')"></span>
+              <span class="wb-color-dot" style="background:#ffffff;" onclick="setWbColor(this, '#ffffff')"></span>
+            </div>
+            <button class="wb-btn" onclick="clearWbDrawing()" style="color: var(--danger); font-weight:bold; padding: 2px 6px;"><i class="fa-solid fa-trash-can"></i> রিসেট</button>
+          </div>
+        </div>
+
+        <!-- Canvas and Element Area -->
+        <div class="whiteboard-canvas-area" id="wb_canvas_area_pres">
+          <!-- Image Element (Draggable/Resizable) -->
+          <div class="wb-element wb-image-container" id="wb_image_container_pres" style="left: ${slide.imageX || 20}%; top: ${slide.imageY || 10}%; width: ${slide.imageWidth || 60}%;">
+            <img src="${slide.image}" class="wb-image-el" style="width: 100%; display: block;" alt="Slide Image">
+            <div class="wb-resize-handle"></div>
+          </div>
+
+          <!-- Drawing Canvas Overlay -->
+          <canvas class="wb-canvas" id="wb_canvas_pres"></canvas>
+
+          <!-- Annotations container for shapes and text boxes -->
+          <div class="wb-annotations-layer" id="wb_annotations_layer_pres" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:9;">
+            <!-- Saved annotations loaded here -->
+          </div>
+        </div>
       </div>
     `;
-  } else if (slide.type === "Table" && selectedVisuals.includes("table")) {
-    const vGoodRolls = document.getElementById("roll-vgood")?.value || "১, ২, ৩";
-    const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
-    const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
-        <strong style="font-size:15px; display:block; margin-bottom:10px;"><i class="fa-solid fa-users-gear"></i> স্মার্ট শিক্ষার্থী গ্রুপিং:</strong>
+  } else {
+    let visualInner = "";
+    if (slide.type === "Quiz" || slide.layout === "quiz") {
+      visualInner = `
+        <div class="quiz-options-grid" style="margin-top: 20px;">
+          <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>ক)</span> প্রথম বিকল্প</div>
+          <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>খ)</span> দ্বিতীয় উত্তর (সঠিক)</div>
+          <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>গ)</span> তৃতীয় বিকল্প</div>
+          <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>ঘ)</span> চতুর্থ বিকল্প</div>
+        </div>
+      `;
+    } else if (slide.type === "Table" && selectedVisuals.includes("table")) {
+      const vGoodRolls = document.getElementById("roll-vgood")?.value || "১, ২, ৩";
+      const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
+      const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
+      visualInner = `
+        <strong style="font-size:15px; display:block; margin-bottom:10px;"><i class="fa-solid fa-users-gear"></i> スマート শিক্ষার্থী গ্রুপিং:</strong>
         <table class="slide-data-table" style="font-size: 15px;">
           <thead>
             <tr><th>গ্রুপ</th><th>রোল নম্বর</th><th>কার্যক্রম</th></tr>
@@ -1646,11 +2447,9 @@ function renderPresenterSlide() {
             <tr style="border-left: 4px solid #ef4444;"><td><strong>গ্রুপ সি (বিশেষ যত্ন)</strong></td><td>${lowRolls}</td><td>শিক্ষকের সহায়তায় বেসিক পুনরাবৃত্তি</td></tr>
           </tbody>
         </table>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("chart")) {
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("chart")) {
+      visualInner = `
         <strong style="font-size:14px; display:block; margin-bottom:10px;"><i class="fa-solid fa-chart-simple"></i> তথ্য চিত্র ও প্রজেক্ট অগ্রগতি:</strong>
         <div class="chart-bars-wrap" style="height: 140px;">
           <div class="chart-bar-col"><div class="chart-bar-fill" style="height: 35%;"></div><span class="chart-bar-label" style="font-size:12px;">পরিকল্পনা (৩৫%)</span></div>
@@ -1658,11 +2457,9 @@ function renderPresenterSlide() {
           <div class="chart-bar-col"><div class="chart-bar-fill" style="height: 90%;"></div><span class="chart-bar-label" style="font-size:12px;">বিশ্লেষণ (৯০%)</span></div>
           <div class="chart-bar-col"><div class="chart-bar-fill" style="height: 50%;"></div><span class="chart-bar-label" style="font-size:12px;">উপস্থাপন (৫০%)</span></div>
         </div>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("table")) {
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("table")) {
+      visualInner = `
         <strong style="font-size:14px; display:block; margin-bottom:8px;"><i class="fa-solid fa-table"></i> বিষয় সারণি:</strong>
         <table class="slide-data-table" style="font-size: 15px;">
           <thead>
@@ -1673,32 +2470,26 @@ function renderPresenterSlide() {
             <tr><td>২য় পর্ব</td><td>দলগত কাজ ও উপস্থাপনা</td><td>২০ মিনিট</td></tr>
           </tbody>
         </table>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("info")) {
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("info")) {
+      visualInner = `
         <strong style="font-size:14px; display:block; margin-bottom:12px;"><i class="fa-solid fa-lightbulb"></i> শিখন ধাপসমূহ:</strong>
         <div class="infographic-steps-wrap">
           <div class="info-step-card" style="padding: 15px;"><div class="step-num" style="width:28px; height:28px; font-size:14px;">১</div><div class="step-txt" style="font-size:13px; margin-top:5px;">ধারণা গ্রহণ</div></div>
           <div class="info-step-card" style="padding: 15px;"><div class="step-num" style="width:28px; height:28px; font-size:14px;">২</div><div class="step-txt" style="font-size:13px; margin-top:5px;">শ্রেণি অনুশীলন</div></div>
           <div class="info-step-card" style="padding: 15px;"><div class="step-num" style="width:28px; height:28px; font-size:14px;">৩</div><div class="step-txt" style="font-size:13px; margin-top:5px;">মূল্যায়ন ও কুইজ</div></div>
         </div>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("vid")) {
-    visualComponentHtml = `
-      <div class="visual-component-box mock-video-container" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("vid")) {
+      visualInner = `
         <div class="mock-video-player" style="height: 150px;">
           <i class="fa-solid fa-play play-icon" style="font-size: 42px;"></i>
           <span class="video-duration" style="font-size:12px;">03:45</span>
         </div>
         <span class="video-title" style="font-size: 13px; margin-top: 8px;"><i class="fa-solid fa-video"></i> ${slide.title} সম্পর্কিত মাল্টিমিডিয়া কন্টেন্ট</span>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("img") || selectedVisuals.includes("geo")) {
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("img") || selectedVisuals.includes("geo")) {
+      visualInner = `
         <div class="diagram-graphic-box" style="padding: 20px; gap: 20px;">
           <div class="diagram-node" style="font-size: 16px; padding: 12px 24px;">সংজ্ঞা ও সূচনা</div>
           <i class="fa-solid fa-arrow-right" style="font-size:18px;"></i>
@@ -1706,8 +2497,16 @@ function renderPresenterSlide() {
           <i class="fa-solid fa-arrow-right" style="font-size:18px;"></i>
           <div class="diagram-node" style="background:#f59e0b; font-size: 16px; padding: 12px 24px;">সিদ্ধান্ত গ্রহণ</div>
         </div>
-      </div>
-    `;
+      `;
+    }
+
+    if (visualInner) {
+      visualComponentHtml = `
+        <div class="visual-component-box ${imgAnimClass}">
+          ${visualInner}
+        </div>
+      `;
+    }
   }
 
   let bodyContentHtml = "";
@@ -1727,7 +2526,7 @@ function renderPresenterSlide() {
       <div class="slide-body-grid layout-card">
         <div class="card-layout-wrapper" style="gap: 15px;">
           ${slide.bullets.map((b) => `
-            <div class="slide-bullet-card" style="padding: 16px 20px; border-radius: 12px;">
+            <div class="slide-bullet-card ${contentAnimClass}" style="padding: 16px 20px; border-radius: 12px;">
               <i class="fa-solid ${slide.icon || 'fa-star'}" style="color:var(--primary); font-size:18px; margin-top: 4px;"></i>
               <div class="bullet-card-text" style="font-size:16px;">${b}</div>
             </div>
@@ -1766,10 +2565,16 @@ function renderPresenterSlide() {
       <span class="slide-tag" style="font-size: 14px; padding: 6px 18px;">${getSlideTypeName(slide.type)}</span>
       <i class="fa-solid ${slide.icon || "fa-graduation-cap"}" style="font-size: 42px;"></i>
     </div>
-    <h1 style="font-size: 36px; font-weight: 700; margin: 15px 0 25px 0;">${slide.title}</h1>
+    <h1 class="${titleAnimClass}" style="font-size: 36px; font-weight: 700; margin: 15px 0 25px 0;">${slide.title}</h1>
     ${bodyContentHtml}
   `;
+
+  // Init whiteboard interactive in presentation mode too! (use suffix _pres)
+  if (slide.image && slide.showImage !== false) {
+    initWhiteboard(slide, true); // true indicates presenter mode
+  }
 }
+
 
 function startTimer() {
   if (presenterTimer) clearInterval(presenterTimer);
@@ -2140,211 +2945,270 @@ function toggleSidebar() {
   }
 }
 
-function downloadAsPowerPointPPTX() {
-  if (slides.length === 0) {
-    alert(currentLang === "bn" ? "প্রথমে কোনো স্লাইড তৈরি করুন!" : "Please create some slides first!");
-    return;
+async function downloadAsPowerPointPPTX() {
+  if (typeof PptxGenJS === 'undefined') {
+    return alert("라이브러리 পাওয়া যায়নি! ইন্টারনেটে সংযুক্ত হয়ে পেজটি রিফ্রেশ দিন।");
   }
 
-  // Initialize presentation
-  let pptx = new PptxGenJS();
-  
-  // Set layout 16x9
-  pptx.layout = 'LAYOUT_16x9';
-
-  // Define colors
-  const primaryColor = '4F46E5'; // Indigo
-  const secondaryColor = '3730A3'; // Dark Indigo
-  const darkTextColor = '1E293B';
-  const lightTextColor = 'FFFFFF';
-  const mutedTextColor = '64748B';
-  const cardBgColor = 'F8FAFC';
-
-  // Loop through slides array
-  slides.forEach((slideObj, index) => {
-    let slide = pptx.addSlide();
+  try {
+    const pptx = new PptxGenJS();
+    // স্লাইড সাইজ এবং প্রপার্টিজ
+    pptx.layout = 'LAYOUT_16x9';
+    pptx.author = 'Sashiba Smart Education';
     
-    // Check slide type and apply theme/layout
-    if (slideObj.type === "Cover") {
-      // Dark cover slide
-      slide.background = { fill: secondaryColor };
-      
-      // Title
-      slide.addText(slideObj.title || "স্বাগতম", {
-        x: 1.0,
-        y: 2.0,
-        w: 8.0,
-        h: 1.5,
-        fontSize: 36,
-        bold: true,
-        color: lightTextColor,
-        fontFace: 'Arial',
-        align: 'left'
-      });
-      
-      // Bullets / Info
-      let bulletY = 3.6;
-      if (slideObj.bullets && slideObj.bullets.length > 0) {
-        slideObj.bullets.forEach((bullet) => {
-          slide.addText(bullet, {
-            x: 1.0,
-            y: bulletY,
-            w: 8.0,
-            h: 0.4,
-            fontSize: 16,
-            color: 'C7D2FE',
-            fontFace: 'Arial',
-            align: 'left'
-          });
-          bulletY += 0.5;
-        });
-      }
-      
-    } else {
-      // Content slide with header
-      slide.background = { fill: 'FFFFFF' };
-      
-      // Header Bar
-      slide.addRect({
-        x: 0,
-        y: 0,
-        w: '100%',
-        h: 1.0,
-        fill: primaryColor
-      });
-      
-      // Header Title
-      slide.addText(slideObj.title || "স্লাইড", {
-        x: 0.6,
-        y: 0.25,
-        w: 8.8,
-        h: 0.5,
-        fontSize: 24,
-        bold: true,
-        color: lightTextColor,
-        fontFace: 'Arial',
-        align: 'left'
-      });
-      
-      // Bullet list spacing and layout
-      const bullets = slideObj.bullets || [];
-      
-      if (slideObj.layout === "split" || slideObj.type === "Content") {
-        // Two columns or lists
-        const mid = Math.ceil(bullets.length / 2);
-        const leftBullets = bullets.slice(0, mid);
-        const rightBullets = bullets.slice(mid);
-        
-        // Left column
-        let leftY = 1.4;
-        leftBullets.forEach((bullet) => {
-          slide.addText(bullet, {
-            x: 0.6,
-            y: leftY,
-            w: 4.2,
-            h: 0.8,
-            fontSize: 16,
-            color: darkTextColor,
-            fontFace: 'Arial',
-            align: 'left',
-            valign: 'top',
-            bullet: true
-          });
-          leftY += 1.0;
-        });
-        
-        // Right column
-        let rightY = 1.4;
-        rightBullets.forEach((bullet) => {
-          slide.addText(bullet, {
-            x: 5.2,
-            y: rightY,
-            w: 4.2,
-            h: 0.8,
-            fontSize: 16,
-            color: darkTextColor,
-            fontFace: 'Arial',
-            align: 'left',
-            valign: 'top',
-            bullet: true
-          });
-          rightY += 1.0;
-        });
-        
-      } else if (slideObj.layout === "card" || slideObj.type === "Outcomes" || slideObj.type === "Quiz") {
-        // Render bullets as card blocks
-        let cardX = 0.6;
-        let cardY = 1.4;
-        let cardW = 2.7;
-        
-        bullets.forEach((bullet, bIdx) => {
-          if (bIdx < 3) { // Max 3 cards
-            slide.addRect({
-              x: cardX,
-              y: cardY,
-              w: cardW,
-              h: 3.5,
-              fill: cardBgColor,
-              line: { color: 'E2E8F0', width: 1.5 }
-            });
-            
-            slide.addText(bullet, {
-              x: cardX + 0.2,
-              y: cardY + 0.3,
-              w: cardW - 0.4,
-              h: 2.9,
-              fontSize: 14,
-              color: darkTextColor,
-              fontFace: 'Arial',
-              align: 'left',
-              valign: 'top'
-            });
-            
-            cardX += 3.1;
-          }
-        });
-        
-      } else {
-        // Standard single column
-        let bulletY = 1.4;
-        bullets.forEach((bullet) => {
-          slide.addText(bullet, {
-            x: 0.6,
-            y: bulletY,
-            w: 8.8,
-            h: 0.8,
-            fontSize: 18,
-            color: darkTextColor,
-            fontFace: 'Arial',
-            align: 'left',
-            valign: 'top',
-            bullet: true
-          });
-          bulletY += 1.0;
-        });
-      }
-      
-      // Footer text
-      slide.addText("স্মার্ট শিক্ষা বাতায়ন", {
-        x: 0.6,
-        y: 6.8,
-        w: 4.0,
-        h: 0.3,
-        fontSize: 10,
-        color: mutedTextColor,
-        fontFace: 'Arial'
-      });
-    }
-  });
+    // ১. ড্যাশবোর্ড কালার প্যালেট (আপনার CSS থেকে হুবহু নেওয়া)
+    const UI_COLORS = {
+      primary: '4F46E5',   // Indigo
+      success: '10B981',   // Emerald
+      warning: 'F59E0B',   // Amber
+      danger: 'EF4444',    // Red
+      dark: '1E293B',      // Slate 800
+      light: 'F8FAFC',     // Slate 50
+      white: 'FFFFFF'
+    };
 
-  // Save the presentation
-  const fileName = "presentation_" + Date.now() + ".pptx";
-  pptx.writeFile({ fileName: fileName })
-    .then(fileName => {
-      alert(currentLang === "bn" ? "পিপিটিএক্স প্রেজেন্টেশন ফাইলটি সফলভাবে ডাউনলোড হয়েছে!" : "PPTX Presentation successfully downloaded!");
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error generating PPTX: " + err);
+    // ২. আইকন ম্যাপার (FontAwesome থেকে PowerPoint উপযোগী ইমোজি)
+    const iconMap = {
+      "fa-graduation-cap": "🎓", "fa-book-open": "📖", "fa-lightbulb": "💡",
+      "fa-bullseye": "🎯", "fa-list-check": "📋", "fa-users": "👥",
+      "fa-circle-question": "❓", "fa-house-laptop": "🏠", "fa-atom": "⚛️", "fa-calculator": "🧮"
+    };
+
+    // ৩. টেক্সট ফিক্সার (ক্লিয়ার বাংলা ফন্ট নিশ্চিত করা)
+    const clean = (t) => t ? t.toString().replace(/[^\x00-\x7F\u0980-\u09FF\s]/g, "").trim() : "";
+
+    slides.forEach((slideObj, index) => {
+      let slide = pptx.addSlide();
+      
+      // স্লাইড থিম নির্ধারণ (ড্যাশবোর্ড অনুযায়ী)
+      let isDark = slideObj.bg === "bg-dark" || slideObj.bg === "bg-emerald" || slideObj.bg === "bg-amber" || slideObj.bg === "bg-purple" || slideObj.bg === "bg-cosmic" || slideObj.bg === "bg-sunset" || slideObj.bg === "bg-ocean" || slideObj.bg === "bg-neon" || slideObj.bg === "bg-matte" || slideObj.type === "Cover";
+      let bgFill = isDark ? UI_COLORS.dark : UI_COLORS.white;
+      
+      if (slideObj.bg === "bg-blue") bgFill = '1E3A8A';
+      else if (slideObj.bg === "bg-emerald") bgFill = '064E3B';
+      else if (slideObj.bg === "bg-amber") bgFill = '78350F';
+      else if (slideObj.bg === "bg-purple") bgFill = '581C87';
+      else if (slideObj.bg === "bg-cosmic") bgFill = '1E1B4B';
+      else if (slideObj.bg === "bg-sunset") bgFill = 'EC4899';
+      else if (slideObj.bg === "bg-ocean") bgFill = '0F766E';
+      else if (slideObj.bg === "bg-neon") bgFill = '09090B';
+      else if (slideObj.bg === "bg-nordic") bgFill = 'E2E8F0';
+      else if (slideObj.bg === "bg-matte") bgFill = '1C1917';
+      else if (slideObj.bg === "bg-white") bgFill = 'FFFFFF';
+      
+      if (slideObj.type === "Cover") bgFill = '312E81'; // কভার স্লাইড সবসময় প্রফেশনাল ডার্ক ব্লু
+      
+      slide.background = { fill: bgFill };
+      let textCol = isDark ? UI_COLORS.white : UI_COLORS.dark;
+
+      // ==========================================
+      // [ক] কভার স্লাইড ডিজাইন (ড্যাশবোর্ডের স্প্ল্যাশ স্টাইল)
+      // ==========================================
+      if (slideObj.type === "Cover") {
+        // ডেকোরেティブ শেপ
+        slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.15, fill: UI_COLORS.primary });
+        
+        slide.addText(iconMap[slideObj.icon] || "🎓", { 
+            x: 0, y: 1.5, w: '100%', fontSize: 60, align: 'center' 
+        });
+
+        slide.addText(clean(slideObj.title), {
+          x: 0.5, y: 2.8, w: 9.0, fontSize: 44, bold: true, color: UI_COLORS.white, align: 'center', fontFace: 'Arial'
+        });
+
+        slide.addShape(pptx.ShapeType.line, { x: '30%', y: '48%', w: '40%', h: 0, line: { color: UI_COLORS.warning, width: 3 } });
+
+        let info = Array.isArray(slideObj.bullets) ? slideObj.bullets.join("  |  ") : "";
+        slide.addText(clean(info), {
+          x: 0.5, y: 5.5, w: 9.0, fontSize: 18, color: 'CBD5E1', align: 'center', fontFace: 'Arial'
+        });
+      } 
+      
+      // ==========================================
+      // [খ] কন্টেন্ট স্লাইড ডিজাইন (ড্যাশবোর্ড স্টুডিও স্টাইল)
+      // ==========================================
+      else {
+        // ১. টপ বার (স্মার্ট হেডার)
+        slide.addShape(pptx.ShapeType.rect, { 
+            x: 0, y: 0, w: '100%', h: 0.8, fill: UI_COLORS.primary 
+        });
+        
+        // ২. স্লাইড আইকন ও টাইটেল
+        let slideIcon = iconMap[slideObj.icon] || "📄";
+        slide.addText(`${slideIcon}  ${clean(slideObj.title)}`, {
+          x: 0.4, y: 0.15, w: 9.2, fontSize: 24, bold: true, color: UI_COLORS.white, fontFace: 'Arial'
+        });
+
+        let bullets = slideObj.bullets || [];
+        let hasImg = (slideObj.image && slideObj.showImage !== false);
+
+        // ৩. ডাইনামিক লেআউট ইঞ্জিন (ড্যাশবোর্ড ম্যাচার)
+        
+        // কেস ১: কার্ড লেআউট (তিনটি আলাদা বক্সে তথ্য)
+        if (slideObj.layout === "card" && bullets.length > 0) {
+            let cardX = 0.4;
+            bullets.slice(0, 3).forEach((txt) => {
+                slide.addShape(pptx.ShapeType.roundRect, {
+                    x: cardX, y: 1.5, w: 2.9, h: 4.2, rectRadius: 0.1,
+                    fill: isDark ? 'FFFFFF10' : 'F1F5F9',
+                    line: { color: UI_COLORS.primary, width: 1.5 }
+                });
+                slide.addText(clean(txt), {
+                    x: cardX + 0.15, y: 1.8, w: 2.6, h: 3.5, 
+                    fontSize: 15, color: textCol, align: 'center', valign: 'top', fontFace: 'Arial'
+                });
+                cardX += 3.15;
+            });
+        } 
+        
+        // কেস ২: স্প্লিট লেআউট (ছবি ও লেখা পাশাপাশি - ড্যাশবোর্ডের মতো)
+        else if (hasImg) {
+            // লেখা (বামে)
+            let bY = 1.3;
+            bullets.slice(0, 7).forEach(txt => {
+                slide.addText(clean(txt), {
+                    x: 0.6, y: bY, w: 5.0, fontSize: 17, color: textCol, 
+                    bullet: { type: 'bullet', color: UI_COLORS.primary }, lineSpacing: 28, fontFace: 'Arial'
+                });
+                bY += 0.8;
+            });
+
+            // ছবি (ডানে - শ্যাডো ও বর্ডার সহ)
+            try {
+                let imgData = slideObj.image.includes("base64,") ? slideObj.image.split("base64,")[1] : slideObj.image;
+                slide.addImage({ 
+                    data: imgData, x: 5.8, y: 1.3, w: 3.8, h: 3.8, 
+                    sizing: { type: 'contain' },
+                    shadow: { type: 'outer', blur: 12, color: '000000', opacity: 0.25 }
+                });
+
+                // ক্যানভাস ড্রয়িং overlay
+                if (slideObj.canvasDrawing && slideObj.canvasDrawing.startsWith("data:")) {
+                    slide.addImage({
+                        data: slideObj.canvasDrawing.split(',')[1],
+                        x: 5.8, y: 1.3, w: 3.8, h: 3.8,
+                        sizing: { type: 'contain' }
+                    });
+                }
+            } catch(e) {}
+        } 
+        
+        // কেস ৩: স্ট্যান্ডার্ড সিঙ্গেল কলাম
+        else {
+            let bY = 1.4;
+            bullets.forEach(txt => {
+                slide.addText(clean(txt), {
+                    x: 0.8, y: bY, w: 8.5, fontSize: 19, color: textCol, 
+                    bullet: { type: 'bullet', color: UI_COLORS.primary }, lineSpacing: 32, fontFace: 'Arial'
+                });
+                bY += 1.0;
+            });
+        }
+
+        // ৪. শিক্ষক নোট ব্যাজ (ফুটার এর ঠিক ওপরে)
+        if (slideObj.notes) {
+            slide.addShape(pptx.ShapeType.roundRect, { 
+                x: 0.5, y: 6.7, w: 9.0, h: 0.45, rectRadius: 0.05, 
+                fill: '00000020' 
+            });
+            slide.addText(`💡 শিক্ষক গাইড: ${clean(slideObj.notes)}`, {
+                x: 0.7, y: 6.7, w: 8.6, h: 0.45, fontSize: 10, italic: true, color: '64748B', valign: 'middle', fontFace: 'Arial'
+            });
+        }
+      }
+
+      // ৫. ফুটার ও ব্র্যান্ডিং (সব স্লাইডে থাকবে)
+      slide.addText(`স্লাইড ${index + 1}  |  সশিবা স্মার্ট শিক্ষা পোর্টাল  |  ${new Date().toLocaleDateString('bn-BD')}`, {
+        x: 0.5, y: 7.25, w: 9, fontSize: 9, color: '94A3B8', align: 'left'
+      });
     });
+
+    // ৬. ফাইল জেনারেশন
+    const fileName = `Sashiba_Expert_Slide_${Date.now()}.pptx`;
+    await pptx.writeFile({ fileName: fileName });
+    console.log("PPTX successfully matched with Dashboard UI.");
+
+  } catch (err) {
+    console.error("Critical Export Error:", err);
+    alert("পাওয়ারপয়েন্ট জেনারেট করা যাচ্ছে না। আপনার স্লাইডের তথ্যে বা ছবিতে কোনো বড় ত্রুটি থাকতে পারে।");
+  }
+}
+
+
+
+// =================== অটো প্লে লজিক ===================
+let wbAutoplayInterval = null;
+let wbAutoplayTime = 5000; // default 5s
+let wbIsAutoplayActive = false;
+
+function toggleAutoplay() {
+  const btn = document.getElementById("btnAutoplay");
+  if (!btn) return;
+  
+  if (wbIsAutoplayActive) {
+    stopAutoplay();
+  } else {
+    startAutoplay();
+  }
+}
+
+function startAutoplay() {
+  wbIsAutoplayActive = true;
+  const btn = document.getElementById("btnAutoplay");
+  if (btn) {
+    btn.innerHTML = `<i class="fa-solid fa-pause"></i> থামুন`;
+    btn.style.background = "#be123c"; // Red background for Pause
+    btn.style.borderColor = "#9f1239";
+  }
+  
+  const intervalSelect = document.getElementById("autoplayInterval");
+  if (intervalSelect) {
+    wbAutoplayTime = parseInt(intervalSelect.value) || 5000;
+  }
+  
+  if (wbAutoplayInterval) clearInterval(wbAutoplayInterval);
+  wbAutoplayInterval = setInterval(() => {
+    if (activeSlideIndex < slides.length - 1) {
+      nextSlide();
+    } else {
+      // Loop back to start
+      activeSlideIndex = 0;
+      renderPresenterSlide();
+    }
+  }, wbAutoplayTime);
+}
+
+function stopAutoplay() {
+  wbIsAutoplayActive = false;
+  const btn = document.getElementById("btnAutoplay");
+  if (btn) {
+    btn.innerHTML = `<i class="fa-solid fa-play"></i> অটো প্লে`;
+    btn.style.background = "#0f766e"; // Teal background for Play
+    btn.style.borderColor = "#115e59";
+  }
+  if (wbAutoplayInterval) {
+    clearInterval(wbAutoplayInterval);
+    wbAutoplayInterval = null;
+  }
+}
+
+function updateAutoplayInterval() {
+  if (wbIsAutoplayActive) {
+    startAutoplay();
+  }
+}
+
+function toggleEditorPanel() {
+  const studio = document.querySelector(".studio-layout");
+  const icon = document.getElementById("editorToggleIcon");
+  if (studio) {
+    const isCollapsed = studio.classList.toggle("editor-collapsed");
+    if (icon) {
+      if (isCollapsed) {
+        icon.className = "fa-solid fa-chevron-left";
+      } else {
+        icon.className = "fa-solid fa-chevron-right";
+      }
+    }
+  }
 }
