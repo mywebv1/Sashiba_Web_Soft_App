@@ -1260,10 +1260,15 @@ function renderActiveCanvas() {
 
   if (navInfo) navInfo.innerText = `${currentLang === "bn" ? "স্লাইড" : "Slide"} ${activeSlideIndex + 1} ${currentLang === "bn" ? "এর" : "of"} ${slides.length}`;
 
+  // Get animations from slide object
+  const titleAnimClass = slide.titleAnimation && slide.titleAnimation !== "none" ? `anim-${slide.titleAnimation}` : "";
+  const contentAnimClass = slide.contentAnimation && slide.contentAnimation !== "none" ? `anim-${slide.contentAnimation}` : "";
+  const imgAnimClass = slide.imageAnimation && slide.imageAnimation !== "none" ? `anim-${slide.imageAnimation}` : "";
+
   const bulletsHtml = slide.bullets
     .map(
       (b, bIdx) => `
-      <div class="slide-bullet-item editable-element" contenteditable="true" onblur="onCanvasContentEdit(event, 'bullet', ${bIdx})">
+      <div class="slide-bullet-item editable-element ${contentAnimClass}" contenteditable="true" onblur="onCanvasContentEdit(event, 'bullet', ${bIdx})">
         <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.7;"></i> 
         <span>${b}</span>
       </div>`
@@ -1277,21 +1282,29 @@ function renderActiveCanvas() {
   let visualComponentHtml = "";
   const selectedVisuals = Array.from(document.querySelectorAll(".vis-check:checked")).map((cb) => cb.value);
 
-  if (slide.type === "Quiz" || slide.layout === "quiz") {
+  // Custom Image Rendering or Default Visual Components
+  if (slide.image && slide.showImage !== false) {
     visualComponentHtml = `
-      <div class="quiz-options-grid">
-        <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>ক)</span> প্রথম বিকল্প</div>
-        <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>খ)</span> দ্বিতীয় উত্তর (সঠিক)</div>
-        <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>গ)</span> তৃতীয় বিকল্প</div>
-        <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>ঘ)</span> চতুর্থ বিকল্প</div>
+      <div class="visual-component-box slide-image-container ${imgAnimClass}" style="text-align: center;">
+        <img src="${slide.image}" class="slide-image-el" style="max-width: 100%; max-height: 230px; border-radius: 8px; box-shadow: var(--shadow-md); object-fit: contain; display: inline-block;" alt="Slide Image">
       </div>
     `;
-  } else if (slide.type === "Table" && selectedVisuals.includes("table")) {
-    const vGoodRolls = document.getElementById("roll-vgood")?.value || "১, ২, ৩";
-    const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
-    const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
-    visualComponentHtml = `
-      <div class="visual-component-box">
+  } else {
+    let visualInner = "";
+    if (slide.type === "Quiz" || slide.layout === "quiz") {
+      visualInner = `
+        <div class="quiz-options-grid">
+          <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>ক)</span> প্রথম বিকল্প</div>
+          <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>খ)</span> দ্বিতীয় উত্তর (সঠিক)</div>
+          <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>গ)</span> তৃতীয় বিকল্প</div>
+          <div class="quiz-opt-card" onclick="toggleQuizAnswer(this)"><span>ঘ)</span> চতুর্থ বিকল্প</div>
+        </div>
+      `;
+    } else if (slide.type === "Table" && selectedVisuals.includes("table")) {
+      const vGoodRolls = document.getElementById("roll-vgood")?.value || "১, ২, ৩";
+      const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
+      const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
+      visualInner = `
         <strong style="font-size:12.5px; display:block; margin-bottom:6px;"><i class="fa-solid fa-users-gear"></i> স্মার্ট শিক্ষার্থী গ্রুপিং:</strong>
         <table class="slide-data-table">
           <thead>
@@ -1303,11 +1316,9 @@ function renderActiveCanvas() {
             <tr style="border-left: 4px solid #ef4444;"><td><strong>গ্রুপ সি (বিশেষ যত্ন)</strong></td><td>${lowRolls}</td><td>শিক্ষকের সহায়তায় বেসিক পুনরাবৃত্তি</td></tr>
           </tbody>
         </table>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("chart")) {
-    visualComponentHtml = `
-      <div class="visual-component-box">
+      `;
+    } else if (selectedVisuals.includes("chart")) {
+      visualInner = `
         <strong style="font-size:12px; display:block; margin-bottom:4px;"><i class="fa-solid fa-chart-simple"></i> তথ্য চিত্র ও প্রজেক্ট অগ্রগতি:</strong>
         <div class="chart-bars-wrap">
           <div class="chart-bar-fill" style="height: 35%;"></div><span class="chart-bar-label">পরিকল্পনা (৩৫%)</span>
@@ -1315,11 +1326,9 @@ function renderActiveCanvas() {
           <div class="chart-bar-fill" style="height: 90%;"></div><span class="chart-bar-label">বিশ্লেষণ (৯০%)</span>
           <div class="chart-bar-fill" style="height: 50%;"></div><span class="chart-bar-label">উপস্থাপন (৫০%)</span>
         </div>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("table")) {
-    visualComponentHtml = `
-      <div class="visual-component-box">
+      `;
+    } else if (selectedVisuals.includes("table")) {
+      visualInner = `
         <strong style="font-size:12px; display:block; margin-bottom:4px;"><i class="fa-solid fa-table"></i> বিষয় সারণি:</strong>
         <table class="slide-data-table">
           <thead>
@@ -1330,32 +1339,26 @@ function renderActiveCanvas() {
             <tr><td>২য় পর্ব</td><td>দলগত কাজ ও উপস্থাপনা</td><td>২০ মিনিট</td></tr>
           </tbody>
         </table>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("info")) {
-    visualComponentHtml = `
-      <div class="visual-component-box">
+      `;
+    } else if (selectedVisuals.includes("info")) {
+      visualInner = `
         <strong style="font-size:12px; display:block; margin-bottom:8px;"><i class="fa-solid fa-lightbulb"></i> শিখন ধাপসমূহ:</strong>
         <div class="infographic-steps-wrap">
           <div class="info-step-card"><div class="step-num">১</div><div class="step-txt">ধারণা গ্রহণ</div></div>
           <div class="info-step-card"><div class="step-num">২</div><div class="step-txt">শ্রেণি অনুশীলন</div></div>
           <div class="info-step-card"><div class="step-num">৩</div><div class="step-txt">মূল্যায়ন ও কুইজ</div></div>
         </div>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("vid")) {
-    visualComponentHtml = `
-      <div class="visual-component-box mock-video-container">
+      `;
+    } else if (selectedVisuals.includes("vid")) {
+      visualInner = `
         <div class="mock-video-player">
           <i class="fa-solid fa-play play-icon"></i>
           <span class="video-duration">03:45</span>
         </div>
         <span class="video-title"><i class="fa-solid fa-video"></i> ${slide.title} সম্পর্কিত মাল্টিমিডিয়া কন্টেন্ট</span>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("img") || selectedVisuals.includes("geo")) {
-    visualComponentHtml = `
-      <div class="visual-component-box">
+      `;
+    } else if (selectedVisuals.includes("img") || selectedVisuals.includes("geo")) {
+      visualInner = `
         <div class="diagram-graphic-box">
           <div class="diagram-node">সংজ্ঞা ও সূচনা</div>
           <i class="fa-solid fa-arrow-right"></i>
@@ -1363,8 +1366,16 @@ function renderActiveCanvas() {
           <i class="fa-solid fa-arrow-right"></i>
           <div class="diagram-node" style="background:#f59e0b;">সিদ্ধান্ত গ্রহণ</div>
         </div>
-      </div>
-    `;
+      `;
+    }
+
+    if (visualInner) {
+      visualComponentHtml = `
+        <div class="visual-component-box ${imgAnimClass}">
+          ${visualInner}
+        </div>
+      `;
+    }
   }
 
   inner.className = `slide-inner-content`;
@@ -1386,7 +1397,7 @@ function renderActiveCanvas() {
       <div class="slide-body-grid layout-card">
         <div class="card-layout-wrapper">
           ${slide.bullets.map((b, bIdx) => `
-            <div class="slide-bullet-card editable-element" contenteditable="true" onblur="onCanvasContentEdit(event, 'bullet', ${bIdx})">
+            <div class="slide-bullet-card editable-element ${contentAnimClass}" contenteditable="true" onblur="onCanvasContentEdit(event, 'bullet', ${bIdx})">
               <i class="fa-solid ${slide.icon || 'fa-star'}" style="color:var(--primary); font-size:16px;"></i>
               <div class="bullet-card-text">${b}</div>
             </div>
@@ -1424,11 +1435,12 @@ function renderActiveCanvas() {
       <span class="slide-tag">${getSlideTypeName(slide.type)}</span>
       <i class="fa-solid ${slide.icon || "fa-graduation-cap"} slide-icon-lg"></i>
     </div>
-    <h2 class="slide-main-title editable-element" contenteditable="true" onblur="onCanvasContentEdit(event, 'title')">${slide.title}</h2>
+    <h2 class="slide-main-title editable-element ${titleAnimClass}" contenteditable="true" onblur="onCanvasContentEdit(event, 'title')">${slide.title}</h2>
     ${bodyContentHtml}
     ${teacherNotesHtml}
   `;
 }
+
 
 function toggleQuizAnswer(el) {
   el.classList.toggle("selected-answer");
@@ -1463,6 +1475,28 @@ function syncEditorForm() {
   if (document.getElementById("editTeacherNotes")) document.getElementById("editTeacherNotes").value = slide.notes || "";
   if (document.getElementById("editSlideIcon")) document.getElementById("editSlideIcon").value = slide.icon || "fa-graduation-cap";
   if (document.getElementById("editSlideBg")) document.getElementById("editSlideBg").value = slide.bg || "default";
+
+  // sync animations
+  if (document.getElementById("editTitleAnim")) document.getElementById("editTitleAnim").value = slide.titleAnimation || "none";
+  if (document.getElementById("editContentAnim")) document.getElementById("editContentAnim").value = slide.contentAnimation || "none";
+  if (document.getElementById("editImageAnim")) document.getElementById("editImageAnim").value = slide.imageAnimation || "none";
+
+  // sync image
+  if (document.getElementById("editShowImage")) document.getElementById("editShowImage").checked = slide.showImage !== false;
+  if (document.getElementById("editImageUrl")) document.getElementById("editImageUrl").value = (slide.image && !slide.image.startsWith("data:")) ? slide.image : "";
+  if (document.getElementById("editPresetImage")) document.getElementById("editPresetImage").value = "";
+
+  const previewArea = document.getElementById("imagePreviewArea");
+  const previewImg = document.getElementById("editImagePreview");
+  if (previewArea && previewImg) {
+    if (slide.image) {
+      previewImg.src = slide.image;
+      previewArea.style.display = "block";
+    } else {
+      previewImg.src = "";
+      previewArea.style.display = "none";
+    }
+  }
 }
 
 function updateActiveSlideFromEditor() {
@@ -1477,6 +1511,12 @@ function updateActiveSlideFromEditor() {
   const iconVal = document.getElementById("editSlideIcon")?.value;
   const bgVal = document.getElementById("editSlideBg")?.value;
 
+  const titleAnimVal = document.getElementById("editTitleAnim")?.value || "none";
+  const contentAnimVal = document.getElementById("editContentAnim")?.value || "none";
+  const imageAnimVal = document.getElementById("editImageAnim")?.value || "none";
+  const showImageVal = document.getElementById("editShowImage")?.checked ?? false;
+  const imageUrlVal = document.getElementById("editImageUrl")?.value || "";
+
   slide.title = titleVal || "শিরোনামহীন স্লাইড";
   slide.type = typeVal || "Content";
   slide.layout = layoutVal || "single";
@@ -1484,11 +1524,103 @@ function updateActiveSlideFromEditor() {
   slide.notes = notesVal || "";
   slide.icon = iconVal || "fa-graduation-cap";
   slide.bg = bgVal || "default";
+
+  slide.titleAnimation = titleAnimVal;
+  slide.contentAnimation = contentAnimVal;
+  slide.imageAnimation = imageAnimVal;
+  slide.showImage = showImageVal;
+  if (imageUrlVal) {
+    slide.image = imageUrlVal;
+  }
   slide.isCustomized = true;
 
   renderThumbnails();
   renderActiveCanvas();
 }
+
+// ছবি আপলোড ও প্রিসেট হ্যান্ডলারসমূহ এবং অ্যানিমেশন প্রিভিউ ফাংশন
+function handleImageUpload(event) {
+  if (slides.length === 0) return;
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const slide = slides[activeSlideIndex];
+    slide.image = e.target.result;
+    slide.showImage = true;
+    slide.isCustomized = true;
+
+    // Update preview
+    const previewArea = document.getElementById("imagePreviewArea");
+    const previewImg = document.getElementById("editImagePreview");
+    if (previewArea && previewImg) {
+      previewImg.src = e.target.result;
+      previewArea.style.display = "block";
+    }
+    const showImageCheckbox = document.getElementById("editShowImage");
+    if (showImageCheckbox) showImageCheckbox.checked = true;
+
+    // Clear URL input
+    const urlInput = document.getElementById("editImageUrl");
+    if (urlInput) urlInput.value = "";
+
+    updateActiveSlideFromEditor();
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyPresetImage() {
+  if (slides.length === 0) return;
+  const presetSel = document.getElementById("editPresetImage");
+  if (!presetSel) return;
+  const val = presetSel.value;
+  if (!val) return;
+
+  const slide = slides[activeSlideIndex];
+  slide.image = val;
+  slide.showImage = true;
+  slide.isCustomized = true;
+
+  // Clear file input
+  const fileInput = document.getElementById("editImageFile");
+  if (fileInput) fileInput.value = "";
+
+  // Update URL input
+  const urlInput = document.getElementById("editImageUrl");
+  if (urlInput) urlInput.value = val;
+
+  // Update checkbox
+  const showImageCheckbox = document.getElementById("editShowImage");
+  if (showImageCheckbox) showImageCheckbox.checked = true;
+
+  updateActiveSlideFromEditor();
+}
+
+function removeSlideImage() {
+  if (slides.length === 0) return;
+  const slide = slides[activeSlideIndex];
+  delete slide.image;
+  slide.showImage = false;
+  slide.isCustomized = true;
+
+  // Clear inputs
+  const fileInput = document.getElementById("editImageFile");
+  if (fileInput) fileInput.value = "";
+  const urlInput = document.getElementById("editImageUrl");
+  if (urlInput) urlInput.value = "";
+  const presetSel = document.getElementById("editPresetImage");
+  if (presetSel) presetSel.value = "";
+  const showImageCheckbox = document.getElementById("editShowImage");
+  if (showImageCheckbox) showImageCheckbox.checked = false;
+
+  updateActiveSlideFromEditor();
+}
+
+function replayCanvasAnimations() {
+  renderActiveCanvas();
+}
+
 
 // [৭] স্লাইড যোগ, ডুপ্লিকেট, ডিলিট ও রি-অর্ডার
 function addNewSlide() {
@@ -1613,28 +1745,41 @@ function renderPresenterSlide() {
 
   if (counter) counter.innerText = `${currentLang === "bn" ? "স্লাইড" : "Slide"} ${activeSlideIndex + 1} / ${slides.length}`;
 
+  // Get animations from slide object
+  const titleAnimClass = slide.titleAnimation && slide.titleAnimation !== "none" ? `anim-${slide.titleAnimation}` : "";
+  const contentAnimClass = slide.contentAnimation && slide.contentAnimation !== "none" ? `anim-${slide.contentAnimation}` : "";
+  const imgAnimClass = slide.imageAnimation && slide.imageAnimation !== "none" ? `anim-${slide.imageAnimation}` : "";
+
   const bulletsHtml = slide.bullets
-    .map((b) => `<div class="slide-bullet-item" style="font-size: 20px; padding: 10px 16px;"><i class="fa-solid fa-chevron-right" style="font-size: 14px; opacity:0.8;"></i> <span>${b}</span></div>`)
+    .map((b) => `<div class="slide-bullet-item ${contentAnimClass}" style="font-size: 20px; padding: 10px 16px;"><i class="fa-solid fa-chevron-right" style="font-size: 14px; opacity:0.8;"></i> <span>${b}</span></div>`)
     .join("");
 
   let visualComponentHtml = "";
   const selectedVisuals = Array.from(document.querySelectorAll(".vis-check:checked")).map((cb) => cb.value);
 
-  if (slide.type === "Quiz" || slide.layout === "quiz") {
+  // Custom Image Rendering or Default Visual Components
+  if (slide.image && slide.showImage !== false) {
     visualComponentHtml = `
-      <div class="quiz-options-grid" style="margin-top: 20px;">
-        <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>ক)</span> প্রথম বিকল্প</div>
-        <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>খ)</span> দ্বিতীয় উত্তর (সঠিক)</div>
-        <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>গ)</span> তৃতীয় বিকল্প</div>
-        <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>ঘ)</span> চতুর্থ বিকল্প</div>
+      <div class="visual-component-box slide-image-container ${imgAnimClass}" style="padding: 20px; margin-top: 15px; text-align: center;">
+        <img src="${slide.image}" class="slide-image-el" style="max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: var(--shadow-md); object-fit: contain;" alt="Slide Image">
       </div>
     `;
-  } else if (slide.type === "Table" && selectedVisuals.includes("table")) {
-    const vGoodRolls = document.getElementById("roll-vgood")?.value || "১, ২, ৩";
-    const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
-    const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
+  } else {
+    let visualInner = "";
+    if (slide.type === "Quiz" || slide.layout === "quiz") {
+      visualInner = `
+        <div class="quiz-options-grid" style="margin-top: 20px;">
+          <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>ক)</span> প্রথম বিকল্প</div>
+          <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>খ)</span> দ্বিতীয় উত্তর (সঠিক)</div>
+          <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>গ)</span> তৃতীয় বিকল্প</div>
+          <div class="quiz-opt-card" style="font-size: 18px; padding: 15px 20px;" onclick="toggleQuizAnswer(this)"><span>ঘ)</span> চতুর্থ বিকল্প</div>
+        </div>
+      `;
+    } else if (slide.type === "Table" && selectedVisuals.includes("table")) {
+      const vGoodRolls = document.getElementById("roll-vgood")?.value || "১, ২, ৩";
+      const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
+      const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
+      visualInner = `
         <strong style="font-size:15px; display:block; margin-bottom:10px;"><i class="fa-solid fa-users-gear"></i> স্মার্ট শিক্ষার্থী গ্রুপিং:</strong>
         <table class="slide-data-table" style="font-size: 15px;">
           <thead>
@@ -1646,11 +1791,9 @@ function renderPresenterSlide() {
             <tr style="border-left: 4px solid #ef4444;"><td><strong>গ্রুপ সি (বিশেষ যত্ন)</strong></td><td>${lowRolls}</td><td>শিক্ষকের সহায়তায় বেসিক পুনরাবৃত্তি</td></tr>
           </tbody>
         </table>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("chart")) {
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("chart")) {
+      visualInner = `
         <strong style="font-size:14px; display:block; margin-bottom:10px;"><i class="fa-solid fa-chart-simple"></i> তথ্য চিত্র ও প্রজেক্ট অগ্রগতি:</strong>
         <div class="chart-bars-wrap" style="height: 140px;">
           <div class="chart-bar-col"><div class="chart-bar-fill" style="height: 35%;"></div><span class="chart-bar-label" style="font-size:12px;">পরিকল্পনা (৩৫%)</span></div>
@@ -1658,11 +1801,9 @@ function renderPresenterSlide() {
           <div class="chart-bar-col"><div class="chart-bar-fill" style="height: 90%;"></div><span class="chart-bar-label" style="font-size:12px;">বিশ্লেষণ (৯০%)</span></div>
           <div class="chart-bar-col"><div class="chart-bar-fill" style="height: 50%;"></div><span class="chart-bar-label" style="font-size:12px;">উপস্থাপন (৫০%)</span></div>
         </div>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("table")) {
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("table")) {
+      visualInner = `
         <strong style="font-size:14px; display:block; margin-bottom:8px;"><i class="fa-solid fa-table"></i> বিষয় সারণি:</strong>
         <table class="slide-data-table" style="font-size: 15px;">
           <thead>
@@ -1673,32 +1814,26 @@ function renderPresenterSlide() {
             <tr><td>২য় পর্ব</td><td>দলগত কাজ ও উপস্থাপনা</td><td>২০ মিনিট</td></tr>
           </tbody>
         </table>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("info")) {
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("info")) {
+      visualInner = `
         <strong style="font-size:14px; display:block; margin-bottom:12px;"><i class="fa-solid fa-lightbulb"></i> শিখন ধাপসমূহ:</strong>
         <div class="infographic-steps-wrap">
           <div class="info-step-card" style="padding: 15px;"><div class="step-num" style="width:28px; height:28px; font-size:14px;">১</div><div class="step-txt" style="font-size:13px; margin-top:5px;">ধারণা গ্রহণ</div></div>
           <div class="info-step-card" style="padding: 15px;"><div class="step-num" style="width:28px; height:28px; font-size:14px;">২</div><div class="step-txt" style="font-size:13px; margin-top:5px;">শ্রেণি অনুশীলন</div></div>
           <div class="info-step-card" style="padding: 15px;"><div class="step-num" style="width:28px; height:28px; font-size:14px;">৩</div><div class="step-txt" style="font-size:13px; margin-top:5px;">মূল্যায়ন ও কুইজ</div></div>
         </div>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("vid")) {
-    visualComponentHtml = `
-      <div class="visual-component-box mock-video-container" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("vid")) {
+      visualInner = `
         <div class="mock-video-player" style="height: 150px;">
           <i class="fa-solid fa-play play-icon" style="font-size: 42px;"></i>
           <span class="video-duration" style="font-size:12px;">03:45</span>
         </div>
         <span class="video-title" style="font-size: 13px; margin-top: 8px;"><i class="fa-solid fa-video"></i> ${slide.title} সম্পর্কিত মাল্টিমিডিয়া কন্টেন্ট</span>
-      </div>
-    `;
-  } else if (selectedVisuals.includes("img") || selectedVisuals.includes("geo")) {
-    visualComponentHtml = `
-      <div class="visual-component-box" style="padding: 20px; margin-top: 15px;">
+      `;
+    } else if (selectedVisuals.includes("img") || selectedVisuals.includes("geo")) {
+      visualInner = `
         <div class="diagram-graphic-box" style="padding: 20px; gap: 20px;">
           <div class="diagram-node" style="font-size: 16px; padding: 12px 24px;">সংজ্ঞা ও সূচনা</div>
           <i class="fa-solid fa-arrow-right" style="font-size:18px;"></i>
@@ -1706,8 +1841,16 @@ function renderPresenterSlide() {
           <i class="fa-solid fa-arrow-right" style="font-size:18px;"></i>
           <div class="diagram-node" style="background:#f59e0b; font-size: 16px; padding: 12px 24px;">সিদ্ধান্ত গ্রহণ</div>
         </div>
-      </div>
-    `;
+      `;
+    }
+
+    if (visualInner) {
+      visualComponentHtml = `
+        <div class="visual-component-box ${imgAnimClass}">
+          ${visualInner}
+        </div>
+      `;
+    }
   }
 
   let bodyContentHtml = "";
@@ -1727,7 +1870,7 @@ function renderPresenterSlide() {
       <div class="slide-body-grid layout-card">
         <div class="card-layout-wrapper" style="gap: 15px;">
           ${slide.bullets.map((b) => `
-            <div class="slide-bullet-card" style="padding: 16px 20px; border-radius: 12px;">
+            <div class="slide-bullet-card ${contentAnimClass}" style="padding: 16px 20px; border-radius: 12px;">
               <i class="fa-solid ${slide.icon || 'fa-star'}" style="color:var(--primary); font-size:18px; margin-top: 4px;"></i>
               <div class="bullet-card-text" style="font-size:16px;">${b}</div>
             </div>
@@ -1766,10 +1909,11 @@ function renderPresenterSlide() {
       <span class="slide-tag" style="font-size: 14px; padding: 6px 18px;">${getSlideTypeName(slide.type)}</span>
       <i class="fa-solid ${slide.icon || "fa-graduation-cap"}" style="font-size: 42px;"></i>
     </div>
-    <h1 style="font-size: 36px; font-weight: 700; margin: 15px 0 25px 0;">${slide.title}</h1>
+    <h1 class="${titleAnimClass}" style="font-size: 36px; font-weight: 700; margin: 15px 0 25px 0;">${slide.title}</h1>
     ${bodyContentHtml}
   `;
 }
+
 
 function startTimer() {
   if (presenterTimer) clearInterval(presenterTimer);

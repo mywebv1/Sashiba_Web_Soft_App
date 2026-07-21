@@ -560,6 +560,10 @@
                   <i class="fa-solid fa-arrow-down"></i>
                   <span id="lbl-btn-down">নিচে</span>
                 </button>
+                <button class="btn-tool" onclick="replayCanvasAnimations()" title="অ্যানিমেশন প্রিভিউ দেখুন" style="color: var(--primary);">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  <span>অ্যানিমেশন প্রিভিউ</span>
+                </button>
               </div>
               <div
                 class="toolbar-right"
@@ -750,6 +754,85 @@
                       <option value="bg-nordic">❄️ নর্ডিক ফ্রস্ট</option>
                       <option value="bg-matte">🖤 ম্যাট চারকোল</option>
                     </select>
+                  </div>
+                </div>
+
+                <!-- অ্যানিমেশন সেটিংস -->
+                <div class="editor-title" style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  <span>অ্যানিমেশন সেটআপ</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                  <div class="editor-field">
+                    <label style="font-size: 11px;">শিরোনাম:</label>
+                    <select id="editTitleAnim" class="form-select" onchange="updateActiveSlideFromEditor()">
+                      <option value="none">নেই (None)</option>
+                      <option value="fade-in">ফেড ইন (Fade In)</option>
+                      <option value="slide-up">স্লাইড আপ (Slide Up)</option>
+                      <option value="slide-left">বাম থেকে ডান</option>
+                      <option value="zoom-in">জুম ইন (Zoom In)</option>
+                      <option value="bounce">বাউন্স (Bounce)</option>
+                    </select>
+                  </div>
+                  <div class="editor-field">
+                    <label style="font-size: 11px;">পয়েন্ট/বক্স:</label>
+                    <select id="editContentAnim" class="form-select" onchange="updateActiveSlideFromEditor()">
+                      <option value="none">নেই (None)</option>
+                      <option value="fade-in">ফেড ইন (Fade In)</option>
+                      <option value="slide-up">স্লাইড আপ (Slide Up)</option>
+                      <option value="slide-left">বাম থেকে ডান</option>
+                      <option value="zoom-in">জুম ইন (Zoom In)</option>
+                      <option value="bounce">বাউন্স (Bounce)</option>
+                    </select>
+                  </div>
+                  <div class="editor-field">
+                    <label style="font-size: 11px;">ছবি/ভিজ্যুয়াল:</label>
+                    <select id="editImageAnim" class="form-select" onchange="updateActiveSlideFromEditor()">
+                      <option value="none">নেই (None)</option>
+                      <option value="fade-in">ফেড ইন (Fade In)</option>
+                      <option value="slide-up">স্লাইড আপ (Slide Up)</option>
+                      <option value="slide-left">বাম থেকে ডান</option>
+                      <option value="zoom-in">জুম ইন (Zoom In)</option>
+                      <option value="bounce">বাউন্স (Bounce)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- স্লাইড ইমেজ সেটিংস -->
+                <div class="editor-title" style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+                  <i class="fa-solid fa-image"></i>
+                  <span>স্লাইড ছবি (Custom Image)</span>
+                </div>
+                <div class="editor-field" style="margin-bottom: 8px;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="editShowImage" onchange="updateActiveSlideFromEditor()" style="width: 15px; height: 15px; cursor: pointer;">
+                    <span style="font-weight: 500;">স্লাইডে ছবি প্রদর্শন করুন</span>
+                  </label>
+                </div>
+                <div class="editor-field">
+                  <label>কম্পিউটার থেকে ছবি আপলোড করুন:</label>
+                  <input type="file" id="editImageFile" class="form-input" accept="image/*" onchange="handleImageUpload(event)" style="padding: 4px;" />
+                </div>
+                <div class="editor-field">
+                  <label>অথবা ছবির ইউআরএল (URL) দিন:</label>
+                  <input type="text" id="editImageUrl" class="form-input" placeholder="https://example.com/image.jpg" oninput="updateActiveSlideFromEditor()" />
+                </div>
+                <div class="editor-field">
+                  <label>অথবা ডেমো ছবি নির্বাচন করুন:</label>
+                  <select id="editPresetImage" class="form-select" onchange="applyPresetImage()">
+                    <option value="">-- ডেমো ছবি নির্বাচন করুন --</option>
+                    <option value="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=600&auto=format&fit=crop">🏫 বিদ্যালয় / ক্লাসরুম</option>
+                    <option value="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop">⚛️ বিজ্ঞান ও মহাকাশ</option>
+                    <option value="https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=600&auto=format&fit=crop">🧮 গণিত ও ক্যালকুলেশন</option>
+                    <option value="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=600&auto=format&fit=crop">📖 বাংলা ও সাহিত্য পাঠ</option>
+                    <option value="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=600&auto=format&fit=crop">💻 আইসিটি ও কোডিং</option>
+                    <option value="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600&auto=format&fit=crop">📚 সাধারণ জ্ঞান ও বই</option>
+                  </select>
+                </div>
+                <div id="imagePreviewArea" style="margin-top: 10px; display: none; text-align: center; border: 1px dashed var(--border); padding: 8px; border-radius: 8px; background: #fafafa;">
+                  <img id="editImagePreview" src="" style="max-height: 100px; max-width: 100%; border-radius: 4px; object-fit: contain;" />
+                  <div style="margin-top: 6px;">
+                    <button class="btn btn-outline" style="padding: 2px 8px; font-size: 11px; color: var(--danger); border-color: var(--danger);" onclick="removeSlideImage()">ছবি মুছে ফেলুন</button>
                   </div>
                 </div>
               </div>
