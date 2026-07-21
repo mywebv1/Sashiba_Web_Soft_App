@@ -1002,17 +1002,25 @@ function renderReportCard(id) {
   const clsName = s.className || settings.className;
   const secName = s.section || settings.section;
   const subjs=settings.subjects;
+
   const marksRows=subjs.map(sub=>{
     const sc=s.scores?.[sub]??0;
     const g=getGrade(sc);
-    return `<tr><td>${sub}</td><td style="text-align:center">১০০</td><td style="text-align:center;font-weight:700;">${sc}</td><td style="text-align:center">${sc}%</td><td style="text-align:center"><span class="grade-badge ${g.cls}">${g.grade}</span></td><td>${sc>=80?'চমৎকার':sc>=60?'ভালো':sc>=40?'গড়মানের':'উন্নতি দরকার'}</td></tr>`;
+    return `
+      <tr>
+        <td class="col-subject">${sub}</td>
+        <td class="col-total">100</td>
+        <td class="col-obtained">${sc}</td>
+        <td class="col-pct">${sc}%</td>
+        <td class="col-grade"><span class="grade-badge ${g.cls}">${g.grade}</span></td>
+        <td class="col-remark">${sc>=80?'চমৎকার':sc>=60?'ভালো':sc>=40?'গড়মানের':'উন্নতি দরকার'}</td>
+      </tr>`;
   }).join('');
-  const progressBars=subjs.map(sub=>{const sc=s.scores?.[sub]||0;return `<div class="prog-row"><div class="prog-label">${sub}</div><div class="prog-track"><div class="prog-fill" style="width:${sc}%"></div></div><div class="prog-val">${sc}</div></div>`;}).join('');
+
   preview.innerHTML=`
     <div class="report-card-container">
       <div class="report-card" id="printable-report">
         <div class="report-card-header">
-          <div style="font-size:34px;margin-bottom:8px;">🏫</div>
           <div class="report-school-name">${settings.school}</div>
           <div class="report-school-sub">শ্রেণি: ${clsName} | শাখা: ${secName} | শিক্ষাবর্ষ: ${settings.year}</div>
           <div class="report-card-title">একাডেমিক মূল্যায়ন রিপোর্ট কার্ড</div>
@@ -1026,7 +1034,19 @@ function renderReportCard(id) {
           <div class="report-info-row"><span class="info-label">অবস্থান</span><span class="info-value" style="color:#4f46e5;font-weight:800;">${posText}</span></div>
         </div>
         <div class="report-marks-table">
-          <table><thead><tr><th>বিষয়</th><th>পূর্ণমান</th><th>প্রাপ্তমান</th><th>শতকরা</th><th>গ্রেড</th><th>মন্তব্য</th></tr></thead><tbody>${marksRows}</tbody></table>
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align:left">বিষয়</th>
+                <th>পূর্ণমান</th>
+                <th>প্রাপ্তমান</th>
+                <th>শতকরা</th>
+                <th>গ্রেড</th>
+                <th style="text-align:left">মন্তব্য</th>
+              </tr>
+            </thead>
+            <tbody>${marksRows}</tbody>
+          </table>
         </div>
         <div class="report-summary">
           <div class="summary-cell"><div class="summary-value">${total}/${maxTotal}</div><div class="summary-label">মোট নম্বর</div></div>
@@ -1034,7 +1054,24 @@ function renderReportCard(id) {
           <div class="summary-cell"><div class="summary-value">${grade.grade}</div><div class="summary-label">চূড়ান্ত গ্রেড</div></div>
           <div class="summary-cell"><div class="summary-value">${grade.gp}</div><div class="summary-label">গ্রেড পয়েন্ট</div></div>
         </div>
-        <div class="report-progress-bars"><h4>বিষয়ভিত্তিক পারফরম্যান্স</h4>${progressBars}</div>
+        <div class="report-progress-bars">
+          <h4>বিষয়ভিত্তিক পারফরম্যান্স গ্রাফ</h4>
+          <div class="modern-progress-grid">
+            ${subjs.map(sub=>{
+              const sc=s.scores?.[sub]||0;
+              return `
+                <div class="m-prog-card">
+                  <div class="m-prog-info">
+                    <span>${sub}</span>
+                    <strong>${sc}%</strong>
+                  </div>
+                  <div class="m-prog-track">
+                    <div class="m-prog-fill" style="width:${sc}%"></div>
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
         <div class="report-remarks"><h4>শিক্ষকের মন্তব্য</h4><p>${s.remarks||'উত্তম পারফরম্যান্স।'}</p></div>
         <div class="report-footer">
           <div class="signature-block"><div class="signature-line"></div><div class="signature-label">অভিভাবকের স্বাক্ষর</div></div>
