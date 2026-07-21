@@ -1012,27 +1012,37 @@ function renderReportCard(id) {
   const secName = s.section || settings.section;
   const subjs=settings.subjects;
 
+  const bestSub = subjs.reduce((max, sub) => (s.scores?.[sub]||0) > (s.scores?.[max]||0) ? sub : max, subjs[0]||'');
+  const weakSub = subjs.reduce((min, sub) => (s.scores?.[sub]||0) < (s.scores?.[min]||0) ? sub : min, subjs[0]||'');
+  const bestScore = s.scores?.[bestSub]||0;
+  const weakScore = s.scores?.[weakSub]||0;
+
   const marksRows=subjs.map(sub=>{
     const sc=s.scores?.[sub]??0;
     const g=getGrade(sc);
+    const rowClass = sc>=80 ? 'row-excellent' : sc<50 ? 'row-weak' : '';
     return `
-      <tr>
-        <td class="col-subject">${sub}</td>
+      <tr class="${rowClass}">
+        <td class="col-subject"><i class="fa-solid fa-book-open sub-icon"></i> ${sub}</td>
         <td class="col-total">100</td>
-        <td class="col-obtained">${sc}</td>
+        <td class="col-obtained"><strong>${sc}</strong></td>
         <td class="col-pct">${sc}%</td>
         <td class="col-grade"><span class="grade-badge ${g.cls}">${g.grade}</span></td>
-        <td class="col-remark">${sc>=80?'চমৎকার':sc>=60?'ভালো':sc>=40?'গড়মানের':'উন্নতি দরকার'}</td>
+        <td class="col-remark">
+          ${sc>=80?'<span class="tag-badge tag-high"><i class="fa-solid fa-award"></i> চমৎকার</span>':
+            sc>=60?'<span class="tag-badge tag-mid"><i class="fa-solid fa-check"></i> ভালো</span>':
+            sc>=40?'<span class="tag-badge tag-avg">গড়মানের</span>':
+            '<span class="tag-badge tag-low"><i class="fa-solid fa-triangle-exclamation"></i> উন্নতি দরকার</span>'}
+        </td>
       </tr>`;
   }).join('');
 
   preview.innerHTML=`
     <div class="report-card-container">
-      <div class="report-card" id="printable-report">
+      <div class="report-card dynamic-ultra-card" id="printable-report">
         
-        <!-- মেডেল ব্যাজসহ প্রিমিয়াম সেন্টার্ড হেডার -->
+        <!-- মেডেল ব্যাজসহ আল্ট্রা ডায়নামিক হেডার -->
         <div class="report-pro-header">
-           <!-- ডানে মেডেল ব্যাজ -->
            <div class="header-medal-container">
               <div class="medal-ribbon"></div>
               <div class="medal-circle">
@@ -1049,19 +1059,29 @@ function renderReportCard(id) {
                  <p class="school-location-v3">শ্রেণি: ${clsName} | শাখা: ${secName} | শিক্ষাবর্ষ: ${settings.year}</p>
               </div>
               <div class="report-main-title-centered">
-                 <strong>অ্যাকাডেমিক ট্রান্সক্রিপ্ট</strong>
+                 <strong>একাডেমিক মূল্যায়ন রিপোর্ট কার্ড</strong>
               </div>
            </div>
         </div>
 
-        <div class="report-student-info">
-          <div class="report-info-row"><span class="info-label">নাম</span><span class="info-value">${s.name}</span></div>
-          <div class="report-info-row"><span class="info-label">রোল</span><span class="info-value">${s.roll}</span></div>
-          <div class="report-info-row"><span class="info-label">শ্রেণি (শাখা)</span><span class="info-value">${clsName} (${secName})</span></div>
-          <div class="report-info-row"><span class="info-label">শিক্ষাবর্ষ</span><span class="info-value">${settings.year}</span></div>
-          <div class="report-info-row"><span class="info-label">অভিভাবক</span><span class="info-value">${s.parentName||'—'}</span></div>
-          <div class="report-info-row"><span class="info-label">অবস্থান</span><span class="info-value" style="color:#4f46e5;font-weight:800;">${posText}</span></div>
+        <!-- ডায়নামিক স্টুডেন্ট প্রোফাইল কার্ড -->
+        <div class="student-profile-strip">
+          <div class="student-avatar-box">
+             <span>${s.name.charAt(0)}</span>
+          </div>
+          <div class="student-meta-grid">
+             <div class="meta-item"><span class="meta-lbl">শিক্ষার্থীর নাম</span><strong class="meta-val">${s.name}</strong></div>
+             <div class="meta-item"><span class="meta-lbl">রোল নং</span><strong class="meta-val">#${s.roll}</strong></div>
+             <div class="meta-item"><span class="meta-lbl">শ্রেণি ও শাখা</span><strong class="meta-val">${clsName} (${secName})</strong></div>
+             <div class="meta-item"><span class="meta-lbl">অভিভাবক</span><strong class="meta-val">${s.parentName||'—'}</strong></div>
+          </div>
+          <div class="rank-badge-box">
+             <div class="rank-title">মেধা অবস্থান</div>
+             <div class="rank-number">${posText}</div>
+          </div>
         </div>
+
+        <!-- ডায়নামিক মার্কস টেবিল -->
         <div class="report-marks-table">
           <table>
             <thead>
@@ -1071,20 +1091,50 @@ function renderReportCard(id) {
                 <th>প্রাপ্তমান</th>
                 <th>শতকরা</th>
                 <th>গ্রেড</th>
-                <th style="text-align:left">মন্তব্য</th>
+                <th style="text-align:left">পারফরম্যান্স মন্তব্য</th>
               </tr>
             </thead>
             <tbody>${marksRows}</tbody>
           </table>
         </div>
-        <div class="report-summary">
-          <div class="summary-cell"><div class="summary-value">${total}/${maxTotal}</div><div class="summary-label">মোট নম্বর</div></div>
-          <div class="summary-cell"><div class="summary-value">${pct}%</div><div class="summary-label">গড় শতকরা</div></div>
-          <div class="summary-cell"><div class="summary-value">${grade.grade}</div><div class="summary-label">চূড়ান্ত গ্রেড</div></div>
-          <div class="summary-cell"><div class="summary-value">${grade.gp}</div><div class="summary-label">গ্রেড পয়েন্ট</div></div>
+
+        <!-- ডায়নামিক রেজাল্ট সামারি ও GPA মিটার -->
+        <div class="dynamic-summary-strip">
+           <div class="sum-box">
+              <span class="sum-lbl">মোট প্রাপ্ত নম্বর</span>
+              <div class="sum-val">${total} <small>/ ${maxTotal}</small></div>
+           </div>
+           <div class="sum-box">
+              <span class="sum-lbl">গড় সাফল্য</span>
+              <div class="sum-val">${pct}%</div>
+           </div>
+           <div class="sum-box highlight-gpa">
+              <span class="sum-lbl">চূড়ান্ত গ্রেড পয়েন্ট</span>
+              <div class="sum-val">${grade.grade} <small>(${grade.gp})</small></div>
+           </div>
         </div>
+
+        <!-- AI ডায়নামিক ইনসাইট হাইলাইটার -->
+        <div class="report-ai-insight-strip">
+           <div class="insight-card ins-best">
+              <i class="fa-solid fa-circle-check"></i>
+              <div>
+                 <strong>সর্বোচ্চ পারফরম্যান্স:</strong> ${bestSub} (${bestScore}%)
+              </div>
+           </div>
+           <div class="insight-card ins-weak">
+              <i class="fa-solid fa-chart-line"></i>
+              <div>
+                 <strong>বিশেষ নজর প্রয়োজন:</strong> ${weakSub} (${weakScore}%)
+              </div>
+           </div>
+        </div>
+
+        <!-- বিষয়ভিত্তিক সার্কুলার ভিজ্যুয়াল ড্যাশবোর্ড -->
         <div class="report-progress-bars">
-          <h4 class="section-modern-title"><i class="fa-solid fa-bolt" style="color:#4f46e5;margin-right:6px;"></i> বিষয়ভিত্তিক পারফরম্যান্স ড্যাশবোর্ড</h4>
+          <div class="modern-section-divider">
+            <span>বিষয়ভিত্তিক শিখনকালীন পারফরম্যান্স বিশ্লেষণ</span>
+          </div>
           <div class="modern-subject-matrix">
             ${subjs.map(sub => {
               const sc = s.scores?.[sub] || 0;
@@ -1109,12 +1159,18 @@ function renderReportCard(id) {
             }).join('')}
           </div>
         </div>
-        <div class="report-remarks"><h4>শিক্ষকের মন্তব্য</h4><p>${s.remarks||'উত্তম পারফরম্যান্স।'}</p></div>
+
+        <div class="report-remarks">
+           <h4><i class="fa-solid fa-pen-nib"></i> শিক্ষকের মূল্যায়ন মন্তব্য</h4>
+           <p>${s.remarks || 'শিক্ষার্থী অত্যন্ত মনোযোগী এবং নিয়মিত ক্লাসে অংশগ্রহণ করে। ভবিষ্যৎ আরও উজ্জ্বল হোক।'}</p>
+        </div>
+
         <div class="report-footer">
           <div class="signature-block"><div class="signature-line"></div><div class="signature-label">অভিভাবকের স্বাক্ষর</div></div>
           <div style="text-align:center;font-size:12px;color:#64748b;"><div style="font-weight:600;">তারিখ: ${new Date().toLocaleDateString('bn-BD')}</div></div>
           <div class="signature-block"><div class="signature-line"></div><div class="signature-label">${settings.teacherName}<br>${settings.teacherDesignation}</div></div>
         </div>
+
       </div>
     </div>
   `;
