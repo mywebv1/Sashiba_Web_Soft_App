@@ -17,10 +17,13 @@ body.dark-mode {
   --text-light:#64748b; --shadow:0 1px 3px rgba(0,0,0,0.3),0 4px 16px rgba(0,0,0,0.2);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Hind Siliguri',sans-serif;background:var(--bg-app);color:var(--text-main);}
+/* Inter handles ASCII digits (0-9), Hind Siliguri handles Bengali */
+html,body{height:100%;font-family:'Inter','Hind Siliguri',sans-serif;background:var(--bg-app);color:var(--text-main);}
 a{text-decoration:none;color:inherit;}
-button{cursor:pointer;border:none;font-family:inherit;}
-input,select,textarea{font-family:inherit;}
+button{cursor:pointer;border:none;font-family:'Inter','Hind Siliguri',sans-serif;}
+input,select,textarea{font-family:'Inter','Hind Siliguri',sans-serif;}
+/* Generic hidden utility — applies everywhere, not just content-section */
+.hidden{display:none!important;}
 
 /* ── App ── */
 .app-container{display:flex;width:100vw;height:100vh;overflow:hidden;}
@@ -83,6 +86,7 @@ input,select,textarea{font-family:inherit;}
 /* ── Content Section ── */
 .content-section{flex:1;overflow-y:auto;padding:20px;}
 .content-section.hidden{display:none;}
+/* Performance section overrides for compact layout */
 
 /* ─────────── PERFORMANCE SECTION ─────────── */
 .perf-layout{display:grid;grid-template-columns:260px 1fr;gap:18px;height:calc(100vh - var(--topbar-h) - 40px);}
@@ -98,9 +102,11 @@ input,select,textarea{font-family:inherit;}
 .psi-roll{font-size:11px;color:var(--text-muted);}
 .psi-grade{margin-left:auto;font-size:11px;font-weight:800;}
 
+/* detail panel: no fixed height, scroll naturally */
 .perf-detail-panel{overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
-.perf-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:400px;color:var(--text-muted);}
-.perf-placeholder i{font-size:50px;opacity:.2;margin-bottom:14px;}
+/* placeholder: compact, only show when visible */
+.perf-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;color:var(--text-muted);padding:30px;}
+.perf-placeholder i{font-size:36px;opacity:.2;margin-bottom:10px;}
 .perf-content{display:flex;flex-direction:column;gap:16px;}
 
 .perf-student-header{background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:22px;display:flex;align-items:center;gap:18px;}
@@ -426,16 +432,28 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 .toast.success{background:linear-gradient(135deg,#059669,var(--success));}
 .toast.error{background:linear-gradient(135deg,#dc2626,var(--danger));}
 
-/* ─────────── PRINT ─────────── */
+/* ─────────── PRINT (A4) ─────────── */
 @media print{
-  .sidebar,.top-bar,.report-controls,.report-actions,.modal-overlay,.toast{display:none!important;}
-  .main-content{overflow:visible!important;}
-  .content-section{padding:0!important;overflow:visible!important;}
-  .report-card{box-shadow:none!important;border:1px solid #e2e8f0!important;}
-  .report-preview{box-shadow:none!important;border:none!important;}
-  body{background:white!important;}
-  .app-container{display:block!important;}
-  .main-content{display:block!important;}
+  @page{size:A4 portrait;margin:8mm;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .sidebar,.top-bar,.report-controls,.report-actions,.modal-overlay,.toast,
+  .nav-section-label,.app-container>*:not(.main-content){display:none!important;}
+  body{background:white!important;margin:0;padding:0;}
+  html,body,.app-container,.main-content{display:block!important;width:100%!important;height:auto!important;overflow:visible!important;}
+  .content-section{padding:0!important;overflow:visible!important;display:block!important;}
+  .content-section.hidden{display:none!important;}
+  #section-report{display:block!important;}
+  .report-preview{box-shadow:none!important;border:none!important;padding:0!important;}
+  .report-card-container{padding:0!important;}
+  .report-card{
+    max-width:100%!important;width:100%!important;
+    box-shadow:none!important;border-radius:0!important;
+    border:none!important;margin:0!important;
+    page-break-inside:avoid;
+  }
+  .report-card-header{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .report-marks-table th{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .report-summary{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
 @media(max-width:900px){
   .analytics-grid,.settings-grid{grid-template-columns:1fr;}
@@ -501,3 +519,12 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 .rubric-score-cell .crit-score{font-size:22px;font-weight:800;color:var(--primary);}
 .rubric-total-bar{background:var(--bg-card);border-radius:var(--radius-sm);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);}
 
+/* ── Export Dropdown ── */
+.export-dropdown{position:absolute;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:200;min-width:190px;overflow:hidden;animation:modalIn .18s ease;margin-top:4px;}
+.export-option{padding:11px 14px;font-size:13px;font-weight:600;color:var(--text-main);cursor:pointer;display:flex;align-items:center;gap:10px;transition:var(--transition);}
+.export-option:hover{background:rgba(79,70,229,.05);color:var(--primary);}
+
+/* ── btn-blue (Word download) ── */
+.btn-blue{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:white;border:none;border-radius:var(--radius-sm);padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--transition);}
+.btn-blue:hover{background:linear-gradient(135deg,#1e40af,#1d4ed8);transform:translateY(-1px);}
+body.dark-mode .btn-blue{background:linear-gradient(135deg,#2563eb,#3b82f6);}

@@ -1105,7 +1105,93 @@ function exportData(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url; a.download=`মূল্যায়ন_${settings.className}_${settings.year}.json`; a.click();
-  URL.revokeObjectURL(url); showToast('এক্সপোর্ট সম্পন্ন!','success');
+  URL.revokeObjectURL(url);
+  document.getElementById('export-dropdown').style.display='none';
+  showToast('ডেটা এক্সপোর্ট সম্পন্ন!','success');
+}
+
+function exportTableAsCSV(){
+  const rows = [['ক্রম','নাম','রোল', ...settings.subjects, 'মোট','গড়','%','গ্রেড','ক্যাটাগরি']];
+  [...students].sort((a,b)=>a.roll-b.roll).forEach((s,i)=>{
+    const {total,maxTotal,avg,pct}=calcTotals(s);
+    const grade=getGrade(pct); const cat=getCategory(pct);
+    rows.push([i+1, s.name, s.roll, ...settings.subjects.map(sub=>s.scores?.[sub]||0), total, avg, pct+'%', grade.grade, cat.label]);
+  });
+  const csv = rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`রেজাল্ট_${settings.className}_${settings.year}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  document.getElementById('export-dropdown').style.display='none';
+  showToast('CSV ডাউনলোড হচ্ছে!','success');
+}
+
+function showExportMenu(e){
+  e.stopPropagation();
+  const dd=document.getElementById('export-dropdown');
+  dd.style.display=dd.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',()=>{
+  const dd=document.getElementById('export-dropdown');
+  if(dd) dd.style.display='none';
+});
+
+/* Word Export for Report Card */
+function exportReportAsWord(){
+  if(!selectedReportStudentId){ showToast('রিপোর্ট কার্ডের জন্য শিক্ষার্থী নির্বাচন করুন!','error'); return; }
+  const s=students.find(x=>x.id===selectedReportStudentId);
+  if(!s){ showToast('শিক্ষার্থী পাওয়া যায়নি','error'); return; }
+  const {total,maxTotal,avg,pct}=calcTotals(s);
+  const grade=getGrade(pct);
+  const subjectRows=settings.subjects.map(sub=>{
+    const score=s.scores?.[sub]||0;
+    const sg=getGrade(score);
+    return `<tr><td>${sub}</td><td style="text-align:center">100</td><td style="text-align:center">${score}</td><td style="text-align:center">${score}%</td><td style="text-align:center">${sg.grade}</td></tr>`;
+  }).join('');
+  const wordHTML=`
+    <html xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:w="urn:schemas-microsoft-com:office:word"
+          xmlns="http://www.w3.org/TR/REC-html40">
+    <head><meta charset="UTF-8">
+    <style>
+      body{font-family:Arial,sans-serif;direction:ltr;margin:20mm;}
+      h1{font-size:18pt;text-align:center;color:#4f46e5;margin-bottom:4px;}
+      h2{font-size:13pt;text-align:center;color:#334155;margin:0 0 16px;}
+      .info-table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+      .info-table td{padding:5px 8px;border:1px solid #e2e8f0;font-size:11pt;}
+      .marks-table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+      .marks-table th{background:#4f46e5;color:white;padding:7px 10px;text-align:center;font-size:11pt;}
+      .marks-table td{border:1px solid #e2e8f0;padding:7px 10px;font-size:11pt;}
+      .summary{background:#f1f5f9;padding:12px;border-radius:6px;margin-bottom:12px;}
+      .grade-big{font-size:24pt;font-weight:bold;color:#4f46e5;text-align:center;}
+      .remarks{border:1px solid #e2e8f0;padding:10px;font-size:11pt;}
+      .footer{margin-top:20px;font-size:10pt;color:#64748b;text-align:center;}
+    </style>
+    </head><body>
+    <h1>সশিবা মূল্যায়ন সিস্টেম</h1>
+    <h2>${settings.school}</h2>
+    <table class="info-table">
+      <tr><td><b>শিক্ষার্থীর নাম:</b> ${s.name}</td><td><b>রোল:</b> ${s.roll}</td></tr>
+      <tr><td><b>শ্রেণি:</b> ${settings.className} (${settings.section})</td><td><b>শিক্ষাবর্ষ:</b> ${settings.year}</td></tr>
+      <tr><td><b>অভিভাবক:</b> ${s.parentName||'প্রয়োজ্য নন'}</td><td><b>শিক্ষক:</b> ${settings.teacherName}</td></tr>
+    </table>
+    <table class="marks-table">
+      <thead><tr><th>বিষয়</th><th>পূর্ণমান</th><th>প্রাপ্তমান</th><th>শতকরা</th><th>গ্রেড</th></tr></thead>
+      <tbody>${subjectRows}</tbody>
+      <tfoot><tr><td><b>মোট</b></td><td style="text-align:center">${maxTotal}</td><td style="text-align:center"><b>${total}</b></td><td style="text-align:center"><b>${pct}%</b></td><td style="text-align:center"><b>${grade.grade}</b></td></tr></tfoot>
+    </table>
+    <div class="summary">মোট: ${total}/${maxTotal} | গড়: ${avg}% | গ্রেড: ${grade.grade} | GPA: ${grade.gp}</div>
+    <p class="remarks"><b>শিক্ষকের মন্তব্য:</b><br>${s.remarks||'বিশেষ মন্তব্য নেই'}</p>
+    <p class="footer">সশিবা মূল্যায়ন আর্কিটেক্ট দ্বারা তৈরি | তারিখ: ${new Date().toLocaleDateString('bn-BD')}</p>
+    </body></html>
+  `;
+  const blob=new Blob(['\uFEFF',wordHTML],{type:'application/msword'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`রিপোর্ট_${s.name}_${settings.year}.doc`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Word ফাইল ডাউনলোড হচ্ছে!','success');
 }
 function importData(event){
   const file=event.target.files[0];
@@ -1137,11 +1223,11 @@ function clearAllData(){
 // ═══════════════════════════════════════════════════════
 const sectionConfig={
   performance:{title:'শিক্ষার্থী পারফরম্যান্স',subtitle:'ব্যক্তিগত পারফরম্যান্স ও AI ফিডব্যাক'},
-  students:{title:'মূল্যায়ন আর্কিটেক্ট',subtitle:'শিক্ষার্থী তালিকা ও নম্বর এন্ট্রি'},
+  students:{title:'একাডেমিক রেজাল্ট',subtitle:'শিক্ষার্থীবার্ষিক ফলাফল, মার্কশিট ও শ্রেণিবিন্যাস'},
   analytics:{title:'ক্লাস বিশ্লেষণ',subtitle:'পারফরম্যান্স ওভারভিউ ও পরিসংখ্যান'},
   rubric:{title:'Rubric নির্মাতা',subtitle:'AI দিয়ে মূল্যায়ন মানদণ্ড তৈরি করুন'},
   feedback:{title:'AI ফিডব্যাক জেনারেটর',subtitle:'ফলাফল দেখে AI লিখে দেবে'},
-  report:{title:'রিপোর্ট কার্ড',subtitle:'প্রিন্ট, PDF ও অভিভাবক শেয়ার'},
+  report:{title:'রিপোর্ট কার্ড',subtitle:'প্রিন্ট, PDF, Word ও অভিভাবক শেয়ার'},
   history:{title:'মূল্যায়ন ইতিহাস',subtitle:'সংরক্ষিত মূল্যায়নের রেকর্ড'},
   settings:{title:'সেটিংস',subtitle:'সিস্টেম কনফিগারেশন'},
 };
