@@ -1196,6 +1196,27 @@ function setHistoryFilter(f){
   document.getElementById('hchip-'+f)?.classList.add('chip-active');
   renderHistory();
 }
+function openSnapshot(id) {
+  const snap = assessmentHistory.find(h => h.id === id);
+  if (!snap) return;
+
+  if (confirm(`আপনি কি "${snap.title}" ফাইলটি সচল করতে চান? বর্তমানে স্ক্রিনে থাকা ডাটা বদলে যাবে।`)) {
+    students = JSON.parse(JSON.stringify(snap.students));
+    settings.className = snap.className || settings.className;
+    settings.section = snap.section || settings.section;
+    window.activeSnapshotId = id;
+
+    saveToStorage();
+    renderStudentTable();
+    refreshReportSelector();
+    refreshFeedbackSelector();
+    renderHistory();
+
+    showSection('students');
+    showToast(`"${snap.title}" সফলভাবে লোড হয়েছে। এখন আপনি প্রিন্ট বা ডাউনলোড করতে পারেন।`, 'success');
+  }
+}
+
 function renderHistory(){
   const q=(document.getElementById('history-search')?.value||'').toLowerCase();
   const classFilter=document.getElementById('history-class')?.value||'';
@@ -1210,23 +1231,29 @@ function renderHistory(){
 
   const el=document.getElementById('history-list');
   if(!el) return;
-  if(list.length===0){el.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:40px;"><i class="fa-solid fa-clock-rotate-left" style="font-size:40px;opacity:.2;display:block;margin-bottom:12px;"></i><p>কোনো ইতিহাস পাওয়া যায়নি।</p></div>';return;}
-  el.innerHTML=list.map(h=>`
-    <div class="history-item ${h.status==='archived'?'archived':''}">
-      <div class="history-icon" style="background:rgba(79,70,229,.1);color:var(--primary)"><i class="fa-solid fa-clock-rotate-left"></i></div>
-      <div style="flex:1;">
-        <div class="history-title">${h.title}</div>
-        <div class="history-meta">${h.date} • ${h.studentCount} জন শিক্ষার্থী • ক্লাস গড়: ${h.classAvg}%</div>
+  if(list.length===0){el.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:40px;"><i class="fa-solid fa-folder-open" style="font-size:40px;opacity:.2;display:block;margin-bottom:12px;"></i><p>কোনো সংরক্ষিত ফাইল পাওয়া যায়নি।</p></div>';return;}
+  
+  el.innerHTML=list.map(h=>{
+    const isActiveFile = window.activeSnapshotId === h.id;
+    return `
+    <div class="history-item ${isActiveFile ? 'currently-active' : ''} ${h.status==='archived'?'archived':''}" onclick="openSnapshot('${h.id}')">
+      <div class="history-icon">
+        <i class="fa-solid ${isActiveFile ? 'fa-file-signature' : 'fa-file-lines'}"></i>
       </div>
-      <span class="history-badge ${h.status==='active'?'hbadge-active':'hbadge-archived'}">${h.status==='active'?'সক্রিয়':'আর্কাইভ'}</span>
-      <div class="history-actions">
-        <button class="action-btn" onclick="restoreSnapshot('${h.id}')" title="পুনরুদ্ধার"><i class="fa-solid fa-rotate-left"></i></button>
-        <button class="action-btn" onclick="duplicateSnapshot('${h.id}')" title="ডুপ্লিকেট"><i class="fa-solid fa-copy"></i></button>
-        <button class="action-btn" onclick="archiveSnapshot('${h.id}')" title="${h.status==='active'?'আর্কাইভ':'আনআর্কাইভ'}"><i class="fa-solid fa-box-archive"></i></button>
+      <div style="flex:1;">
+        <div class="history-title">
+            ${h.title} 
+            ${isActiveFile ? '<span class="active-file-pill">currently-active (বর্তমানে সচল)</span>' : ''}
+        </div>
+        <div class="history-meta">${h.date} • ${h.studentCount} জন শিক্ষার্থী • গড়: ${h.classAvg}%</div>
+      </div>
+      <div class="history-actions" onclick="event.stopPropagation()">
+        <button class="action-btn" onclick="archiveSnapshot('${h.id}')" title="আর্কাইভ/আনআর্কাইভ"><i class="fa-solid fa-box-archive"></i></button>
         <button class="action-btn danger" onclick="deleteSnapshot('${h.id}')" title="মুছুন"><i class="fa-solid fa-trash"></i></button>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 function restoreSnapshot(id){
   const snap=assessmentHistory.find(h=>h.id===id);
