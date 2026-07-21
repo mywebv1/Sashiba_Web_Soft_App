@@ -1095,7 +1095,7 @@ function renderReportCard(id) {
           </div>
           <div class="student-meta-grid">
              <div class="meta-item"><span class="meta-lbl">শিক্ষার্থীর নাম</span><strong class="meta-val">${s.name}</strong></div>
-             <div class="meta-item"><span class="meta-lbl">রোল নং</span><strong class="meta-val">#${s.roll}</strong></div>
+             <div class="meta-item"><span class="meta-lbl">রোল নম্বর</span><strong class="meta-val">${toBnNum(s.roll)}</strong></div>
              <div class="meta-item"><span class="meta-lbl">শ্রেণি ও শাখা</span><strong class="meta-val">${clsName} (${secName})</strong></div>
              <div class="meta-item"><span class="meta-lbl">অভিভাবক</span><strong class="meta-val">${s.parentName||'—'}</strong></div>
           </div>

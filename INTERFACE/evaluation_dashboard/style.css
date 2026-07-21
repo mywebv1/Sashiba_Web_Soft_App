@@ -509,43 +509,43 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 }
 
 .student-avatar-box {
-    width: 68px;
-    height: 68px;
-    border-radius: 16px;
+    width: 80px;
+    height: 80px;
+    border-radius: 18px;
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
     color: white;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 900;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
-    border: 2px solid #ffffff;
-    outline: 2px solid #cbd5e1;
+    box-shadow: none !important;
+    border: 3px solid #4f46e5;
     flex-shrink: 0;
 }
 
 .student-meta-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 24px;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 8px 20px;
     flex: 1;
 }
 
 .meta-item { display: flex; flex-direction: column; }
-.meta-lbl { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; }
-.meta-val { font-size: 13px; color: #0f172a; font-weight: 700; }
+.meta-lbl { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.meta-val { font-size: 14px; color: #0f172a; font-weight: 800; }
 
 .rank-badge-box {
     text-align: center;
     background: #ffffff;
-    border: 1px solid #cbd5e1;
-    padding: 6px 14px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    border: 1.5px solid #4f46e5;
+    padding: 8px 18px;
+    border-radius: 12px;
+    box-shadow: none !important;
+    margin-right: 15px; /* Shift slightly left directly over performance column */
 }
-.rank-title { font-size: 10px; color: #64748b; font-weight: 700; }
-.rank-number { font-size: 18px; font-weight: 900; color: #4f46e5; }
+.rank-title { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; }
+.rank-number { font-size: 20px; font-weight: 900; color: #4f46e5; margin-top: 1px; }
 
 /* Dynamic Table Rows & Icons */
 .sub-icon { color: #4f46e5; margin-right: 6px; font-size: 11px; }
