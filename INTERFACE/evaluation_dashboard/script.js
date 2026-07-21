@@ -718,7 +718,7 @@ function renderStudentTable() {
   let list = [...students];
 
   if(currentFilter!=='all') {
-    const mapLabel = {good:'ভালো',average:'मध्यম',weak:'দুর্বল'};
+    const mapLabel = {good:'ভালো',average:'মধ্যম',weak:'দুর্বল'};
     list = list.filter(s=>getCategory(calcTotals(s).pct).label===mapLabel[currentFilter]);
   }
 
