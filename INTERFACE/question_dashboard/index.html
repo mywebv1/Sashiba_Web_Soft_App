@@ -469,6 +469,42 @@
             <span id="lib-new-btn">নতুন প্রশ্নপত্র</span>
           </button>
         </header>
+
+        <!-- লাইব্রেরি ফিল্টার এবং সার্চ বার -->
+        <div class="library-filter-bar">
+          <div class="search-box-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="libSearchInput" placeholder="শ্রেণি, বিষয় বা প্রতিষ্ঠানের নাম খুঁজুন..." oninput="filterLibrary()">
+          </div>
+          <div class="filter-dropdown-wrapper">
+            <select id="libClassFilter" onchange="filterLibrary()">
+              <option value="">সকল শ্রেণি</option>
+              <option value="প্রথম">প্রথম শ্রেণি</option>
+              <option value="দ্বিতীয়">দ্বিতীয় শ্রেণি</option>
+              <option value="তৃতীয়">তৃতীয় শ্রেণি</option>
+              <option value="চতুর্থ">চতুর্থ শ্রেণি</option>
+              <option value="পঞ্চম">পঞ্চম শ্রেণি</option>
+              <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
+              <option value="সপ্তম">সপ্তম শ্রেণি</option>
+              <option value="অষ্টম">অষ্টম শ্রেণি</option>
+              <option value="নবম">নবম শ্রেণি</option>
+              <option value="দশম">দশম শ্রেণি</option>
+              <option value="একাদশ">একাদশ শ্রেণি</option>
+              <option value="দ্বাদশ">দ্বাদশ শ্রেণি</option>
+            </select>
+          </div>
+          <div class="date-filter-wrapper">
+            <i class="fa-solid fa-calendar-days"></i>
+            <input type="date" id="libDateFilter" onchange="filterLibrary()" title="তারিখ অনুযায়ী ফিল্টার">
+          </div>
+          <div class="filter-dropdown-wrapper">
+            <select id="libSortFilter" onchange="filterLibrary()">
+              <option value="newest">সর্বশেষ সংরক্ষিত (নতুন আগে)</option>
+              <option value="oldest">পুরাতন ফাইল আগে</option>
+            </select>
+          </div>
+        </div>
+
         <div class="library-container">
           <div class="library-grid" id="libraryGrid">
             <!-- JS থেকে কার্ড তৈরি হবে -->

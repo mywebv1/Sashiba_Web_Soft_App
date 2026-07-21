@@ -484,10 +484,82 @@ input:focus,
     display: none !important;
   }
 
-  /* ব্রাউজার ফিক্স */
   header,
   footer,
   nav {
     display: none !important;
   }
 }
+
+/* ........... ৮. ডার্ক মোড স্টাইল ........... */
+body.dark-mode {
+  --bg: #0f172a;
+  --text: #f8fafc;
+  --white: #1e293b;
+  --light-text: #94a3b8;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.brand-section {
+  color: #ffffff !important;
+}
+
+.brand-section .logo h1 {
+  color: #ffffff !important;
+}
+
+.brand-section .tagline {
+  color: #93c5fd !important;
+  opacity: 1 !important;
+}
+
+.brand-section .points li {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .form-card {
+  background: #1e293b;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  color: #f8fafc;
+}
+
+body.dark-mode .form-title {
+  color: #ffffff !important;
+}
+
+body.dark-mode label {
+  color: #e2e8f0 !important;
+  font-weight: 600;
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="tel"],
+body.dark-mode input[type="number"],
+body.dark-mode select {
+  background: #0f172a;
+  border-color: #334155;
+  color: #ffffff !important;
+}
+
+body.dark-mode input::placeholder {
+  color: #64748b !important;
+}
+
+body.dark-mode .step-indicator {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .pkg-item {
+  background: #0f172a;
+  border-color: #334155;
+  color: #ffffff !important;
+}
+
+body.dark-mode .summary-card {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+

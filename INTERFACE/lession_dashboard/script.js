@@ -1,8 +1,28 @@
 // =========================================================================
 //                   সশিবা স্মার্ট শিক্ষা বাতায়ন - লেসন প্ল্যান ড্যাশবোর্ড লজিক
 // =========================================================================
-// এই ফাইলে সকল লজিক এবং লোকাল স্টোরেজ ডাটাবেস হ্যান্ডেল করা হয়েছে।
-// কোড সহজে পরিবর্তনের সুবিধার্থে প্রতিটি অংশকে বাংলা ইন্ডিকেটর দিয়ে আলাদা করা হলো।
+
+// ==================== থিম সিনক্রোনাইজেশন লজিক (postMessage & localStorage) ====================
+(function initSubAppThemeSync() {
+  function applyTheme(theme) {
+    if (theme === "dark") {
+      document.body.classList.add("dark-mode");
+    } else if (theme === "light") {
+      document.body.classList.remove("dark-mode");
+    }
+  }
+
+  try {
+    const savedTheme = localStorage.getItem("sashiba_theme");
+    if (savedTheme) applyTheme(savedTheme);
+  } catch (e) {}
+
+  window.addEventListener("message", function (event) {
+    if (event.data && event.data.type === "THEME_CHANGE") {
+      applyTheme(event.data.theme);
+    }
+  });
+})();
 
 // ==========================================
 // [১] কনফিগারেশন এবং স্ট্যাটিক ডাটাবেস (Configuration Database)
@@ -593,6 +613,22 @@ window.onload = () => {
   }
 
   checkLibraryCount();
+
+  // তারিখ ইনপুটে ৪ ডিজিটের বেশি বছর টাইপ করা প্রতিরোধ
+  const dateInput = document.getElementById("libDateFilter");
+  if (dateInput) {
+    dateInput.setAttribute("max", "9999-12-31");
+    dateInput.addEventListener("input", function () {
+      if (this.value) {
+        const parts = this.value.split("-");
+        if (parts[0] && parts[0].length > 4) {
+          parts[0] = parts[0].slice(0, 4);
+          this.value = parts.join("-");
+          filterLibrary();
+        }
+      }
+    });
+  }
 };
 
 // ==========================================
@@ -729,8 +765,8 @@ function loadChapters() {
 
   chapBox.innerHTML = matchedChapters
     .map((ch) => {
-      return `<label class="block mb-1">
-      <input type="radio" name="chapter-select" class="chap-select" value="${ch}" onchange="loadTopics('${ch}')"> ${ch}
+      return `<label>
+      <input type="checkbox" class="chap-select" value="${ch}" onchange="loadTopics()"> ${ch}
     </label>`;
     })
     .join("");
@@ -742,26 +778,43 @@ function loadChapters() {
   updatePreview();
 }
 
-function loadTopics(chapName) {
+function loadTopics() {
   const topicBox = document.getElementById("topic-list");
+  if (!topicBox) return;
+
+  const checkedChaps = Array.from(document.querySelectorAll('.chap-select:checked')).map(cb => cb.value);
+
+  if (checkedChaps.length === 0) {
+    topicBox.innerHTML = currentLang === "bn" ? "অধ্যায় নির্বাচন করুন..." : "Select Chapter first...";
+    updatePreview();
+    return;
+  }
 
   const topicsDb = currentLang === "bn" ? db.topics_bn : db.topics_en;
-  const matchedTopics = topicsDb[chapName] || [
-    currentLang === "bn"
-      ? `টপিক ১: ${chapName} এর মূল বিষয়বস্তু`
-      : `Topic 1: Core Concepts of ${chapName}`,
-    currentLang === "bn"
-      ? `টপিক ২: পাঠের সহজ ব্যাখ্যা ও উদাহরণ`
-      : `Topic 2: Easy Explanation & Examples`,
-    currentLang === "bn"
-      ? `টপিক ৩: পাঠ ও মূল্যায়ন প্রশ্নোত্তর`
-      : `Topic 3: Discussion and Assessment Q/A`,
-  ];
+  let allTopics = [];
 
-  topicBox.innerHTML = matchedTopics
-    .map((tp) => {
-      return `<label class="block mb-1">
-      <input type="checkbox" class="topic-check" value="${tp}" onchange="updatePreview()"> ${tp}
+  checkedChaps.forEach(chapName => {
+    const matchedTopics = topicsDb[chapName] || [
+      currentLang === "bn"
+        ? `টপিক ১: ${chapName} এর মূল বিষয়বস্তু`
+        : `Topic 1: Core Concepts of ${chapName}`,
+      currentLang === "bn"
+        ? `টপিক ২: পাঠের সহজ ব্যাখ্যা ও উদাহরণ`
+        : `Topic 2: Easy Explanation & Examples`,
+      currentLang === "bn"
+        ? `টপিক ৩: পাঠ ও মূল্যায়ন প্রশ্নোত্তর`
+        : `Topic 3: Discussion and Assessment Q/A`,
+    ];
+    matchedTopics.forEach(tp => {
+      allTopics.push({ topic: tp, chapter: chapName });
+    });
+  });
+
+  topicBox.innerHTML = allTopics
+    .map((item) => {
+      const cleanChapName = item.chapter.split(":")[0];
+      return `<label>
+      <input type="checkbox" class="topic-check" value="${item.topic}" data-chap="${item.chapter}" onchange="updatePreview()"> ${item.topic} <span class="text-muted" style="font-size:10px; margin-left:auto; color:#64748b;">(${cleanChapName})</span>
     </label>`;
     })
     .join("");
@@ -1151,32 +1204,34 @@ function handleSave() {
 
 function saveDraft() {
   const planId = Date.now().toString();
+  const now = new Date();
+  
+  const classVal = document.getElementById("class").value.trim();
+  const subjectVal = document.getElementById("subject").value.trim();
+  
   const planData = {
     id: planId,
     lang: currentLang,
-    date: new Date().toLocaleDateString(
-      currentLang === "bn" ? "bn-BD" : "en-US",
-      { year: "numeric", month: "long", day: "numeric" },
-    ),
-    schName:
-      document.getElementById("schName").value.trim() || "নামহীন প্রতিষ্ঠান",
+    timestamp: Date.now(),
+    date: now.toLocaleDateString(currentLang === "bn" ? "bn-BD" : "en-US", { year: "numeric", month: "long", day: "numeric" }),
+    time: now.toLocaleTimeString(currentLang === "bn" ? "bn-BD" : "en-US", { hour: "2-digit", minute: "2-digit" }),
+    schName: document.getElementById("schName").value.trim() || "নামহীন প্রতিষ্ঠান",
     schAddr: document.getElementById("schAddr").value.trim(),
     schCode: document.getElementById("schCode").value.trim(),
     schYear: document.getElementById("schYear").value.trim(),
     board: document.getElementById("board").value,
-    class: document.getElementById("class").value,
+    class: classVal || "সাধারণ",
     group: document.getElementById("group").value,
-    subject: document.getElementById("subject").value,
+    subject: subjectVal || "সাধারণ বিষয়",
     bookName: document.getElementById("bookName").value,
     duration: document.getElementById("duration").value,
     lessonObjective: document.getElementById("lessonObjective").value,
 
-    methods: Array.from(document.querySelectorAll(".meth-check:checked")).map(
-      (m) => m.value,
-    ),
-    blooms: Array.from(document.querySelectorAll(".bloom-check:checked")).map(
-      (b) => b.value,
-    ),
+    chapters: Array.from(document.querySelectorAll(".chap-select:checked")).map(cb => cb.value),
+    topics: Array.from(document.querySelectorAll(".topic-check:checked")).map(cb => cb.value),
+
+    methods: Array.from(document.querySelectorAll(".meth-check:checked")).map((m) => m.value),
+    blooms: Array.from(document.querySelectorAll(".bloom-check:checked")).map((b) => b.value),
 
     outcomesHtml: document.getElementById("v-outcomes").innerHTML,
     groupHtml: document.getElementById("v-group-section").innerHTML,
@@ -1184,24 +1239,15 @@ function saveDraft() {
     homework: document.getElementById("v-homework").innerText,
   };
 
-  if (!planData.subject) {
-    alert(
-      currentLang === "bn"
-        ? "ড্রাফট সংরক্ষণ করার আগে অন্তত বিষয় ও লেসন প্ল্যান জেনারেট করুন!"
-        : "Please select Subject and generate lesson plan before saving draft!",
-    );
-    return;
-  }
-
   let savedLessons = JSON.parse(localStorage.getItem("sashiba_lessons")) || [];
-  savedLessons.push(planData);
+  savedLessons.unshift(planData);
   localStorage.setItem("sashiba_lessons", JSON.stringify(savedLessons));
 
   checkLibraryCount();
   alert(
     currentLang === "bn"
-      ? "লেসন প্ল্যানটি ড্রাফট হিসেবে সংরক্ষণ করা হয়েছে!"
-      : "Lesson plan has been saved as draft!",
+      ? "লেসন প্ল্যানটি লাইব্রেরিতে নতুন চেইনে সফলভাবে সংরক্ষণ করা হয়েছে!"
+      : "Lesson plan has been saved to library!",
   );
 
   const menu = document.getElementById("exportMenu");
@@ -1231,9 +1277,18 @@ function checkLibraryCount() {
 }
 
 function renderLibrary() {
+  filterLibrary();
+}
+
+function filterLibrary() {
   const grid = document.getElementById("libraryGrid");
-  const savedLessons =
-    JSON.parse(localStorage.getItem("sashiba_lessons")) || [];
+  if (!grid) return;
+
+  const savedLessons = JSON.parse(localStorage.getItem("sashiba_lessons")) || [];
+  const search = (document.getElementById("libSearchInput") || {}).value || "";
+  const classFilter = (document.getElementById("libClassFilter") || {}).value || "";
+  const dateFilter = (document.getElementById("libDateFilter") || {}).value || "";
+  const sortFilter = (document.getElementById("libSortFilter") || {}).value || "newest";
 
   if (savedLessons.length === 0) {
     grid.innerHTML = `
@@ -1246,25 +1301,61 @@ function renderLibrary() {
     return;
   }
 
-  grid.innerHTML = savedLessons
+  let filtered = savedLessons.filter((plan) => {
+    const textSearch = (plan.subject + " " + plan.class + " " + plan.schName + " " + (plan.lessonObjective || "")).toLowerCase();
+    const matchesQuery = !search || textSearch.includes(search.toLowerCase());
+    const matchesClass = !classFilter || (plan.class && plan.class.includes(classFilter));
+    
+    var itemDate = "";
+    if (plan.timestamp) {
+      var d = new Date(plan.timestamp);
+      var year = d.getFullYear();
+      var month = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      itemDate = year + "-" + month + "-" + day;
+    }
+    var matchesDate = !dateFilter || itemDate === dateFilter;
+
+    return matchesQuery && matchesClass && matchesDate;
+  });
+
+  if (sortFilter === "newest") {
+    filtered.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  } else if (sortFilter === "oldest") {
+    filtered.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 50px 20px; color: #64748b;">
+        <i class="fa-solid fa-magnifying-glass" style="font-size: 40px; margin-bottom: 12px; color: #cbd5e1;"></i>
+        <p style="font-size: 15px;">আপনার খোঁজা ফিল্টারের সাথে কোনো ফাইল মেলেনি।</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filtered
     .map((plan) => {
+      const displayClass = plan.class && plan.class !== "N/A" ? plan.class : "সাধারণ";
+      const displayTime = plan.time ? ` | ⏰ ${plan.time}` : "";
       return `
-      <div class="library-card">
-        <div class="card-meta">
-          <span class="tag-class">${plan.class || "N/A"} শ্রেণি</span>
-          <span class="tag-date">${plan.date}</span>
+      <div class="chain-card">
+        <div class="chain-badge-row">
+          <span class="pill-badge class-badge"><i class="fa-solid fa-graduation-cap"></i> ${displayClass} শ্রেণি</span>
+          <span class="pill-badge subject-badge"><i class="fa-solid fa-book"></i> ${plan.subject || "সাধারণ বিষয়"}</span>
+          <span class="pill-badge date-badge"><i class="fa-regular fa-calendar-days"></i> ${plan.date}${displayTime}</span>
         </div>
-        <h3 class="card-subject">${plan.subject || "নামহীন বিষয়"}</h3>
-        <p class="card-school">${plan.schName}</p>
-        <p class="card-objective">${plan.lessonObjective ? plan.lessonObjective.substring(0, 70) + "..." : "কোনো নির্দিষ্ট উদ্দেশ্য নেই।"}</p>
-        <div class="card-actions">
-          <button class="btn btn-outline btn-sm" onclick="loadDraft('${plan.id}')">
+        <h3 class="chain-card-title">বিষয়: ${plan.subject || "সাধারণ বিষয়"}</h3>
+        <div class="chain-card-school"><i class="fa-solid fa-school"></i> ${plan.schName || "প্রতিষ্ঠান"}</div>
+        <div class="chain-card-actions">
+          <button class="chain-btn" onclick="loadDraft('${plan.id}')">
             <i class="fa-solid fa-folder-open"></i> লোড
           </button>
-          <button class="btn btn-outline btn-sm" onclick="exportDraftToWord('${plan.id}')">
-            <i class="fa-solid fa-cloud-arrow-down"></i> এক্সপোর্ট
+          <button class="chain-btn" onclick="exportDraftToWord('${plan.id}')">
+            <i class="fa-solid fa-file-word"></i> ওয়ার্ড
           </button>
-          <button class="btn btn-danger btn-sm" onclick="deleteDraft('${plan.id}')" style="background:#ef4444; color:white; border:none; padding: 6px 12px; border-radius: 6px; cursor:pointer;">
+          <button class="chain-btn delete-btn" onclick="deleteDraft('${plan.id}')">
             <i class="fa-solid fa-trash-can"></i> ডিলিট
           </button>
         </div>
@@ -1298,6 +1389,18 @@ function loadDraft(id) {
   document.getElementById("subject").value = plan.subject || "";
 
   loadChapters();
+
+  // Restore chapters
+  document.querySelectorAll(".chap-select").forEach((cb) => {
+    cb.checked = plan.chapters && plan.chapters.includes(cb.value);
+  });
+
+  loadTopics();
+
+  // Restore topics
+  document.querySelectorAll(".topic-check").forEach((cb) => {
+    cb.checked = plan.topics && plan.topics.includes(cb.value);
+  });
 
   document.getElementById("bookName").value = plan.bookName || "";
   document.getElementById("duration").value = plan.duration || 45;
@@ -1404,4 +1507,11 @@ function deleteDraft(id) {
 
   checkLibraryCount();
   renderLibrary();
+}
+
+function toggleSidebar() {
+  const workspace = document.querySelector(".workspace");
+  if (workspace) {
+    workspace.classList.toggle("sidebar-collapsed");
+  }
 }

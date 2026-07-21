@@ -164,11 +164,36 @@ body {
 /* ==========================================
    [৪] ওয়ার্কস্পেস গ্রিড এবং ইনপুট কার্ড (Workspace Inputs)
    ========================================== */
+.btn-sidebar-toggle {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #1e293b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  margin-right: 10px;
+}
+
+.btn-sidebar-toggle:hover {
+  background: #f1f5f9;
+  color: var(--primary);
+}
+
 .workspace {
   flex-grow: 1;
   display: grid;
   grid-template-columns: 420px 1fr;
   overflow: hidden;
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.workspace.sidebar-collapsed {
+  grid-template-columns: 0px 1fr;
 }
 
 .input-panel {
@@ -176,6 +201,13 @@ body {
   border-right: 1px solid var(--border);
   padding: 20px;
   overflow-y: auto;
+  transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-right-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.workspace.sidebar-collapsed .input-panel {
+  padding: 0;
+  border-right-width: 0;
+  overflow: hidden;
 }
 
 .card {
@@ -248,8 +280,38 @@ body {
   border-radius: 8px;
   font-size: 13px;
   margin-bottom: 10px;
-  max-height: 120px;
+  max-height: 180px;
   overflow-y: auto;
+}
+
+.list-box label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 6px;
+  user-select: none;
+  font-weight: 500;
+  color: #334155;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.list-box label:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.list-box label input {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--primary);
+  flex-shrink: 0;
 }
 
 .methods-grid {
@@ -708,9 +770,625 @@ body {
   .doc-header {
     page-break-inside: avoid;
   }
-
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
 }
+
+/* ==========================================
+   [৯] ডার্ক মোড সাপোর্ট (Dark Mode Styling)
+   ========================================== */
+body.dark-mode {
+  --bg-app: #0b1329;
+  --border: #1e293b;
+  background: #0b1329;
+  color: #f1f5f9;
+}
+
+body.dark-mode .sidebar {
+  background: #040d1d;
+  border-color: #1e293b;
+}
+
+body.dark-mode .brand-text strong {
+  color: #f1f5f9;
+}
+
+body.dark-mode .nav-item {
+  color: #94a3b8;
+}
+
+body.dark-mode .nav-item:hover,
+body.dark-mode .nav-item.active {
+  background: #1e293b;
+  color: #818cf8;
+}
+
+body.dark-mode .sidebar-user {
+  border-color: #1e293b;
+}
+
+body.dark-mode .avatar {
+  background: #1e293b;
+  color: #818cf8;
+}
+
+body.dark-mode .user-name {
+  color: #f1f5f9;
+}
+
+body.dark-mode .user-role {
+  color: #94a3b8;
+}
+
+body.dark-mode .main-content {
+  background: #0f172a;
+}
+
+body.dark-mode .top-bar {
+  background: #040d1d;
+  border-color: #1e293b;
+}
+
+body.dark-mode .main-heading {
+  color: #f1f5f9;
+}
+
+body.dark-mode .btn-outline {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .btn-outline:hover {
+  background: #334155 !important;
+  color: #818cf8 !important;
+}
+
+body.dark-mode .input-panel {
+  background: #0b1329;
+  border-color: #1e293b;
+}
+
+body.dark-mode .card {
+  border-color: #1e293b;
+  background: #0f172a;
+}
+
+body.dark-mode .card-header {
+  background: #1e293b;
+  color: #818cf8;
+  border-color: #334155;
+}
+
+body.dark-mode .card-body {
+  background: #0f172a;
+}
+
+body.dark-mode .form-input,
+body.dark-mode .form-select {
+  background: #0f172a;
+  border-color: #334155;
+  color: #ffffff !important;
+}
+
+body.dark-mode .form-input::placeholder {
+  color: #64748b !important;
+}
+
+body.dark-mode .lbl,
+body.dark-mode .list-box-label {
+  color: #cbd5e1 !important;
+  font-weight: 600;
+}
+
+body.dark-mode .list-box {
+  background: #0f172a;
+  border-color: #334155;
+  color: #ffffff !important;
+}
+
+body.dark-mode .list-box label {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+body.dark-mode .list-box label:hover {
+  background: #334155;
+  border-color: #475569;
+}
+
+body.dark-mode .methods-grid {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .preview-panel {
+  background: #0b1329;
+}
+
+body.dark-mode .a4-page {
+  background: #0f172a !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .doc-header {
+  border-color: #334155 !important;
+}
+
+body.dark-mode .doc-header h1 {
+  color: #ffffff !important;
+}
+
+body.dark-mode .doc-header p {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .meta-row {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .meta-row span,
+body.dark-mode .meta-row strong {
+  color: #ffffff !important;
+}
+
+body.dark-mode .lesson-title {
+  color: #818cf8 !important;
+}
+
+/* ১. স্টুডেন্ট গ্রুপিং কার্ড ফিক্স (Circle 1) */
+body.dark-mode .group-card {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #f8fafc !important;
+  box-shadow: none !important;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+body.dark-mode .group-card strong {
+  color: #60a5fa !important;
+}
+
+body.dark-mode .btn-outline,
+body.dark-mode #langToggleBtn {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .btn-outline:hover,
+body.dark-mode #langToggleBtn:hover {
+  background: #334155 !important;
+  color: #818cf8 !important;
+}
+
+/* ২. লেসন টেবিল ফিক্স (Circle 2 - preview-table & lesson-table) */
+body.dark-mode .preview-table,
+body.dark-mode .lesson-table,
+body.dark-mode .a4-page table {
+  border-color: #334155 !important;
+}
+
+body.dark-mode .preview-table th,
+body.dark-mode .lesson-table th,
+body.dark-mode .a4-page th {
+  background: #1e293b !important;
+  color: #60a5fa !important;
+  border: 1px solid #334155 !important;
+  font-weight: 700 !important;
+  padding: 10px;
+}
+
+body.dark-mode .preview-table td,
+body.dark-mode .lesson-table td,
+body.dark-mode .a4-page td,
+body.dark-mode #v-table tr,
+body.dark-mode #v-table td {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border: 1px solid #334155 !important;
+  padding: 10px;
+}
+
+/* ৩. বাড়ির কাজ ও নোট বক্স ফিক্স (Circle 3) */
+body.dark-mode .homework-box,
+body.dark-mode .bg-light-yellow {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-left: 4px solid #f59e0b !important;
+  color: #fef08a !important;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+body.dark-mode .homework-box h4,
+body.dark-mode .homework-box strong,
+body.dark-mode .homework-box p,
+body.dark-mode .homework-box #v-homework {
+  color: #fef08a !important;
+}
+
+body.dark-mode .ai-content-box {
+  background: #1e1b4b !important;
+  border-left-color: #6366f1 !important;
+  color: #e0e7ff !important;
+}
+
+body.dark-mode .ai-content-box p,
+body.dark-mode .ai-content-box li {
+  color: #e0e7ff !important;
+}
+
+body.dark-mode .ai-label {
+  color: #a5b4fc !important;
+}
+
+body.dark-mode .preview-list {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .preview-list li {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .bg-light-blue {
+  background: #064e3b !important;
+  border-left-color: #10b981 !important;
+  color: #a7f3d0 !important;
+}
+
+body.dark-mode .bg-light-blue .ai-label {
+  color: #a7f3d0 !important;
+}
+
+body.dark-mode .dropdown-menu {
+  background: #0f172a;
+  border-color: #334155;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .dropdown-item:hover {
+  background: #1e293b;
+}
+
+body.dark-mode .item-text strong {
+  color: #f1f5f9;
+}
+
+body.dark-mode .item-text small {
+  color: #94a3b8;
+}
+
+body.dark-mode .library-card {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+body.dark-mode .card-subject {
+  color: #f1f5f9;
+}
+
+body.dark-mode .card-school,
+body.dark-mode .card-objective,
+body.dark-mode .tag-date {
+  color: #94a3b8;
+}
+
+body.dark-mode .card-actions {
+  border-color: #1e293b;
+}
+
+/* ==========================================
+   [১০] চেইন ফিল্টার বার ও আধুনিক কার্ড ডিজাইন
+   ========================================== */
+.library-filter-bar {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 16px 25px;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+body.dark-mode .library-filter-bar {
+  background: #040d1d;
+  border-color: #1e293b;
+}
+
+.search-box-wrapper {
+  flex: 1;
+  min-width: 250px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box-wrapper i {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.search-box-wrapper input {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  background: #f8fafc;
+  outline: none;
+  transition: all 0.2s;
+}
+
+body.dark-mode .search-box-wrapper input {
+  background: #0f172a;
+  border-color: #334155;
+  color: #ffffff;
+}
+
+.filter-dropdown-wrapper select {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #f8fafc;
+  color: #1e293b;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s ease;
+}
+
+.filter-dropdown-wrapper select:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.date-filter-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 170px;
+}
+
+.date-filter-wrapper i {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.date-filter-wrapper input[type="date"] {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #f8fafc;
+  color: #1e293b;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s ease;
+}
+
+.date-filter-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.3);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.date-filter-wrapper input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+.date-filter-wrapper input[type="date"]:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.filter-dropdown-wrapper select:focus,
+.date-filter-wrapper input[type="date"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  background: white;
+}
+
+body.dark-mode .filter-dropdown-wrapper select,
+body.dark-mode .date-filter-wrapper input[type="date"] {
+  background: #0f172a;
+  border-color: #334155;
+  color: #ffffff;
+}
+
+body.dark-mode .date-filter-wrapper i {
+  color: #64748b;
+}
+
+body.dark-mode .date-filter-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+
+.chain-card {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+body.dark-mode .chain-card {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.chain-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(79, 70, 229, 0.12);
+  border-color: var(--primary);
+}
+
+.chain-badge-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pill-badge.class-badge {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+body.dark-mode .pill-badge.class-badge {
+  background: rgba(37, 99, 235, 0.2);
+  color: #60a5fa;
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+.pill-badge.subject-badge {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+body.dark-mode .pill-badge.subject-badge {
+  background: rgba(22, 163, 74, 0.2);
+  color: #4ade80;
+  border-color: rgba(22, 163, 74, 0.4);
+}
+
+.pill-badge.date-badge {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+body.dark-mode .pill-badge.date-badge {
+  background: #1e293b;
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+.chain-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 4px 0 0 0;
+  line-height: 1.4;
+}
+
+body.dark-mode .chain-card-title {
+  color: #ffffff;
+}
+
+.chain-card-school {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+body.dark-mode .chain-card-school {
+  color: #94a3b8;
+}
+
+.chain-card-actions {
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 14px;
+  margin-top: 6px;
+}
+
+body.dark-mode .chain-card-actions {
+  border-color: #1e293b;
+}
+
+.chain-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1.5px solid var(--border);
+  background: white;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+body.dark-mode .chain-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+.chain-btn:hover {
+  background: #f1f5f9;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+body.dark-mode .chain-btn:hover {
+  background: #0f172a;
+  color: #818cf8;
+  border-color: #818cf8;
+}
+
+.chain-btn.delete-btn:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* Scrollbar Customization for Dark Mode */
+body.dark-mode ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+body.dark-mode ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 5px;
+}
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+

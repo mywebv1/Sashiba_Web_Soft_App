@@ -69,8 +69,42 @@ function handleTyping() {
 // ৩. থিম টগল
 function toggleMode() {
   document.body.classList.toggle("dark-mode");
-  document.getElementById("mode-btn").innerText =
-    document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+  const isDark = document.body.classList.contains("dark-mode");
+  document.getElementById("mode-btn").innerText = isDark ? "☀️" : "🌙";
+  
+  const theme = isDark ? "dark" : "light";
+  try {
+    localStorage.setItem("sashiba_theme", theme);
+  } catch (e) {}
+  
+  syncIframeThemes();
+}
+
+function syncIframeThemes() {
+  const isDark = document.body.classList.contains("dark-mode");
+  const theme = isDark ? "dark" : "light";
+  
+  ["portal-iframe", "signup-iframe"].forEach((id) => {
+    const iframe = document.getElementById(id);
+    if (iframe && iframe.contentWindow) {
+      // 1. postMessage মাধ্যমে থিম পাঠানো (file:// প্রোটোকলেও ১০০% কাজ করে)
+      try {
+        iframe.contentWindow.postMessage({ type: "THEME_CHANGE", theme: theme }, "*");
+      } catch (e) {}
+
+      // 2. Direct DOM attempt (যদি সামঞ্জস্যপূর্ণ অনুমতি থাকে)
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        if (iframeDoc && iframeDoc.body) {
+          if (isDark) {
+            iframeDoc.body.classList.add("dark-mode");
+          } else {
+            iframeDoc.body.classList.remove("dark-mode");
+          }
+        }
+      } catch (e) {}
+    }
+  });
 }
 
 // ৪. হোম পেজে ফিরে আসা
@@ -167,10 +201,14 @@ function openPortal(type) {
   const iframePage = document.getElementById("iframe-page");
   const portalIframe = document.getElementById("portal-iframe");
   
-  // সোর্স ডিটারমিন করা
+  // থিম ট্র্যাকিং লিসেনার যুক্ত করা
+  portalIframe.onload = syncIframeThemes;
+  
   let targetSrc = "";
   if (type === "lesson") {
     targetSrc = "./lession_dashboard/index.html";
+  } else if (type === "presentation") {
+    targetSrc = "./presentation_dashboard/index.html";
   } else if (type === "question") {
     targetSrc = "./question_dashboard/index.html";
   }
@@ -178,6 +216,8 @@ function openPortal(type) {
   // আইফ্রেম সোর্স লোড করা
   if (portalIframe.src !== targetSrc) {
     portalIframe.src = targetSrc;
+  } else {
+    syncIframeThemes();
   }
   
   // কন্টেইনার শো করা
@@ -198,9 +238,13 @@ function openSignupModal() {
   const modalContent = document.getElementById("signup-modal-content");
   const iframe = document.getElementById("signup-iframe");
   
+  iframe.onload = syncIframeThemes;
+  
   // মডাল আইফ্রেমে রেজিস্ট্রেশন ফর্ম লোড করা
   if (iframe.src === "about:blank" || !iframe.src || iframe.src.indexOf("registration_form") === -1) {
     iframe.src = "./registration_form/index.html";
+  } else {
+    syncIframeThemes();
   }
   
   modal.classList.remove("hidden");

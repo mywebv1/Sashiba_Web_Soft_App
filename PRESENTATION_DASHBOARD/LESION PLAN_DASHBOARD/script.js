@@ -729,8 +729,8 @@ function loadChapters() {
 
   chapBox.innerHTML = matchedChapters
     .map((ch) => {
-      return `<label>
-      <input type="checkbox" class="chap-select" value="${ch}" onchange="loadTopics()"> ${ch}
+      return `<label class="block mb-1">
+      <input type="radio" name="chapter-select" class="chap-select" value="${ch}" onchange="loadTopics('${ch}')"> ${ch}
     </label>`;
     })
     .join("");
@@ -742,43 +742,26 @@ function loadChapters() {
   updatePreview();
 }
 
-function loadTopics() {
+function loadTopics(chapName) {
   const topicBox = document.getElementById("topic-list");
-  if (!topicBox) return;
-
-  const checkedChaps = Array.from(document.querySelectorAll('.chap-select:checked')).map(cb => cb.value);
-
-  if (checkedChaps.length === 0) {
-    topicBox.innerHTML = currentLang === "bn" ? "অধ্যায় নির্বাচন করুন..." : "Select Chapter first...";
-    updatePreview();
-    return;
-  }
 
   const topicsDb = currentLang === "bn" ? db.topics_bn : db.topics_en;
-  let allTopics = [];
+  const matchedTopics = topicsDb[chapName] || [
+    currentLang === "bn"
+      ? `টপিক ১: ${chapName} এর মূল বিষয়বস্তু`
+      : `Topic 1: Core Concepts of ${chapName}`,
+    currentLang === "bn"
+      ? `টপিক ২: পাঠের সহজ ব্যাখ্যা ও উদাহরণ`
+      : `Topic 2: Easy Explanation & Examples`,
+    currentLang === "bn"
+      ? `টপিক ৩: পাঠ ও মূল্যায়ন প্রশ্নোত্তর`
+      : `Topic 3: Discussion and Assessment Q/A`,
+  ];
 
-  checkedChaps.forEach(chapName => {
-    const matchedTopics = topicsDb[chapName] || [
-      currentLang === "bn"
-        ? `টপিক ১: ${chapName} এর মূল বিষয়বস্তু`
-        : `Topic 1: Core Concepts of ${chapName}`,
-      currentLang === "bn"
-        ? `টপিক ২: পাঠের সহজ ব্যাখ্যা ও উদাহরণ`
-        : `Topic 2: Easy Explanation & Examples`,
-      currentLang === "bn"
-        ? `টপিক ৩: পাঠ ও মূল্যায়ন প্রশ্নোত্তর`
-        : `Topic 3: Discussion and Assessment Q/A`,
-    ];
-    matchedTopics.forEach(tp => {
-      allTopics.push({ topic: tp, chapter: chapName });
-    });
-  });
-
-  topicBox.innerHTML = allTopics
-    .map((item) => {
-      const cleanChapName = item.chapter.split(":")[0];
-      return `<label>
-      <input type="checkbox" class="topic-check" value="${item.topic}" data-chap="${item.chapter}" onchange="updatePreview()"> ${item.topic} <span class="text-muted" style="font-size:10px; margin-left:auto; color:#64748b;">(${cleanChapName})</span>
+  topicBox.innerHTML = matchedTopics
+    .map((tp) => {
+      return `<label class="block mb-1">
+      <input type="checkbox" class="topic-check" value="${tp}" onchange="updatePreview()"> ${tp}
     </label>`;
     })
     .join("");
@@ -1188,9 +1171,6 @@ function saveDraft() {
     duration: document.getElementById("duration").value,
     lessonObjective: document.getElementById("lessonObjective").value,
 
-    chapters: Array.from(document.querySelectorAll(".chap-select:checked")).map(cb => cb.value),
-    topics: Array.from(document.querySelectorAll(".topic-check:checked")).map(cb => cb.value),
-
     methods: Array.from(document.querySelectorAll(".meth-check:checked")).map(
       (m) => m.value,
     ),
@@ -1319,18 +1299,6 @@ function loadDraft(id) {
 
   loadChapters();
 
-  // Restore chapters
-  document.querySelectorAll(".chap-select").forEach((cb) => {
-    cb.checked = plan.chapters && plan.chapters.includes(cb.value);
-  });
-
-  loadTopics();
-
-  // Restore topics
-  document.querySelectorAll(".topic-check").forEach((cb) => {
-    cb.checked = plan.topics && plan.topics.includes(cb.value);
-  });
-
   document.getElementById("bookName").value = plan.bookName || "";
   document.getElementById("duration").value = plan.duration || 45;
   document.getElementById("lessonObjective").value = plan.lessonObjective || "";
@@ -1438,9 +1406,110 @@ function deleteDraft(id) {
   renderLibrary();
 }
 
-function toggleSidebar() {
-  const workspace = document.querySelector(".workspace");
-  if (workspace) {
-    workspace.classList.toggle("sidebar-collapsed");
+// ==========================================
+// [১৮] প্রেজেন্টেশন ড্যাশবোর্ডে ডেটা পাঠানো (Send to Presentation Dashboard)
+// ==========================================
+function sendToPresentation(planId) {
+  let planToTransfer = null;
+  if (planId) {
+    const savedLessons = JSON.parse(localStorage.getItem("sashiba_lessons")) || [];
+    planToTransfer = savedLessons.find((p) => p.id === planId);
+  } else {
+    // বর্তমান ফর্ম ইনপুটসমূহ
+    const schName = document.getElementById("schName")?.value || "";
+    const schAddr = document.getElementById("schAddr")?.value || "";
+    const schCode = document.getElementById("schCode")?.value || "";
+    const schYear = document.getElementById("schYear")?.value || "";
+    const board = document.getElementById("board")?.value || "";
+    const className = document.getElementById("class")?.value || "";
+    const groupName = document.getElementById("group")?.value || "";
+    const subject = document.getElementById("subject")?.value || "";
+    const bookName = document.getElementById("bookName")?.value || "";
+    const duration = document.getElementById("duration")?.value || "45";
+    const objective = document.getElementById("lessonObjective")?.value || "";
+
+    const selectedChapter =
+      document
+        .querySelector('input[name="ch"]:checked')
+        ?.parentElement?.textContent?.trim() || "";
+    const selectedTopics = Array.from(
+      document.querySelectorAll('#topic-list input[type="checkbox"]:checked'),
+    ).map((cb) => cb.parentElement.textContent.trim());
+    const selectedMethods = Array.from(
+      document.querySelectorAll('#methods-list input[type="checkbox"]:checked'),
+    ).map((cb) => cb.parentElement.textContent.trim());
+    const selectedBlooms = Array.from(
+      document.querySelectorAll('#bloom-options input[type="checkbox"]:checked'),
+    ).map((cb) => cb.value);
+
+    const rollVGood = document.getElementById("roll-vgood")?.value || "";
+    const rollAvg = document.getElementById("roll-avg")?.value || "";
+    const rollLow = document.getElementById("roll-low")?.value || "";
+
+    // শিখনফল ও টাইমটেবিল
+    const outcomesNodes = document.querySelectorAll("#v-outcomes li");
+    const outcomes = Array.from(outcomesNodes).map((li) =>
+      li.textContent.trim(),
+    );
+
+    const tableRows = document.querySelectorAll("#v-table tr");
+    const tableData = Array.from(tableRows)
+      .map((tr) => {
+        const tds = tr.querySelectorAll("td");
+        if (tds.length === 3) {
+          return {
+            time: tds[0].textContent.trim(),
+            teacher: tds[1].textContent.trim(),
+            student: tds[2].textContent.trim(),
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    const homework = document.getElementById("v-homework")?.textContent || "";
+
+    planToTransfer = {
+      id: "transfer_" + Date.now(),
+      date: new Date().toLocaleDateString(
+        currentLang === "bn" ? "bn-BD" : "en-US",
+      ),
+      schName,
+      schAddr,
+      schCode,
+      schYear,
+      board,
+      className,
+      groupName,
+      subject,
+      bookName,
+      duration,
+      objective,
+      chapter: selectedChapter,
+      topics: selectedTopics,
+      methods: selectedMethods,
+      blooms: selectedBlooms,
+      grouping: { vgood: rollVGood, avg: rollAvg, low: rollLow },
+      outcomes,
+      tableData,
+      homework,
+    };
   }
+
+  if (planToTransfer) {
+    localStorage.setItem(
+      "sashiba_active_transfer_lesson",
+      JSON.stringify(planToTransfer),
+    );
+    let savedLessons =
+      JSON.parse(localStorage.getItem("sashiba_lessons")) || [];
+    if (!savedLessons.some((p) => p.id === planToTransfer.id)) {
+      savedLessons.unshift(planToTransfer);
+      localStorage.setItem("sashiba_lessons", JSON.stringify(savedLessons));
+    }
+  }
+
+  // প্রেজেন্টেশন ড্যাশবোর্ডে স্থানান্তর
+  window.location.href = "../index.html?autoImport=true";
 }
+

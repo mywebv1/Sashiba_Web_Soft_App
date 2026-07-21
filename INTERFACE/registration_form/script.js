@@ -1,3 +1,25 @@
+// ==================== থিম সিনক্রোনাইজেশন লজিক (postMessage & localStorage) ====================
+(function initSubAppThemeSync() {
+  function applyTheme(theme) {
+    if (theme === "dark") {
+      document.body.classList.add("dark-mode");
+    } else if (theme === "light") {
+      document.body.classList.remove("dark-mode");
+    }
+  }
+
+  try {
+    const savedTheme = localStorage.getItem("sashiba_theme");
+    if (savedTheme) applyTheme(savedTheme);
+  } catch (e) {}
+
+  window.addEventListener("message", function (event) {
+    if (event.data && event.data.type === "THEME_CHANGE") {
+      applyTheme(event.data.theme);
+    }
+  });
+})();
+
 // ১. নেভিগেশন ও প্রগ্রেস বার
 function next(s) {
   document.querySelectorAll(".step").forEach((step) => {

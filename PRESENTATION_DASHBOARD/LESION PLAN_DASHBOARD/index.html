@@ -60,6 +60,13 @@
           >
             <i class="fa-solid fa-clock-rotate-left"></i> পুরোনো লেসন প্ল্যান
           </a>
+          <a
+            href="../index.html"
+            class="nav-item"
+            id="sb-pres-dash"
+          >
+            <i class="fa-solid fa-desktop"></i> প্রেজেন্টেশন ড্যাশবোর্ড
+          </a>
         </nav>
 
         <!-- ইউজার প্রোফাইল কার্ড -->
@@ -78,12 +85,7 @@
       <main class="main-content" id="mainBuilder">
         <!-- টপ বার ও এক্সপোর্ট ড্রপডাউন -->
         <header class="top-bar">
-          <div style="display: flex; align-items: center;">
-            <button class="btn-sidebar-toggle" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Toggle Sidebar">
-              <i class="fa-solid fa-bars"></i>
-            </button>
-            <h1 class="main-heading" id="hdr-title">লেসন আর্কিটেক্ট</h1>
-          </div>
+          <h1 class="main-heading" id="hdr-title">লেসন আর্কিটেক্ট</h1>
           <div class="actions" style="display: flex; gap: 10px">
             <!-- ইংরেজি ও বাংলা ভাষা টগল বাটন -->
             <button
@@ -93,6 +95,17 @@
             >
               <i class="fa-solid fa-globe"></i>
               <span>English</span>
+            </button>
+
+            <!-- প্রেজেন্টেশন জেনারেট বাটন -->
+            <button
+              class="btn btn-primary"
+              style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; color: white;"
+              onclick="sendToPresentation()"
+              id="btn-send-pres"
+            >
+              <i class="fa-solid fa-chalkboard-user"></i>
+              <span>প্রেজেন্টেশন তৈরি করুন</span>
             </button>
 
             <div class="dropdown-wrapper">
@@ -108,6 +121,18 @@
 
               <!-- এক্সপোর্ট ড্রপডাউন মেনু -->
               <div class="dropdown-menu" id="exportMenu">
+                <!-- প্রেজেন্টেশনে রূপান্তর -->
+                <button
+                  class="dropdown-item"
+                  onclick="sendToPresentation()"
+                  id="opt-pres"
+                >
+                  <i class="fa-solid fa-file-powerpoint"></i>
+                  <div class="item-text">
+                    <strong>প্রেজেন্টেশনে রূপান্তর</strong>
+                    <small>স্লাইড ড্যাশবোর্ডে অটো স্লাইড তৈরি করুন</small>
+                  </div>
+                </button>
                 <!-- ড্রাফট সেভ বাটন -->
                 <button
                   class="dropdown-item"
@@ -441,42 +466,6 @@
             <i class="fa-solid fa-arrow-left"></i> ব্যাক টু ড্যাশবোর্ড
           </button>
         </header>
-
-        <!-- লাইব্রেরি ফিল্টার এবং সার্চ বার -->
-        <div class="library-filter-bar">
-          <div class="search-box-wrapper">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="libSearchInput" placeholder="শ্রেণি, বিষয় বা প্রতিষ্ঠানের নাম খুঁজুন..." oninput="filterLibrary()">
-          </div>
-          <div class="filter-dropdown-wrapper">
-            <select id="libClassFilter" onchange="filterLibrary()">
-              <option value="">সকল শ্রেণি</option>
-              <option value="প্রথম">প্রথম শ্রেণি</option>
-              <option value="দ্বিতীয়">দ্বিতীয় শ্রেণি</option>
-              <option value="তৃতীয়">তৃতীয় শ্রেণি</option>
-              <option value="চতুর্থ">চতুর্থ শ্রেণি</option>
-              <option value="পঞ্চম">পঞ্চম শ্রেণি</option>
-              <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
-              <option value="সপ্তম">সপ্তম শ্রেণি</option>
-              <option value="অষ্টম">অষ্টম শ্রেণি</option>
-              <option value="নবম">নবম শ্রেণি</option>
-              <option value="দশম">দশম শ্রেণি</option>
-              <option value="একাদশ">একাদশ শ্রেণি</option>
-              <option value="দ্বাদশ">দ্বাদশ শ্রেণি</option>
-            </select>
-          </div>
-          <div class="date-filter-wrapper">
-            <i class="fa-solid fa-calendar-days"></i>
-            <input type="date" id="libDateFilter" onchange="filterLibrary()" title="তারিখ অনুযায়ী ফিল্টার">
-          </div>
-          <div class="filter-dropdown-wrapper">
-            <select id="libSortFilter" onchange="filterLibrary()">
-              <option value="newest">সর্বশেষ সংরক্ষিত (নতুন আগে)</option>
-              <option value="oldest">পুরাতন ফাইল আগে</option>
-            </select>
-          </div>
-        </div>
-
         <!-- কার্ড ডিসপ্লে গ্রিড -->
         <div class="library-grid" id="libraryGrid"></div>
       </main>

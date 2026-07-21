@@ -78,7 +78,12 @@
       <main class="main-content" id="mainBuilder">
         <!-- টপ বার ও এক্সপোর্ট ড্রপডাউন -->
         <header class="top-bar">
-          <h1 class="main-heading" id="hdr-title">লেসন আর্কিটেক্ট</h1>
+          <div style="display: flex; align-items: center;">
+            <button class="btn-sidebar-toggle" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Toggle Sidebar">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <h1 class="main-heading" id="hdr-title">লেসন আর্কিটেক্ট</h1>
+          </div>
           <div class="actions" style="display: flex; gap: 10px">
             <!-- ইংরেজি ও বাংলা ভাষা টগল বাটন -->
             <button

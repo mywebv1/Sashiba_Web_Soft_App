@@ -1,8 +1,28 @@
 // =========================================================================
 //          সশিবা প্রশ্নপত্র আর্কিটেক্ট — অ্যাপ লজিক (app.js)
-//          এই ফাইলটি script.js এর পরে লোড হয় এবং সব নতুন
-//          ফিচার পরিচালনা করে।
 // =========================================================================
+
+// ==================== থিম সিনক্রোনাইজেশন লজিক (postMessage & localStorage) ====================
+(function initSubAppThemeSync() {
+  function applyTheme(theme) {
+    if (theme === "dark") {
+      document.body.classList.add("dark-mode");
+    } else if (theme === "light") {
+      document.body.classList.remove("dark-mode");
+    }
+  }
+
+  try {
+    const savedTheme = localStorage.getItem("sashiba_theme");
+    if (savedTheme) applyTheme(savedTheme);
+  } catch (e) {}
+
+  window.addEventListener("message", function (event) {
+    if (event.data && event.data.type === "THEME_CHANGE") {
+      applyTheme(event.data.theme);
+    }
+  });
+})();
 
 // ==================== [১] বর্তমান ভাষা স্টেট শুরু ====================
 let currentLang = "bn";
@@ -152,6 +172,22 @@ window.onload = function () {
 
   // লাইব্রেরি রেন্ডার করো
   renderLibrary();
+
+  // তারিখ ইনপুটে ৪ ডিজিটের বেশি বছর টাইপ করা প্রতিরোধ
+  const dateInput = document.getElementById("libDateFilter");
+  if (dateInput) {
+    dateInput.setAttribute("max", "9999-12-31");
+    dateInput.addEventListener("input", function () {
+      if (this.value) {
+        const parts = this.value.split("-");
+        if (parts[0] && parts[0].length > 4) {
+          parts[0] = parts[0].slice(0, 4);
+          this.value = parts.join("-");
+          filterLibrary();
+        }
+      }
+    });
+  }
 
   // বাইরে ক্লিক করলে এক্সপোর্ট মেনু বন্ধ হবে
   document.addEventListener("click", function (e) {
@@ -458,77 +494,120 @@ function saveToLibrary() {
   // জেনারেট না হলে সেভ করা যাবে না
   if (!qHtml || qHtml.indexOf("empty-msg") !== -1) {
     alert(currentLang === "bn"
-      ? "\u09aa\u09cd\u09b0\u09a5\u09ae\u09c7 \u09aa\u09cd\u09b0\u09b6\u09cd\u09a8\u09aa\u09a4\u09cd\u09b0 \u099c\u09c7\u09a8\u09be\u09b0\u09c7\u099f \u0995\u09b0\u09c1\u09a8!"
+      ? "প্রথমে প্রশ্নপত্র জেনারেট করুন!"
       : "Please generate a question paper first!");
     return;
   }
 
+  var now = new Date();
+  var formattedDate = now.toLocaleDateString(currentLang === "bn" ? "bn-BD" : "en-US", { year: "numeric", month: "long", day: "numeric" });
+  var formattedTime = now.toLocaleTimeString(currentLang === "bn" ? "bn-BD" : "en-US", { hour: "2-digit", minute: "2-digit" });
+
+  var displayCls = cls && cls.trim() !== "" ? cls : "সাধারণ";
+  var displaySub = sub && sub.trim() !== "" ? sub : "সাধারণ বিষয়";
+
   var library = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
   var entry = {
-    id:       Date.now(),
-    title:    cls + " - " + sub,
-    inst:     name.trim() || (currentLang === "bn" ? "\u0985\u099c\u09be\u09a8\u09be \u09aa\u09cd\u09b0\u09a4\u09bf\u09b7\u09cd\u09a0\u09be\u09a8" : "Unknown Institution"),
-    cls:      cls,
-    sub:      sub,
-    time:     time,
-    date:     new Date().toLocaleDateString("bn-BD"),
-    qContent: qHtml,
-    aContent: aHtml,
+    id:        Date.now(),
+    timestamp: Date.now(),
+    title:     displayCls + " • " + displaySub,
+    inst:      name.trim() || (currentLang === "bn" ? "নামহীন প্রতিষ্ঠান" : "Unknown Institution"),
+    cls:       displayCls,
+    sub:       displaySub,
+    time:      time,
+    date:      formattedDate,
+    timeStr:   formattedTime,
+    qContent:  qHtml,
+    aContent:  aHtml,
   };
 
   library.unshift(entry);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(library));
   alert(currentLang === "bn"
-    ? "\u09aa\u09cd\u09b0\u09b6\u09cd\u09a8\u09aa\u09a4\u09cd\u09b0 \u09b2\u09be\u0987\u09ac\u09cd\u09b0\u09c7\u09b0\u09bf\u09a4\u09c7 \u09b8\u09c7\u09ad \u09b9\u09af\u09bc\u09c7\u099b\u09c7!"
+    ? "প্রশ্নপত্রটি লাইব্রেরিতে নতুন চেইনে সেভ হয়েছে!"
     : "Question paper saved to library!");
   var menu = document.getElementById("exportMenu");
   if (menu) menu.style.display = "none";
 }
 
 function renderLibrary() {
-  var grid    = document.getElementById("libraryGrid");
+  filterLibrary();
+}
+
+function filterLibrary() {
+  var grid = document.getElementById("libraryGrid");
   if (!grid) return;
   var library = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
-  var noSaved = currentLang === "bn"
-    ? "\u0995\u09cb\u09a8\u09cb \u09b8\u09c7\u09ad \u0995\u09b0\u09be \u09aa\u09cd\u09b0\u09b6\u09cd\u09a8\u09aa\u09a4\u09cd\u09b0 \u09a8\u09c7\u0987"
-    : "No saved question papers";
-  var noSavedSub = currentLang === "bn"
-    ? "\u09aa\u09cd\u09b0\u09b6\u09cd\u09a8\u09aa\u09a4\u09cd\u09b0 \u09a4\u09c8\u09b0\u09bf \u0995\u09b0\u09c1\u09a8 \u098f\u09ac\u0982 \u09b2\u09be\u0987\u09ac\u09cd\u09b0\u09c7\u09b0\u09bf\u09a4\u09c7 \u09b8\u09c7\u09ad \u0995\u09b0\u09c1\u09a8\u0964"
-    : "Create a question paper and save it to your library.";
+  var search = (document.getElementById("libSearchInput") || {}).value || "";
+  var classFilter = (document.getElementById("libClassFilter") || {}).value || "";
+  var dateFilter = (document.getElementById("libDateFilter") || {}).value || "";
+  var sortFilter = (document.getElementById("libSortFilter") || {}).value || "newest";
 
   if (library.length === 0) {
     grid.innerHTML =
-      '<div class="empty-library">' +
-        '<i class="fa-solid fa-folder-open"></i>' +
-        "<h3>" + noSaved + "</h3>" +
-        "<p>" + noSavedSub + "</p>" +
-      "</div>";
+      '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #64748b;">' +
+        '<i class="fa-solid fa-folder-open" style="font-size: 48px; margin-bottom: 15px; color: #cbd5e1;"></i>' +
+        '<p style="font-size: 16px;">এখনো কোনো প্রশ্নপত্র সংরক্ষণ করা হয়নি।</p>' +
+      '</div>';
     return;
   }
 
-  var loadTxt   = currentLang === "bn" ? "\u09b2\u09cb\u09a1" : "Load";
-  var printTxt  = currentLang === "bn" ? "\u09aa\u09cd\u09b0\u09bf\u09a8\u09cd\u099f" : "Print";
-  var deleteTxt = currentLang === "bn" ? "\u09ae\u09c1\u099b\u09c1\u09a8" : "Delete";
-  var minTxt    = currentLang === "bn" ? " \u09ae\u09bf\u09a8\u09bf\u099f" : " min";
+  var filtered = library.filter(function (item) {
+    var textSearch = (item.title + " " + item.inst + " " + item.cls + " " + item.sub).toLowerCase();
+    var matchesQuery = !search || textSearch.indexOf(search.toLowerCase()) !== -1;
+    var matchesClass = !classFilter || (item.cls && item.cls.indexOf(classFilter) !== -1);
+    
+    var itemDate = "";
+    if (item.timestamp) {
+      var d = new Date(item.timestamp);
+      var year = d.getFullYear();
+      var month = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      itemDate = year + "-" + month + "-" + day;
+    }
+    var matchesDate = !dateFilter || itemDate === dateFilter;
 
-  grid.innerHTML = library.map(function (item) {
+    return matchesQuery && matchesClass && matchesDate;
+  });
+
+  if (sortFilter === "newest") {
+    filtered.sort(function (a, b) { return (b.timestamp || b.id || 0) - (a.timestamp || a.id || 0); });
+  } else if (sortFilter === "oldest") {
+    filtered.sort(function (a, b) { return (a.timestamp || a.id || 0) - (b.timestamp || b.id || 0); });
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML =
+      '<div style="grid-column: 1/-1; text-align: center; padding: 50px 20px; color: #64748b;">' +
+        '<i class="fa-solid fa-magnifying-glass" style="font-size: 40px; margin-bottom: 12px; color: #cbd5e1;"></i>' +
+        '<p style="font-size: 15px;">আপনার খোঁজা ফিল্টারের সাথে কোনো ফাইল মেলেনি।</p>' +
+      '</div>';
+    return;
+  }
+
+  var loadTxt   = currentLang === "bn" ? "লোড" : "Load";
+  var printTxt  = currentLang === "bn" ? "প্রিন্ট" : "Print";
+  var deleteTxt = currentLang === "bn" ? "ডিলিট" : "Delete";
+
+  grid.innerHTML = filtered.map(function (item) {
+    var displayCls = item.cls && item.cls !== "N/A" ? item.cls : "সাধারণ";
+    var timeInfo = item.timeStr ? " | ⏰ " + item.timeStr : "";
     return (
-      '<div class="lib-card">' +
-        '<div class="lib-card-icon"><i class="fa-solid fa-file-lines"></i></div>' +
-        "<h3>" + item.title + "</h3>" +
-        "<p>" + item.inst + " &bull; " + item.date + "</p>" +
-        '<div class="lib-card-meta">' +
-          '<span class="lib-badge">' + item.cls + "</span>" +
-          '<span class="lib-badge green">' + item.sub + "</span>" +
-          '<span class="lib-badge">' + item.time + minTxt + "</span>" +
-        "</div>" +
-        '<div class="lib-card-actions">' +
-          '<button class="lib-btn" onclick="loadFromLibrary(' + item.id + ')"><i class="fa-solid fa-rotate-left"></i> ' + loadTxt + "</button>" +
-          '<button class="lib-btn" onclick="printFromLibrary(' + item.id + ')"><i class="fa-solid fa-print"></i> ' + printTxt + "</button>" +
-          '<button class="lib-btn danger" onclick="deleteFromLibrary(' + item.id + ')"><i class="fa-solid fa-trash"></i> ' + deleteTxt + "</button>" +
-        "</div>" +
-      "</div>"
+      '<div class="chain-card">' +
+        '<div class="chain-badge-row">' +
+          '<span class="pill-badge class-badge"><i class="fa-solid fa-graduation-cap"></i> ' + displayCls + ' শ্রেণি</span>' +
+          '<span class="pill-badge subject-badge"><i class="fa-solid fa-file-pen"></i> ' + (item.sub || "সাধারণ বিষয়") + '</span>' +
+          '<span class="pill-badge date-badge"><i class="fa-regular fa-calendar-days"></i> ' + item.date + timeInfo + '</span>' +
+        '</div>' +
+        '<h3 class="chain-card-title">প্রশ্নপত্র: ' + (item.sub || "সাধারণ বিষয়") + ' (' + item.time + ' মিনিট)</h3>' +
+        '<div class="chain-card-school"><i class="fa-solid fa-school"></i> ' + (item.inst || "প্রতিষ্ঠান") + '</div>' +
+        '<div class="chain-card-actions">' +
+          '<button class="chain-btn" onclick="loadFromLibrary(' + item.id + ')"><i class="fa-solid fa-folder-open"></i> ' + loadTxt + '</button>' +
+          '<button class="chain-btn" onclick="printFromLibrary(' + item.id + ')"><i class="fa-solid fa-print"></i> ' + printTxt + '</button>' +
+          '<button class="chain-btn delete-btn" onclick="deleteFromLibrary(' + item.id + ')"><i class="fa-solid fa-trash-can"></i> ' + deleteTxt + '</button>' +
+        '</div>' +
+      '</div>'
     );
   }).join("");
 }

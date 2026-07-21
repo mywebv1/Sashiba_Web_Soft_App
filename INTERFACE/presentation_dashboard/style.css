@@ -2034,7 +2034,7 @@ body.dark-mode .visual-component-box {
 }
 
 body.dark-mode .slide-data-table th {
-  background: #1e293b;
+  background: #0f172a;
   color: #f1f5f9;
   border-color: #334155;
 }
@@ -2045,13 +2045,13 @@ body.dark-mode .slide-data-table td {
 }
 
 body.dark-mode .info-step-card {
-  background: #1e293b;
+  background: #0f172a;
   border-color: #334155;
   color: #ffffff;
 }
 
 body.dark-mode .quiz-opt-card {
-  background: #0f172a;
+  background: #1e293b;
   border-color: #334155;
   color: #ffffff;
 }
@@ -2063,7 +2063,7 @@ body.dark-mode .quiz-opt-card:hover {
 }
 
 body.dark-mode .slide-bullet-card {
-  background: #0f172a;
+  background: #1e293b;
   border-color: #334155;
   color: #ffffff;
 }
