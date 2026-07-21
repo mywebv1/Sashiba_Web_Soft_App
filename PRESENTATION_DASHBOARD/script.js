@@ -1321,18 +1321,18 @@ function renderActiveCanvas() {
         </div>
 
         <!-- Canvas and Element Area -->
-        <div class="whiteboard-canvas-area" id="wb_canvas_area">
+        <div class="whiteboard-canvas-area" id="wb_canvas_area_edit">
           <!-- Image Element (Draggable/Resizable) -->
-          <div class="wb-element wb-image-container" id="wb_image_container" style="left: ${slide.imageX || 20}%; top: ${slide.imageY || 10}%; width: ${slide.imageWidth || 60}%;">
+          <div class="wb-element wb-image-container" id="wb_image_container_edit" style="left: ${slide.imageX || 20}%; top: ${slide.imageY || 10}%; width: ${slide.imageWidth || 60}%;">
             <img src="${slide.image}" class="wb-image-el" style="width: 100%; display: block;" alt="Slide Image">
             <div class="wb-resize-handle"></div>
           </div>
 
           <!-- Drawing Canvas Overlay -->
-          <canvas class="wb-canvas" id="wb_canvas"></canvas>
+          <canvas class="wb-canvas" id="wb_canvas_edit"></canvas>
 
           <!-- Annotations container for shapes and text boxes -->
-          <div class="wb-annotations-layer" id="wb_annotations_layer" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:9;">
+          <div class="wb-annotations-layer" id="wb_annotations_layer_edit" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:9;">
             <!-- Saved annotations loaded here -->
           </div>
         </div>
@@ -1354,7 +1354,7 @@ function renderActiveCanvas() {
       const avgRolls = document.getElementById("roll-avg")?.value || "৪, ৫, ৬";
       const lowRolls = document.getElementById("roll-low")?.value || "৭, ৮, ৯";
       visualInner = `
-        <strong style="font-size:12.5px; display:block; margin-bottom:6px;"><i class="fa-solid fa-users-gear"></i> স্মার্ট শিক্ষার্থী গ্রুপিং:</strong>
+        <strong style="font-size:12.5px; display:block; margin-bottom:6px;"><i class="fa-solid fa-users-gear"></i> スマート শিক্ষার্থী গ্রুপিং:</strong>
         <table class="slide-data-table">
           <thead>
             <tr><th>গ্রুপ</th><th>রোল নম্বর</th><th>কার্যক্রম</th></tr>
@@ -1717,10 +1717,11 @@ function replayCanvasAnimations() {
 // =================== হোয়াইটবোর্ড ইন্টারেক্টিভ ফাংশনসমূহ ===================
 
 function initWhiteboard(slide, isPresenter) {
-  const canvas = document.getElementById("wb_canvas");
-  const area = document.getElementById("wb_canvas_area");
-  const wrapper = document.getElementById("wb_image_container");
-  const annotLayer = document.getElementById("wb_annotations_layer");
+  const suffix = isPresenter ? "_pres" : "_edit";
+  const canvas = document.getElementById("wb_canvas" + suffix);
+  const area = document.getElementById("wb_canvas_area" + suffix);
+  const wrapper = document.getElementById("wb_image_container" + suffix);
+  const annotLayer = document.getElementById("wb_annotations_layer" + suffix);
   if (!canvas || !area) return;
 
   // সেটআপ ক্যানভাস রেজোলিউশন
@@ -1807,7 +1808,8 @@ function initWhiteboard(slide, isPresenter) {
     }
   }, 100);
 
-  updateWbPointerEvents();
+  // Set initial tool pointer-events
+  updateWbPointerEvents(isPresenter);
 
   // মাউস ও টাচ ইভেন্টস যুক্তকরণ
   canvas.addEventListener("mousedown", (e) => startDrawing(e, canvas));
@@ -1845,6 +1847,10 @@ function initWhiteboard(slide, isPresenter) {
 function makeElementInteractable(el, slide) {
   if (!el) return;
 
+  // Determine suffix based on context
+  const isPres = document.getElementById("fullscreenOverlay").style.display !== "none";
+  const suffix = isPres ? "_pres" : "_edit";
+
   const handle = el.querySelector(".wb-resize-handle");
   let clickTime = 0;
 
@@ -1852,17 +1858,17 @@ function makeElementInteractable(el, slide) {
   el.addEventListener("mousedown", (e) => {
     if (wbActiveTool !== 'select') return;
     if (e.target === handle) return;
-    if (e.target.closest(".wb-delete-btn")) return; // let delete button trigger its click
+    if (e.target.closest(".wb-delete-btn")) return;
     if (document.activeElement === el) return; // Allow caret editing when focused
 
     clickTime = Date.now();
     wbActiveElement = el;
-    wbLastActiveElement = el; // Store last active element!
+    wbLastActiveElement = el;
     wbIsDragging = true;
     wbDragStartX = e.clientX;
     wbDragStartY = e.clientY;
 
-    const area = document.getElementById("wb_canvas_area");
+    const area = document.getElementById("wb_canvas_area" + suffix);
     const areaRect = area.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
 
@@ -1876,7 +1882,6 @@ function makeElementInteractable(el, slide) {
     const currentColor = el.style.color || el.style.borderColor || '#ef4444';
     document.querySelectorAll(".wb-color-dot").forEach(d => {
       d.classList.remove("active");
-      // convert style color (e.g. rgb) to match picker style
       const rgbColor = d.style.backgroundColor;
       if (rgbColor === currentColor) d.classList.add("active");
     });
@@ -1893,7 +1898,6 @@ function makeElementInteractable(el, slide) {
     const dragDuration = Date.now() - clickTime;
     if (dragDuration < 250 && el.contentEditable === "true") {
       el.focus();
-      // Select all text if it is default
       if (el.innerText === 'নতুন টেক্সট') {
         const range = document.createRange();
         range.selectNodeContents(el);
@@ -1926,7 +1930,7 @@ function makeElementInteractable(el, slide) {
       wbDragStartX = e.clientX;
       wbDragStartY = e.clientY;
 
-      const area = document.getElementById("wb_canvas_area");
+      const area = document.getElementById("wb_canvas_area" + suffix);
       const areaRect = area.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
 
@@ -1945,7 +1949,10 @@ function makeElementInteractable(el, slide) {
     document.addEventListener("mousemove", (e) => {
       if (!wbActiveElement) return;
 
-      const area = document.getElementById("wb_canvas_area");
+      const isPresActive = document.getElementById("fullscreenOverlay").style.display !== "none";
+      const activeSuffix = isPresActive ? "_pres" : "_edit";
+
+      const area = document.getElementById("wb_canvas_area" + activeSuffix);
       if (!area) return;
       const areaRect = area.getBoundingClientRect();
 
@@ -2030,9 +2037,12 @@ function stopDrawing(slide) {
 function saveWhiteboardState(slide) {
   if (!slide) return;
 
-  const canvas = document.getElementById("wb_canvas");
-  const wrapper = document.getElementById("wb_image_container");
-  const annotLayer = document.getElementById("wb_annotations_layer");
+  const isPres = document.getElementById("fullscreenOverlay").style.display !== "none";
+  const suffix = isPres ? "_pres" : "_edit";
+
+  const canvas = document.getElementById("wb_canvas" + suffix);
+  const wrapper = document.getElementById("wb_image_container" + suffix);
+  const annotLayer = document.getElementById("wb_annotations_layer" + suffix);
 
   // ক্যানভাস ড্রয়িং সংরক্ষণ
   if (canvas) {
@@ -2097,11 +2107,14 @@ function setWbTool(btn, tool) {
   wbActiveTool = tool;
   document.querySelectorAll(".wb-btn").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
-  updateWbPointerEvents();
+  
+  const isPres = document.getElementById("fullscreenOverlay").style.display !== "none";
+  updateWbPointerEvents(isPres);
 }
 
-function updateWbPointerEvents() {
-  const canvas = document.getElementById("wb_canvas");
+function updateWbPointerEvents(isPresenter) {
+  const suffix = isPresenter ? "_pres" : "_edit";
+  const canvas = document.getElementById("wb_canvas" + suffix);
   if (!canvas) return;
 
   if (wbActiveTool === 'pen' || wbActiveTool === 'eraser') {
@@ -2118,7 +2131,6 @@ function setWbColor(dot, color) {
   document.querySelectorAll(".wb-color-dot").forEach(d => d.classList.remove("active"));
   if (dot) dot.classList.add("active");
 
-  // ফোকাসড বা সিলেক্টেড অবজেক্টের কালার লাইভ চেঞ্জ করা
   const selectedEl = document.querySelector(".wb-element.selected") || wbLastActiveElement;
   if (selectedEl && !selectedEl.classList.contains("wb-image-container")) {
     selectedEl.style.color = color;
@@ -2190,7 +2202,9 @@ function addWbShape(type) {
 }
 
 function updateWbImageSize(val) {
-  const wrapper = document.getElementById("wb_image_container");
+  const isPres = document.getElementById("fullscreenOverlay").style.display !== "none";
+  const suffix = isPres ? "_pres" : "_edit";
+  const wrapper = document.getElementById("wb_image_container" + suffix);
   if (wrapper) {
     wrapper.style.width = `${val}%`;
     const slide = slides[activeSlideIndex];
@@ -2388,18 +2402,18 @@ function renderPresenterSlide() {
         </div>
 
         <!-- Canvas and Element Area -->
-        <div class="whiteboard-canvas-area" id="wb_canvas_area">
+        <div class="whiteboard-canvas-area" id="wb_canvas_area_pres">
           <!-- Image Element (Draggable/Resizable) -->
-          <div class="wb-element wb-image-container" id="wb_image_container" style="left: ${slide.imageX || 20}%; top: ${slide.imageY || 10}%; width: ${slide.imageWidth || 60}%;">
+          <div class="wb-element wb-image-container" id="wb_image_container_pres" style="left: ${slide.imageX || 20}%; top: ${slide.imageY || 10}%; width: ${slide.imageWidth || 60}%;">
             <img src="${slide.image}" class="wb-image-el" style="width: 100%; display: block;" alt="Slide Image">
             <div class="wb-resize-handle"></div>
           </div>
 
           <!-- Drawing Canvas Overlay -->
-          <canvas class="wb-canvas" id="wb_canvas"></canvas>
+          <canvas class="wb-canvas" id="wb_canvas_pres"></canvas>
 
           <!-- Annotations container for shapes and text boxes -->
-          <div class="wb-annotations-layer" id="wb_annotations_layer" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:9;">
+          <div class="wb-annotations-layer" id="wb_annotations_layer_pres" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:9;">
             <!-- Saved annotations loaded here -->
           </div>
         </div>
@@ -2554,9 +2568,9 @@ function renderPresenterSlide() {
     ${bodyContentHtml}
   `;
 
-  // Init whiteboard interactive in presentation mode too!
+  // Init whiteboard interactive in presentation mode too! (use suffix _pres)
   if (slide.image && slide.showImage !== false) {
-    initWhiteboard(slide, false); // Keep false to allow drawing/erasing live on screen!
+    initWhiteboard(slide, true); // true indicates presenter mode
   }
 }
 
