@@ -2947,153 +2947,190 @@ function toggleSidebar() {
 
 async function downloadAsPowerPointPPTX() {
   if (typeof PptxGenJS === 'undefined') {
-    return alert("PPTX লাইব্রেরি লোড হয়নি! দয়া করে ইন্টারনেট কানেকশন চেক করুন।");
-  }
-  if (slides.length === 0) {
-    return alert("ডাউনলোড করার জন্য কোনো স্লাইড নেই!");
+    return alert("라이브러리 পাওয়া যায়নি! ইন্টারনেটে সংযুক্ত হয়ে পেজটি রিফ্রেশ দিন।");
   }
 
   try {
     const pptx = new PptxGenJS();
+    // স্লাইড সাইজ এবং প্রপার্টিজ
     pptx.layout = 'LAYOUT_16x9';
-    pptx.author = 'সশিবা স্মার্ট শিক্ষা বাতায়ন';
-    pptx.company = 'Sashiba';
-
-    // ১. ড্যাশবোর্ড থিম সিঙ্ক্রোনাইজেশন
-    const themeId = typeof activeTheme !== 'undefined' ? activeTheme : "theme-modern";
-    const themeColors = {
-      "theme-modern": { bg: "FFFFFF", text: "1E293B", primary: "4F46E5", accent: "F59E0B" },
-      "theme-dark":   { bg: "0F172A", text: "F8FAFC", primary: "38BDF8", accent: "38BDF8" },
-      "theme-kids":   { bg: "FFF7ED", text: "C2410C", primary: "F97316", accent: "F97316" },
-      "theme-minimal":{ bg: "FFFFFF", text: "0F172A", primary: "4F46E5", accent: "4F46E5" },
-      "theme-stem":   { bg: "022C22", text: "34D399", primary: "10B981", accent: "34D399" }
+    pptx.author = 'Sashiba Smart Education';
+    
+    // ১. ড্যাশবোর্ড কালার প্যালেট (আপনার CSS থেকে হুবহু নেওয়া)
+    const UI_COLORS = {
+      primary: '4F46E5',   // Indigo
+      success: '10B981',   // Emerald
+      warning: 'F59E0B',   // Amber
+      danger: 'EF4444',    // Red
+      dark: '1E293B',      // Slate 800
+      light: 'F8FAFC',     // Slate 50
+      white: 'FFFFFF'
     };
-    const currentTheme = themeColors[themeId] || themeColors["theme-modern"];
 
-    // ২. টেক্সট ক্লিনার (পাওয়ারপয়েন্টে ভাঙা আইকন বা ইমোজি প্রতিরোধ করতে)
-    const fixTxt = (t) => t ? t.toString().replace(/[^\x00-\x7F\u0980-\u09FF\s]/g, "").trim() : "";
+    // ২. আইকন ম্যাপার (FontAwesome থেকে PowerPoint উপযোগী ইমোজি)
+    const iconMap = {
+      "fa-graduation-cap": "🎓", "fa-book-open": "📖", "fa-lightbulb": "💡",
+      "fa-bullseye": "🎯", "fa-list-check": "📋", "fa-users": "👥",
+      "fa-circle-question": "❓", "fa-house-laptop": "🏠", "fa-atom": "⚛️", "fa-calculator": "🧮"
+    };
+
+    // ৩. টেক্সট ফিক্সার (ক্লিয়ার বাংলা ফন্ট নিশ্চিত করা)
+    const clean = (t) => t ? t.toString().replace(/[^\x00-\x7F\u0980-\u09FF\s]/g, "").trim() : "";
 
     slides.forEach((slideObj, index) => {
       let slide = pptx.addSlide();
       
-      // ৩. ডাইনামিক ব্যাকগ্রাউন্ড লজিক (সবগুলো কালার সোয়াচ ম্যাপিং)
-      let slideBg = currentTheme.bg;
-      if (slideObj.bg === "bg-dark") slideBg = "0F172A";
-      else if (slideObj.bg === "bg-blue") slideBg = "1E3A8A";
-      else if (slideObj.bg === "bg-emerald") slideBg = "064E3B";
-      else if (slideObj.bg === "bg-amber") slideBg = "78350F";
-      else if (slideObj.bg === "bg-purple") slideBg = "581C87";
-      else if (slideObj.bg === "bg-cosmic") slideBg = "1E1B4B";
-      else if (slideObj.bg === "bg-sunset") slideBg = "EC4899";
-      else if (slideObj.bg === "bg-ocean") slideBg = "0F766E";
-      else if (slideObj.bg === "bg-neon") slideBg = "09090B";
-      else if (slideObj.bg === "bg-nordic") slideBg = "E2E8F0";
-      else if (slideObj.bg === "bg-matte") slideBg = "1C1917";
-      else if (slideObj.bg === "bg-white") slideBg = "FFFFFF";
+      // স্লাইড থিম নির্ধারণ (ড্যাশবোর্ড অনুযায়ী)
+      let isDark = slideObj.bg === "bg-dark" || slideObj.bg === "bg-emerald" || slideObj.bg === "bg-amber" || slideObj.bg === "bg-purple" || slideObj.bg === "bg-cosmic" || slideObj.bg === "bg-sunset" || slideObj.bg === "bg-ocean" || slideObj.bg === "bg-neon" || slideObj.bg === "bg-matte" || slideObj.type === "Cover";
+      let bgFill = isDark ? UI_COLORS.dark : UI_COLORS.white;
       
-      if (slideObj.type === "Cover") slideBg = "312E81"; // কভার স্লাইড ডার্ক ব্লু
+      if (slideObj.bg === "bg-blue") bgFill = '1E3A8A';
+      else if (slideObj.bg === "bg-emerald") bgFill = '064E3B';
+      else if (slideObj.bg === "bg-amber") bgFill = '78350F';
+      else if (slideObj.bg === "bg-purple") bgFill = '581C87';
+      else if (slideObj.bg === "bg-cosmic") bgFill = '1E1B4B';
+      else if (slideObj.bg === "bg-sunset") bgFill = 'EC4899';
+      else if (slideObj.bg === "bg-ocean") bgFill = '0F766E';
+      else if (slideObj.bg === "bg-neon") bgFill = '09090B';
+      else if (slideObj.bg === "bg-nordic") bgFill = 'E2E8F0';
+      else if (slideObj.bg === "bg-matte") bgFill = '1C1917';
+      else if (slideObj.bg === "bg-white") bgFill = 'FFFFFF';
       
-      slide.background = { fill: slideBg };
-      let txtCol = (slideBg === "FFFFFF" || slideBg === "F8FAFC" || slideBg === "FFF7ED" || slideBg === "E2E8F0") ? "1E293B" : "FFFFFF";
+      if (slideObj.type === "Cover") bgFill = '312E81'; // কভার স্লাইড সবসময় প্রফেশনাল ডার্ক ব্লু
+      
+      slide.background = { fill: bgFill };
+      let textCol = isDark ? UI_COLORS.white : UI_COLORS.dark;
 
-      // ৪. কভার স্লাইড ডিজাইন (মাঝখানে বিন্যস্ত)
+      // ==========================================
+      // [ক] কভার স্লাইড ডিজাইন (ড্যাশবোর্ডের স্প্ল্যাশ স্টাইল)
+      // ==========================================
       if (slideObj.type === "Cover") {
-        slide.addText(fixTxt(slideObj.title), {
-          x: 0, y: "30%", w: "100%", fontSize: 44, bold: true, color: "FFFFFF", align: "center", fontFace: "Arial"
-        });
-        slide.addShape(pptx.ShapeType.rect, { x: "30%", y: "48%", w: "40%", h: 0.05, fill: { color: "F59E0B" } });
+        // ডেকোরেティブ শেপ
+        slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: '100%', h: 0.15, fill: UI_COLORS.primary });
         
-        let subText = slideObj.bullets ? slideObj.bullets.join(" | ") : "";
-        slide.addText(fixTxt(subText), {
-          x: 0, y: "55%", w: "100%", fontSize: 18, color: "CBD5E1", align: "center", fontFace: "Arial"
+        slide.addText(iconMap[slideObj.icon] || "🎓", { 
+            x: 0, y: 1.5, w: '100%', fontSize: 60, align: 'center' 
+        });
+
+        slide.addText(clean(slideObj.title), {
+          x: 0.5, y: 2.8, w: 9.0, fontSize: 44, bold: true, color: UI_COLORS.white, align: 'center', fontFace: 'Arial'
+        });
+
+        slide.addShape(pptx.ShapeType.line, { x: '30%', y: '48%', w: '40%', h: 0, line: { color: UI_COLORS.warning, width: 3 } });
+
+        let info = Array.isArray(slideObj.bullets) ? slideObj.bullets.join("  |  ") : "";
+        slide.addText(clean(info), {
+          x: 0.5, y: 5.5, w: 9.0, fontSize: 18, color: 'CBD5E1', align: 'center', fontFace: 'Arial'
         });
       } 
       
-      // ৫. কন্টেন্ট স্লাইড ডিজাইন
+      // ==========================================
+      // [খ] কন্টেন্ট স্লাইড ডিজাইন (ড্যাশবোর্ড স্টুডিও স্টাইল)
+      // ==========================================
       else {
-        // ড্যাশবোর্ডের মতো হেডার বার
-        slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: "100%", h: 0.75, fill: { color: currentTheme.primary } });
-        slide.addText(fixTxt(slideObj.title), {
-          x: 0.4, y: 0.15, w: 9, fontSize: 24, bold: true, color: "FFFFFF", fontFace: "Arial"
+        // ১. টপ বার (স্মার্ট হেডার)
+        slide.addShape(pptx.ShapeType.rect, { 
+            x: 0, y: 0, w: '100%', h: 0.8, fill: UI_COLORS.primary 
+        });
+        
+        // ২. স্লাইড আইকন ও টাইটেল
+        let slideIcon = iconMap[slideObj.icon] || "📄";
+        slide.addText(`${slideIcon}  ${clean(slideObj.title)}`, {
+          x: 0.4, y: 0.15, w: 9.2, fontSize: 24, bold: true, color: UI_COLORS.white, fontFace: 'Arial'
         });
 
-        const bullets = slideObj.bullets || [];
-        const hasImg = (slideObj.image && slideObj.showImage !== false);
+        let bullets = slideObj.bullets || [];
+        let hasImg = (slideObj.image && slideObj.showImage !== false);
 
-        // ৫.১ কার্ড লেআউট লজিক (যদি ড্যাশবোর্ডে কার্ড সিলেক্ট থাকে)
-        if (slideObj.layout === "card" && !hasImg) {
-          let cardX = 0.5;
-          bullets.slice(0, 3).forEach((txt) => {
-            slide.addShape(pptx.ShapeType.roundRect, {
-              x: cardX, y: 1.5, w: 2.8, h: 4.0, rectRadius: 0.1,
-              fill: { color: (slideBg === "FFFFFF" || slideBg === "E2E8F0") ? "F1F5F9" : "FFFFFF10" },
-              line: { color: currentTheme.primary, width: 1 }
+        // ৩. ডাইনামিক লেআউট ইঞ্জিন (ড্যাশবোর্ড ম্যাচার)
+        
+        // কেস ১: কার্ড লেআউট (তিনটি আলাদা বক্সে তথ্য)
+        if (slideObj.layout === "card" && bullets.length > 0) {
+            let cardX = 0.4;
+            bullets.slice(0, 3).forEach((txt) => {
+                slide.addShape(pptx.ShapeType.roundRect, {
+                    x: cardX, y: 1.5, w: 2.9, h: 4.2, rectRadius: 0.1,
+                    fill: isDark ? 'FFFFFF10' : 'F1F5F9',
+                    line: { color: UI_COLORS.primary, width: 1.5 }
+                });
+                slide.addText(clean(txt), {
+                    x: cardX + 0.15, y: 1.8, w: 2.6, h: 3.5, 
+                    fontSize: 15, color: textCol, align: 'center', valign: 'top', fontFace: 'Arial'
+                });
+                cardX += 3.15;
             });
-            slide.addText(fixTxt(txt), {
-              x: cardX + 0.1, y: 1.7, w: 2.6, fontSize: 14, color: txtCol, align: 'center', fontFace: 'Arial'
-            });
-            cardX += 3.1;
-          });
         } 
-        // ৫.২ স্প্লিট লেআউট (ছবিসহ)
+        
+        // কেস ২: স্প্লিট লেআউট (ছবি ও লেখা পাশাপাশি - ড্যাশবোর্ডের মতো)
         else if (hasImg) {
-          try {
-            let imgData = slideObj.image.includes("base64,") ? slideObj.image.split("base64,")[1] : slideObj.image;
-            slide.addImage({ 
-              data: imgData, x: 5.7, y: 1.2, w: 4.0, h: 3.5, 
-              sizing: { type: "contain" },
-              shadow: { type: 'outer', blur: 10, color: '000000', opacity: 0.2 }
+            // লেখা (বামে)
+            let bY = 1.3;
+            bullets.slice(0, 7).forEach(txt => {
+                slide.addText(clean(txt), {
+                    x: 0.6, y: bY, w: 5.0, fontSize: 17, color: textCol, 
+                    bullet: { type: 'bullet', color: UI_COLORS.primary }, lineSpacing: 28, fontFace: 'Arial'
+                });
+                bY += 0.8;
             });
 
-            // ক্যানভাস ড্রয়িং overlay
-            if (slideObj.canvasDrawing && slideObj.canvasDrawing.startsWith("data:")) {
-              slide.addImage({
-                data: slideObj.canvasDrawing.split(',')[1],
-                x: 5.7, y: 1.2, w: 4.0, h: 3.5,
-                sizing: { type: "contain" }
-              });
-            }
-          } catch (e) { console.error("Image Error:", e); }
+            // ছবি (ডানে - শ্যাডো ও বর্ডার সহ)
+            try {
+                let imgData = slideObj.image.includes("base64,") ? slideObj.image.split("base64,")[1] : slideObj.image;
+                slide.addImage({ 
+                    data: imgData, x: 5.8, y: 1.3, w: 3.8, h: 3.8, 
+                    sizing: { type: 'contain' },
+                    shadow: { type: 'outer', blur: 12, color: '000000', opacity: 0.25 }
+                });
 
-          let bY = 1.3;
-          bullets.slice(0, 7).forEach(txt => {
-            slide.addText(fixTxt(txt), {
-              x: 0.5, y: bY, w: 5.0, fontSize: 16, color: txtCol, bullet: true, lineSpacing: 25, fontFace: 'Arial'
-            });
-            bY += 0.7;
-          });
+                // ক্যানভাস ড্রয়িং overlay
+                if (slideObj.canvasDrawing && slideObj.canvasDrawing.startsWith("data:")) {
+                    slide.addImage({
+                        data: slideObj.canvasDrawing.split(',')[1],
+                        x: 5.8, y: 1.3, w: 3.8, h: 3.8,
+                        sizing: { type: 'contain' }
+                    });
+                }
+            } catch(e) {}
         } 
-        // ৫.৩ স্ট্যান্ডার্ড সিঙ্গেল কলাম
+        
+        // কেস ৩: স্ট্যান্ডার্ড সিঙ্গেল কলাম
         else {
-          let bY = 1.3;
-          bullets.forEach(txt => {
-            slide.addText(fixTxt(txt), {
-              x: 0.8, y: bY, w: 8.5, fontSize: 18, color: txtCol, bullet: true, lineSpacing: 30, fontFace: 'Arial'
+            let bY = 1.4;
+            bullets.forEach(txt => {
+                slide.addText(clean(txt), {
+                    x: 0.8, y: bY, w: 8.5, fontSize: 19, color: textCol, 
+                    bullet: { type: 'bullet', color: UI_COLORS.primary }, lineSpacing: 32, fontFace: 'Arial'
+                });
+                bY += 1.0;
             });
-            bY += 0.9;
-          });
         }
 
+        // ৪. শিক্ষক নোট ব্যাজ (ফুটার এর ঠিক ওপরে)
         if (slideObj.notes) {
-          slide.addText("Note: " + fixTxt(slideObj.notes), {
-            x: 0.5, y: 6.9, w: 9, fontSize: 10, color: "94A3B8", italic: true, fontFace: "Arial"
-          });
+            slide.addShape(pptx.ShapeType.roundRect, { 
+                x: 0.5, y: 6.7, w: 9.0, h: 0.45, rectRadius: 0.05, 
+                fill: '00000020' 
+            });
+            slide.addText(`💡 শিক্ষক গাইড: ${clean(slideObj.notes)}`, {
+                x: 0.7, y: 6.7, w: 8.6, h: 0.45, fontSize: 10, italic: true, color: '64748B', valign: 'middle', fontFace: 'Arial'
+            });
         }
       }
 
-      // ফুটার ও পেজ নম্বর
-      slide.addText(`${index + 1} | সশিবা স্মার্ট শিক্ষা পোর্টাল`, {
-        x: 0.5, y: 7.2, w: 9, fontSize: 9, color: "94A3B8"
+      // ৫. ফুটার ও ব্র্যান্ডিং (সব স্লাইডে থাকবে)
+      slide.addText(`স্লাইড ${index + 1}  |  সশিবা স্মার্ট শিক্ষা পোর্টাল  |  ${new Date().toLocaleDateString('bn-BD')}`, {
+        x: 0.5, y: 7.25, w: 9, fontSize: 9, color: '94A3B8', align: 'left'
       });
     });
 
-    const fileName = `Sashiba_Presentation_${Date.now()}.pptx`;
+    // ৬. ফাইল জেনারেশন
+    const fileName = `Sashiba_Expert_Slide_${Date.now()}.pptx`;
     await pptx.writeFile({ fileName: fileName });
-    console.log("Download successful");
+    console.log("PPTX successfully matched with Dashboard UI.");
 
   } catch (err) {
-    console.error(err);
-    alert("পাওয়ারপয়েন্ট তৈরিতে কারিগরি ত্রুটি হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।");
+    console.error("Critical Export Error:", err);
+    alert("পাওয়ারপয়েন্ট জেনারেট করা যাচ্ছে না। আপনার স্লাইডের তথ্যে বা ছবিতে কোনো বড় ত্রুটি থাকতে পারে।");
   }
 }
 
