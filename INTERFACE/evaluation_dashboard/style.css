@@ -545,9 +545,9 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
 .toast.success{background:linear-gradient(135deg,#059669,var(--success));}
 .toast.error{background:linear-gradient(135deg,#dc2626,var(--danger));}
 
-/* ─────────── PRINT (A4) ─────────── */
+/* ─────────── PRINT (A4 - Single Page Fit) ─────────── */
 @media print{
-  @page{size:A4 portrait;margin:8mm;}
+  @page{size:A4 portrait;margin:5mm;}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
   .sidebar,.top-bar,.report-controls,.report-actions,.modal-overlay,.toast,
   .nav-section-label,.app-container>*:not(.main-content){display:none!important;}
@@ -561,12 +561,35 @@ body.dark-mode .cat-weak{background:rgba(239,68,68,.2);color:#f87171;}
   .report-card{
     max-width:100%!important;width:100%!important;
     box-shadow:none!important;border-radius:0!important;
-    border:none!important;margin:0!important;
-    page-break-inside:avoid;
+    border:none!important;margin:0 auto!important;
+    transform:scale(0.93);
+    transform-origin:top center;
+    page-break-inside:avoid!important;
   }
-  .report-card-header{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .report-card-header{padding:14px 18px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .report-school-name{font-size:19px!important;}
+  .report-student-info{background:#f8fafc!important;}
+  .report-info-row{padding:5px 12px!important;}
+  .report-marks-table{padding:6px 14px!important;}
+  .report-marks-table table th,.report-marks-table table td{padding:5px 8px!important;}
   .report-marks-table th{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .report-summary{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .report-summary{margin-top:4px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .summary-cell{padding:6px!important;}
+  .summary-value{font-size:16px!important;}
+  .report-progress-bars{padding:8px 14px!important;}
+  .section-modern-title{font-size:11px!important;margin-bottom:6px!important;}
+  .modern-subject-matrix{
+    grid-template-columns:repeat(5,1fr)!important;
+    gap:5px!important;
+  }
+  .matrix-card{padding:5px 8px!important;border-radius:6px!important;}
+  .score-circle{width:32px!important;height:32px!important;}
+  .m-sub-name{font-size:11px!important;}
+  .m-sub-status{font-size:9px!important;}
+  .report-remarks{padding:6px 14px!important;}
+  .report-remarks p{font-size:11px!important;line-height:1.4!important;}
+  .report-footer{padding:8px 14px!important;}
+  .signature-line{height:24px!important;min-width:110px!important;}
 }
 @media(max-width:900px){
   .analytics-grid,.settings-grid{grid-template-columns:1fr;}

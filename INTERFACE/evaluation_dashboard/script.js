@@ -718,7 +718,16 @@ function printRubric() { window.print(); }
 
 function renderStudentTable() {
   const query = (document.getElementById('student-search')?.value||'').toLowerCase().trim();
+  const classFilter = document.getElementById('filter-class')?.value || '';
+  const sectionFilter = document.getElementById('filter-section')?.value || '';
+  
   let list = [...students];
+
+  // শ্রেণি ফিল্টার
+  if(classFilter) list = list.filter(s => (s.className || settings.className) === classFilter);
+  
+  // শাখা ফিল্টার
+  if(sectionFilter) list = list.filter(s => (s.section || settings.section) === sectionFilter);
 
   if(currentFilter!=='all') {
     const mapLabel = {good:'ভালো',average:'মধ্যম',weak:'দুর্বল'};
@@ -1091,7 +1100,63 @@ function renderReportCard(id) {
   `;
 }
 function printReportCard(){if(!selectedReportStudentId){showToast('শিক্ষার্থী নির্বাচন করুন!','error');return;}window.print();}
-function saveReportCard(){if(!selectedReportStudentId){showToast('শিক্ষার্থী নির্বাচন করুন!','error');return;}saveToStorage();showToast('সংরক্ষিত হয়েছে!','success');}
+function saveReportCard() {
+  if (!selectedReportStudentId) {
+    showToast('শিক্ষার্থী নির্বাচন করুন!', 'error');
+    return;
+  }
+  saveToStorage();
+  saveCurrentSnapshot();
+  showToast('সিস্টেম ও মূল্যায়ন ইতিহাসে সংরক্ষিত হয়েছে!', 'success');
+}
+
+/* ─── Keyboard Shortcuts & Save Options ─── */
+function openSaveOptionsModal() {
+  const modal = document.getElementById('save-options-modal');
+  if(modal) modal.classList.remove('hidden');
+}
+
+function closeSaveOptionsModal() {
+  const modal = document.getElementById('save-options-modal');
+  if(modal) modal.classList.add('hidden');
+}
+
+// ESC এবং কীবোর্ড শর্টকাট
+document.addEventListener('keydown', e => {
+  // ESC চাপলে ক্লোজ করার সুবিধা
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    if (selectedReportStudentId) {
+      selectedReportStudentId = null;
+      const sel = document.getElementById('report-student-select');
+      if (sel) sel.value = "";
+      renderReportCard(null);
+    }
+    closeStudentModal();
+    closeSaveOptionsModal();
+    const expDrop = document.getElementById('export-dropdown');
+    if (expDrop) expDrop.style.display = 'none';
+  }
+
+  const isCtrl = e.ctrlKey || e.metaKey;
+  if (!isCtrl) return;
+
+  if (e.key === 's' || e.key === 'S') {
+    e.preventDefault();
+    if (selectedReportStudentId) {
+      saveReportCard();
+    } else {
+      openSaveOptionsModal();
+    }
+  }
+  if (e.key === 'p' || e.key === 'P') {
+    e.preventDefault();
+    printReportCard();
+  }
+  if (e.key === 'e' || e.key === 'E') {
+    e.preventDefault();
+    exportReportAsWord();
+  }
+});
 function archiveCurrentReport(){if(!selectedReportStudentId){showToast('শিক্ষার্থী নির্বাচন করুন!','error');return;}saveCurrentSnapshot();showToast('আর্কাইভ হয়েছে!','success');}
 function shareWhatsApp(){
   if(!selectedReportStudentId){showToast('শিক্ষার্থী নির্বাচন করুন!','error');return;}
@@ -1408,35 +1473,6 @@ function goHome(){
     try { window.location.href = '../index.html'; } catch(e){ window.location.href = 'index.html'; }
   }
 }
-
-/* ─── Keyboard Shortcuts & Save Options ─── */
-function openSaveOptionsModal() {
-  const modal = document.getElementById('save-options-modal');
-  if(modal) modal.classList.remove('hidden');
-}
-
-function closeSaveOptionsModal() {
-  const modal = document.getElementById('save-options-modal');
-  if(modal) modal.classList.add('hidden');
-}
-
-document.addEventListener('keydown', e => {
-  const isCtrl = e.ctrlKey || e.metaKey;
-  if(!isCtrl) return;
-
-  if(e.key === 's' || e.key === 'S') {
-    e.preventDefault();
-    openSaveOptionsModal();
-  }
-  if(e.key === 'p' || e.key === 'P') {
-    e.preventDefault();
-    printReportCard();
-  }
-  if(e.key === 'e' || e.key === 'E') {
-    e.preventDefault();
-    exportReportAsWord();
-  }
-});
 
 /* ─── PDF Download ─── */
 function downloadAsPDF() {
