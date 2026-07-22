@@ -651,6 +651,53 @@ function triggerTestTeacherAlert(teacherName, phone, subject, time, room) {
   }, 12000);
 }
 
+// REAL-TIME AUTOMATED BACKGROUND SCHEDULE MONITOR (EVERY 10 SECONDS)
+let triggeredAlertsCache = {};
+
+function checkRoutineScheduleAlerts() {
+  const now = new Date();
+  const currentHours = now.getHours();
+  const currentMinutes = now.getMinutes();
+
+  classData.routines.forEach(r => {
+    if (!r.time) return;
+    
+    // Parse time string e.g. "06:30 PM" or "১০:০০ - ১০:৪৫ AM"
+    const timeMatch = r.time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (!timeMatch) return;
+
+    let h = parseInt(timeMatch[1], 10);
+    let m = parseInt(timeMatch[2], 10);
+    const ampm = timeMatch[3] ? timeMatch[3].toUpperCase() : '';
+
+    if (ampm === 'PM' && h < 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+
+    const alertMinutesBefore = parseInt(r.alertTime || '10', 10);
+    
+    // Target alert time
+    let targetAlertMinutes = (h * 60 + m) - alertMinutesBefore;
+    if (targetAlertMinutes < 0) targetAlertMinutes += 24 * 60;
+
+    const nowTotalMinutes = currentHours * 60 + currentMinutes;
+
+    // Check if current time matches target alert time window (within 2 mins)
+    const diff = Math.abs(nowTotalMinutes - targetAlertMinutes);
+    const cacheKey = `${r.id}_${now.toDateString()}_${h}_${m}`;
+
+    if (diff <= 1 && !triggeredAlertsCache[cacheKey]) {
+      triggeredAlertsCache[cacheKey] = true;
+      triggerTestTeacherAlert(
+        r.teacher || 'শিক্ষক',
+        r.phone || '01700000000',
+        r.subject || 'বিষয়',
+        r.time,
+        r.room || '১০২'
+      );
+    }
+  });
+}
+
 function deleteRoutine(id) {
   if (confirm('আপনি কি এই রুটিন পিরিয়ড কার্ডটি মুছে ফেলতে চান?')) {
     classData.routines = classData.routines.filter(r => r.id !== id);
@@ -812,4 +859,8 @@ function saveSettings(e) {
 document.addEventListener('DOMContentLoaded', () => {
   loadStorage();
   showSection('overview');
+  
+  // Start automated background schedule monitor (runs every 5 seconds)
+  checkRoutineScheduleAlerts();
+  setInterval(checkRoutineScheduleAlerts, 5000);
 });
