@@ -563,16 +563,33 @@
           <input type="text" id="m-time" class="form-input" placeholder="১০:০০ - ১০:৪৫ AM" required>
         </div>
         <div class="form-group">
-          <label>কক্ষ নং</label>
-          <input type="text" id="m-room" class="form-input" value="১০২">
+          <label>দায়িত্বপ্রাপ্ত শিক্ষক</label>
+          <input type="text" id="m-teacher" class="form-input" placeholder="যেমন: মাগুরিব স্যার">
         </div>
         <div class="form-group">
-          <label>অধ্যায়/বিষয়বস্তু</label>
-          <input type="text" id="m-topic" class="form-input" placeholder="যেমন: অধ্যায় ৩ - বীজগণিত">
+          <label><i class="fa-solid fa-phone text-primary"></i> শিক্ষকের মোবাইল নম্বর (অটো রিং/SMS টেস্ট)</label>
+          <input type="tel" id="m-phone" class="form-input" placeholder="যেমন: 01700000000" required>
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-bell text-warning"></i> অটো রিমাইন্ডার পাঠানোর সময়</label>
+          <select id="m-alert-time" class="form-input">
+            <option value="5">ক্লাস শুরুর ৫ মিনিট পূর্বে</option>
+            <option value="10" selected>ক্লাস শুরুর ১০ মিনিট পূর্বে</option>
+            <option value="15">ক্লাস শুরুর ১৫ মিনিট পূর্বে</option>
+            <option value="30">ক্লাস শুরুর ৩০ মিনিট পূর্বে</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-tower-cell text-success"></i> রিমাইন্ডার মোড</label>
+          <select id="m-alert-mode" class="form-input">
+            <option value="call_sms" selected>📞 অটো ভয়েস কল ও SMS (উভয়ই)</option>
+            <option value="sms">💬 শুধুমাত্র SMS রিমাইন্ডার</option>
+            <option value="call">📞 শুধুমাত্র অটো ভয়েস কল</option>
+          </select>
         </div>
         <div class="modal-actions mt-6">
           <button type="button" class="btn btn-outline" onclick="closeRoutineModal()">বাতিল</button>
-          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> কার্ড যোগ করুন</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> কার্ড সংরক্ষণ করুন</button>
         </div>
       </form>
     </div>
