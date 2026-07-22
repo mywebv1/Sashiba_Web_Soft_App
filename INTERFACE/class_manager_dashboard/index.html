@@ -289,7 +289,28 @@
                 <h3><i class="fa-solid fa-users-check text-success"></i> দৈনিক স্মার্ট উপস্থিতি ও ক্লাস এনগেজমেন্ট কার্ড</h3>
                 <span class="section-subtitle">শিক্ষার্থীদের সরাসরি উপস্থিতি, বিলম্ব ও পার্টিসিপেশন স্টার মার্ক প্রদান</span>
               </div>
-              <div class="flex-gap-center">
+              <div class="flex-gap-center flex-wrap">
+                <select id="att-class-select" class="form-input-compact" onchange="filterAttendanceByClass()">
+                  <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
+                  <option value="সপ্তম">সপ্তম শ্রেণি</option>
+                  <option value="অষ্টম" selected>অষ্টম শ্রেণি</option>
+                  <option value="নবম">নবম শ্রেণি</option>
+                  <option value="দশম">দশম শ্রেণি</option>
+                </select>
+
+                <select id="att-section-select" class="form-input-compact" onchange="filterAttendanceByClass()">
+                  <option value="ক" selected>শাখা - ক</option>
+                  <option value="খ">শাখা - খ</option>
+                  <option value="গ">শাখা - গ</option>
+                </select>
+
+                <select id="att-group-select" class="form-input-compact" onchange="filterAttendanceByClass()">
+                  <option value="সাধারণ" selected>সাধারণ বিভাগ</option>
+                  <option value="বিজ্ঞান">বিজ্ঞান বিভাগ</option>
+                  <option value="মানবিক">মানবিক বিভাগ</option>
+                  <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা বিভাগ</option>
+                </select>
+
                 <input type="date" class="form-input-compact" id="attendance-date-picker">
                 <button class="btn btn-green" onclick="saveAttendance()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন</button>
               </div>

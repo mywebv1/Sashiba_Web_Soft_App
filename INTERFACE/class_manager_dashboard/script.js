@@ -28,11 +28,14 @@ let classData = {
     { id: 8, timeframe: "12months", timeframeLabel: "আগামী ১২ মাস (১ বছর)", subject: "সম্পূর্ণ কারিকুলাম", chapter: "বার্ষিকী ও চূড়ান্ত মূল্যায়ন", target: "১০০% সিলেবাস সমাপন", progress: 10 }
   ],
   students: [
-    { roll: 1, name: "আব্দুল্লাহ আল মামুন", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "খুব মনোযোগী" },
-    { roll: 2, name: "সামিয়া আক্তার", attendance: "Present", engagement: 4, attention: "ভালো", remark: "নিয়মিত সক্রিয়" },
-    { roll: 3, name: "রাহাত হোসেন", attendance: "Absent", engagement: 2, attention: "গড়মানের", remark: "অভিভাবককে কল করা প্রয়োজন" },
-    { roll: 4, name: "তানভীর আহমেদ", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "দ্রুত উত্তর দেয়" },
-    { roll: 5, name: "নুসরাত জাহান", attendance: "Late", engagement: 3, attention: "সন্তোষজনক", remark: "১০ মিনিট দেরিতে এসেছে" }
+    { roll: 1, name: "আব্দুল্লাহ আল মামুন", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "খুব মনোযোগী" },
+    { roll: 2, name: "সামিয়া আক্তার", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Present", engagement: 4, attention: "ভালো", remark: "নিয়মিত সক্রিয়" },
+    { roll: 3, name: "রাহাত হোসেন", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Absent", engagement: 2, attention: "গড়মানের", remark: "অভিভাবককে কল করা প্রয়োজন" },
+    { roll: 4, name: "তানভীর আহমেদ", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "দ্রুত উত্তর দেয়" },
+    { roll: 5, name: "নুসরাত জাহান", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Late", engagement: 3, attention: "সন্তোষজনক", remark: "১০ মিনিট দেরিতে এসেছে" },
+    { roll: 1, name: "সাকিব আল হাসান", className: "নবম", section: "ক", group: "বিজ্ঞান", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "ল্যাবে সক্রিয়" },
+    { roll: 2, name: "মালিহা রহমান", className: "নবম", section: "ক", group: "বিজ্ঞান", attendance: "Present", engagement: 4, attention: "ভালো", remark: "নিয়মিত উপস্থিত" },
+    { roll: 1, name: "মেহেদী হাসান", className: "দশম", section: "ক", group: "ব্যবসায় শিক্ষা", attendance: "Present", engagement: 4, attention: "ভালো", remark: "হিসাববিজ্ঞানে পারদর্শী" }
   ],
   exams: [
     { id: 1, type: "ক্লাস টেস্ট", subject: "গণিত", date: "২০২৬-০৭-২৫", time: "১০:০০ AM", marks: 20, coverage: "বীজগণিত অধ্যায় ৩" },
@@ -245,31 +248,51 @@ function renderSyllabus(tf) {
   `).join('');
 }
 
-// RENDER ATTENDANCE CARDS
+// RENDER ATTENDANCE CARDS WITH CLASS/SECTION/GROUP FILTERS
+function filterAttendanceByClass() {
+  renderAttendanceCards();
+}
+
 function renderAttendanceCards() {
   const container = document.getElementById('attendance-cards-container');
-  document.getElementById('attendance-date-picker').valueAsDate = new Date();
+  const datePicker = document.getElementById('attendance-date-picker');
+  if (datePicker && !datePicker.value) datePicker.valueAsDate = new Date();
 
-  container.innerHTML = classData.students.map(s => `
+  const selectedClass = document.getElementById('att-class-select')?.value || 'অষ্টম';
+  const selectedSection = document.getElementById('att-section-select')?.value || 'ক';
+  const selectedGroup = document.getElementById('att-group-select')?.value || 'সাধারণ';
+
+  const filteredStudents = classData.students.filter(s => 
+    (s.className === selectedClass || !s.className) && 
+    (s.section === selectedSection || !s.section) && 
+    (s.group === selectedGroup || !s.group || selectedGroup === 'সাধারণ')
+  );
+
+  if (filteredStudents.length === 0) {
+    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">নির্বাচনকৃত <strong>${selectedClass} শ্রেণি (শাখা-${selectedSection}, ${selectedGroup})</strong> এর জন্য কোনো শিক্ষার্থী পাওয়া যায়নি।</p>`;
+    return;
+  }
+
+  container.innerHTML = filteredStudents.map(s => `
     <div class="attendance-card-box">
       <div class="student-att-header">
         <div class="att-roll-badge">${s.roll}</div>
         <div>
           <strong style="font-size:14px; color:var(--text-main);">${s.name}</strong>
-          <span style="display:block; font-size:11px; color:var(--text-muted);">রোল: ${s.roll} | অষ্টম (ক)</span>
+          <span style="display:block; font-size:11px; color:var(--text-muted);">রোল: ${s.roll} | শ্রেণি: ${s.className || selectedClass} (${s.section || selectedSection}) | বিভাগ: ${s.group || selectedGroup}</span>
         </div>
       </div>
 
       <div class="att-status-buttons">
-        <button class="att-btn ${s.attendance === 'Present' ? 'active-present' : ''}" onclick="setStudentAtt(${s.roll}, 'Present')">উপস্থিত</button>
-        <button class="att-btn ${s.attendance === 'Absent' ? 'active-absent' : ''}" onclick="setStudentAtt(${s.roll}, 'Absent')">অনুপস্থিত</button>
-        <button class="att-btn ${s.attendance === 'Late' ? 'active-late' : ''}" onclick="setStudentAtt(${s.roll}, 'Late')">দেরিতে</button>
+        <button class="att-btn ${s.attendance === 'Present' ? 'active-present' : ''}" onclick="setStudentAtt('${s.name}', 'Present')">উপস্থিত</button>
+        <button class="att-btn ${s.attendance === 'Absent' ? 'active-absent' : ''}" onclick="setStudentAtt('${s.name}', 'Absent')">অনুপস্থিত</button>
+        <button class="att-btn ${s.attendance === 'Late' ? 'active-late' : ''}" onclick="setStudentAtt('${s.name}', 'Late')">দেরিতে</button>
       </div>
 
       <div style="margin-top:10px;">
         <span style="font-size:11px; font-weight:700; color:var(--text-muted);">এনগেজমেন্ট স্টার:</span>
         <div class="star-rating">
-          ${[1,2,3,4,5].map(star => `<i class="fa-solid fa-star" style="color:${star <= s.engagement ? '#fbbf24' : '#cbd5e1'}" onclick="setStudentEng(${s.roll}, ${star})"></i>`).join('')}
+          ${[1,2,3,4,5].map(star => `<i class="fa-solid fa-star" style="color:${star <= s.engagement ? '#fbbf24' : '#cbd5e1'}" onclick="setStudentEng('${s.name}', ${star})"></i>`).join('')}
         </div>
       </div>
 
@@ -278,8 +301,8 @@ function renderAttendanceCards() {
   `).join('');
 }
 
-function setStudentAtt(roll, status) {
-  const st = classData.students.find(x => x.roll === roll);
+function setStudentAtt(name, status) {
+  const st = classData.students.find(x => x.name === name);
   if (st) {
     st.attendance = status;
     saveStorage();
@@ -287,8 +310,8 @@ function setStudentAtt(roll, status) {
   }
 }
 
-function setStudentEng(roll, stars) {
-  const st = classData.students.find(x => x.roll === roll);
+function setStudentEng(name, stars) {
+  const st = classData.students.find(x => x.name === name);
   if (st) {
     st.engagement = stars;
     saveStorage();
