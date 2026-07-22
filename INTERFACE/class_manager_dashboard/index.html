@@ -727,6 +727,38 @@
           </select>
         </div>
         <div class="form-group">
+          <label><i class="fa-solid fa-calendar-day text-primary"></i> ক্লাসের শুরুর তারিখ (Start Date)</label>
+          <input type="date" id="ms-start-date" class="form-input" value="2026-07-25" required>
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-clock text-warning"></i> ক্লাস শুরুর সময় ও স্থায়িত্ব (Duration)</label>
+          <div style="display:flex; gap:8px;">
+            <select id="ms-start-time" class="form-input" style="flex:1;">
+              <option value="০৯:০০ AM" selected>০৯:০০ AM</option>
+              <option value="১০:০০ AM">১০:০০ AM</option>
+              <option value="১১:০০ AM">১১:০০ AM</option>
+              <option value="১২:০০ PM">১২:০০ PM</option>
+              <option value="০২:০০ PM">০২:০০ PM</option>
+            </select>
+            <select id="ms-duration" class="form-input" style="flex:1;">
+              <option value="৪৫ মিনিট">৪৫ মিনিট চলবে</option>
+              <option value="১ ঘণ্টা" selected>১ ঘণ্টা চলবে</option>
+              <option value="১ ঘণ্টা ৩০ মি.">১ ঘণ্টা ৩০ মি. চলবে</option>
+              <option value="২ ঘণ্টা">২ ঘণ্টা চলবে</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-right-long text-purple"></i> পরবর্তী ক্লাস ও পর্যায়ক্রমিক ফ্লো (Next Class & Sequence)</label>
+          <select id="ms-next-class" class="form-input">
+            <option value="পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)" selected>পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)</option>
+            <option value="পরবর্তী বিষয়: ইংরেজি (১১:০০ AM - ১২:০০ PM)">পরবর্তী বিষয়: ইংরেজি (১১:০০ AM - ১২:০০ PM)</option>
+            <option value="পরবর্তী বিষয়: টিফিন ও ব্রেক (১২:০০ PM - ১২:৪৫ PM)">পরবর্তী বিষয়: টিফিন ও ব্রেক (১২:০০ PM - ১২:৪৫ PM)</option>
+            <option value="পরবর্তী বিষয়: তথ্য ও প্রযুক্তি (১২:৪৫ PM - ০১:৩০ PM)">পরবর্তী বিষয়: তথ্য ও প্রযুক্তি (১২:৪৫ PM - ০১:৩০ PM)</option>
+            <option value="দৈনিক ক্লাস শেষ (পরবর্তী দিন রুটিন অনুসরণ)">দৈনিক ক্লাস শেষ (পরবর্তী দিন রুটিন অনুসরণ)</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label>সহায়ক বই / প্র্যাকটিক্যাল / ল্যাবওয়ার্কের বিবরণ</label>
           <select id="ms-ref-books" class="form-input">
             <option value="NCTB বোর্ড অনুমোদিত মূল বই (২০২৬)" selected>NCTB বোর্ড অনুমোদিত মূল বই (২০২৬)</option>

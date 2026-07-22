@@ -292,7 +292,7 @@ function renderSyllabus(tf) {
   const container = document.getElementById('syllabus-cards-container');
   const items = classData.syllabuses.filter(s => s.timeframe === tf);
   if (items.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">এই সময়সীমার জন্য কোনো একাডেমিক সিলেবাস ও মাস্টার প্ল্যান যোগ করা হয়নি।</p>`;
+    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">এই সময়সীমার জন্য কোনো একাডেমিক সিলেবাস ও পাঠ পরিকল্পনা কার্ড যোগ করা হয়নি।</p>`;
     return;
   }
   container.innerHTML = items.map(s => `
@@ -306,21 +306,28 @@ function renderSyllabus(tf) {
       </div>
 
       <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:flex-start;">
-        <h4 style="font-size:16px; font-weight:800; color:var(--text-main);">${s.subject} <span style="font-size:12px; color:var(--primary); font-weight:700;">(কোড: ${s.subjectCode || '১০১'})</span></h4>
-        <span class="badge" style="background:rgba(79,70,229,0.1); color:var(--primary); font-size:11px;"><i class="fa-solid fa-clock"></i> পিরিয়ড: ${s.periodsNeeded || 4}টি</span>
+        <h4 style="font-size:16px; font-weight:800; color:var(--text-main);">${s.subject} <span style="font-size:12px; color:var(--primary); font-weight:700;">(কোড: ${s.subjectCode || '১০৯'})</span></h4>
+        <span class="badge" style="background:rgba(79,70,229,0.1); color:var(--primary); font-size:11px;"><i class="fa-solid fa-clock"></i> ${s.periodsNeeded || '৬'}টি পিরিয়ড</span>
       </div>
 
-      <p style="font-size:13px; font-weight:700; color:var(--text-main); margin-top:4px;">📖 অধ্যায়/টপিক: ${s.chapter}</p>
+      <!-- Schedule & Duration Bar -->
+      <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; background:rgba(16,185,129,0.08); padding:6px 10px; border-radius:6px; font-size:11px; font-weight:700; color:var(--success);">
+        <span><i class="fa-solid fa-calendar-day"></i> শুরু: ${s.startDate || '২০২৬-০৭-২৫'} (${s.startTime || '০৯:০০ AM'})</span>
+        <span><i class="fa-solid fa-hourglass-half"></i> ব্যাপ্তি: ${s.duration || '১ ঘণ্টা'}</span>
+      </div>
+
+      <p style="font-size:13px; font-weight:700; color:var(--text-main); margin-top:8px;">📖 অধ্যায়/টপিক: ${s.chapter}</p>
       
       <div style="margin-top:8px; padding:8px; background:rgba(0,0,0,0.03); border-radius:8px; font-size:11.5px; color:var(--text-muted);">
         <div><strong>🗓️ সপ্তাহিক পাঠ পরিকল্পনা:</strong> ${s.weeklyPlan || 'নির্ধারিত পাঠসূচি'}</div>
-        <div style="margin-top:2px;"><strong>🎯 শিখন লক্ষ্য:</strong> ${s.target}</div>
-        <div style="margin-top:2px;"><strong>📚 সহায়ক বই/ল্যাব:</strong> ${s.refBooks || 'NCTB অনুমোদিত বোর্ড বই'}</div>
+        <div style="margin-top:3px; color:var(--purple); font-weight:700;"><strong>➡️ পর্যায়ক্রমিক ফ্লো:</strong> ${s.nextClass || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM)'}</div>
+        <div style="margin-top:3px;"><strong>🎯 শিখন লক্ষ্য:</strong> ${s.target}</div>
+        <div style="margin-top:3px;"><strong>📚 সহায়ক বই/ল্যাব:</strong> ${s.refBooks || 'NCTB অনুমোদিত বোর্ড বই'}</div>
       </div>
 
       <div style="margin-top:14px;">
         <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:800; color:var(--text-main);">
-          <span>একাডেমিক অগ্রগতি</span>
+          <span>একাডেমিক অগ্রগতি ট্র্যাকিং (১২ মাস)</span>
           <span>${s.progress}%</span>
         </div>
         <div class="progress-bar-wrap">
@@ -779,6 +786,10 @@ function editSyllabus(id) {
   document.getElementById('ms-chapter').value = item.chapter || '';
   if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = item.weeklyPlan || '';
   if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = item.periodsNeeded || '৬';
+  if (document.getElementById('ms-start-date')) document.getElementById('ms-start-date').value = item.startDate || '2026-07-25';
+  if (document.getElementById('ms-start-time')) document.getElementById('ms-start-time').value = item.startTime || '০৯:০০ AM';
+  if (document.getElementById('ms-duration')) document.getElementById('ms-duration').value = item.duration || '১ ঘণ্টা';
+  if (document.getElementById('ms-next-class')) document.getElementById('ms-next-class').value = item.nextClass || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)';
   if (document.getElementById('ms-ref-books')) document.getElementById('ms-ref-books').value = item.refBooks || '';
   document.getElementById('ms-target').value = item.target || '';
   document.getElementById('syllabus-modal').classList.remove('hidden');
@@ -790,10 +801,14 @@ function saveSyllabusModal(e) {
   e.preventDefault();
   const timeframe = document.getElementById('ms-timeframe').value;
   const subject = document.getElementById('ms-subject').value;
-  const subjectCode = document.getElementById('ms-subject-code')?.value || '১০১';
+  const subjectCode = document.getElementById('ms-subject-code')?.value || '১০৯';
   const chapter = document.getElementById('ms-chapter').value;
   const weeklyPlan = document.getElementById('ms-weekly-plan')?.value || 'সপ্তাহিক পাঠ পরিকল্পনা';
   const periodsNeeded = document.getElementById('ms-periods')?.value || '৬';
+  const startDate = document.getElementById('ms-start-date')?.value || '২০২৬-০৭-২৫';
+  const startTime = document.getElementById('ms-start-time')?.value || '০৯:০০ AM';
+  const duration = document.getElementById('ms-duration')?.value || '১ ঘণ্টা';
+  const nextClass = document.getElementById('ms-next-class')?.value || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)';
   const refBooks = document.getElementById('ms-ref-books')?.value || 'NCTB বোর্ড বই';
   const target = document.getElementById('ms-target').value;
 
@@ -813,6 +828,10 @@ function saveSyllabusModal(e) {
       item.chapter = chapter;
       item.weeklyPlan = weeklyPlan;
       item.periodsNeeded = periodsNeeded;
+      item.startDate = startDate;
+      item.startTime = startTime;
+      item.duration = duration;
+      item.nextClass = nextClass;
       item.refBooks = refBooks;
       item.target = target;
     }
@@ -826,6 +845,10 @@ function saveSyllabusModal(e) {
       chapter,
       weeklyPlan,
       periodsNeeded,
+      startDate,
+      startTime,
+      duration,
+      nextClass,
       refBooks,
       target,
       progress: 10
