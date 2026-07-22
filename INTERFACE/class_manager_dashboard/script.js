@@ -1,5 +1,5 @@
 /* ==========================================================================
-   সশিবা স্মার্ট ক্লাস ম্যানেজার v2 — পূর্ণাঙ্গ লজিক ও ইন্টারঅ্যাকশন স্ক্রিপ্ট
+   সশিবা স্মার্ট ক্লাস ম্যানেজার v2 — পূর্ণাঙ্গ লজিক ও ইন্টারঅ্যাকশন স্ক্রিপ্ট (Edit & Delete Enabled)
    ========================================================================== */
 
 // 1. STATE INITIALIZATION & LOCALSTORAGE
@@ -58,6 +58,11 @@ let classData = {
   ]
 };
 
+// Editing ID Trackers
+let editingRoutineId = null;
+let editingSyllabusId = null;
+let editingExamId = null;
+
 function loadStorage() {
   try {
     const data = localStorage.getItem("sashiba_classmanager_data_v2");
@@ -81,10 +86,10 @@ function showSection(name) {
 
   const titles = {
     overview: ["স্মার্ট ক্লাস ম্যানেজার ড্যাশবোর্ড", "শিক্ষকের শ্রেণিকক্ষ পরিচালনার সম্পূর্ণ ডিজিটাল আর্কিটেক্ট"],
-    routine: ["🎓 সাপ্তাহিক ক্লাস রুটিন ও লাইভ পিরিয়ড কার্ড", "শ্রেণি ও বিষয়ভিত্তিক সময়সূচী পরিবর্তন ও পরিচালনা"],
-    syllabus: ["📚 সময়ভিত্তিক সিলেবাস পরিকল্পনা ও কভারেজ কার্ড", "১ দিন থেকে ১২ মাসের কভারেজ ও অগ্রগতি ট্র্যাকিং"],
+    routine: ["🎓 সাপ্তাহিক ক্লাস রুটিন ও লাইভ পিরিয়ড কার্ড", "শ্রেণি ও বিষয়ভিত্তিক সময়সূচী সম্পাদনা ও পরিচালনা"],
+    syllabus: ["📚 সময়ভিত্তিক সিলেবাস পরিকল্পনা ও কভারেজ কার্ড", "১ দিন থেকে ১২ মাসের কভারেজ ও অগ্রগতি সম্পাদনা"],
     attendance: ["👥 উপস্থিতি ও ক্লাস এনগেজমেন্ট কার্ড", "দৈনিক উপস্থিতি গ্রহণ ও স্টুডেন্ট এনগেজমেন্ট মার্কিং"],
-    exams: ["🎯 পরীক্ষার সময়সূচী ও রুটিন কার্ড", "ক্লাস টেস্ট থেকে বার্ষিকী পরীক্ষার পূর্ণাঙ্গ তথ্য"],
+    exams: ["🎯 পরীক্ষার সময়সূচী ও রুটিন কার্ড", "ক্লাস টেস্ট থেকে বার্ষিকী পরীক্ষার তথ্য সম্পাদনা"],
     live_control: ["🚀 লাইভ ক্লাস কন্ট্রোল হাব", "টাইমার, র্যান্ডমাইজার ও রিয়েল-টাইম কুইজ পরিচালনা"],
     ai_insights: ["🧠 AI ইনসাইটস ও সুপারিশ", "শ্রেণিকক্ষের পারফরম্যান্সের ডাইনামিক বিশ্লেষণ"],
     history: ["🕒 ক্লাস ইতিহাস ও ডিজিটাল রেকর্ড", "পূর্ববর্তী সকল লাইভ সেশনের রেকর্ড পর্যালোচনা"],
@@ -149,7 +154,13 @@ function renderOverview() {
   const todayItems = classData.routines.filter(r => r.day === "রবিবার");
   cardsContainer.innerHTML = todayItems.map(r => `
     <div class="period-card-item ${r.activeNow ? 'active-now' : ''}">
-      <span class="pci-time"><i class="fa-solid fa-clock"></i> ${r.time}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="pci-time"><i class="fa-solid fa-clock"></i> ${r.time}</span>
+        <div style="display:flex; gap:6px;">
+          <button onclick="editRoutine(${r.id})" style="color:var(--primary); background:none; font-size:13px; cursor:pointer;" title="সম্পাদনা করুন"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button onclick="deleteRoutine(${r.id})" style="color:var(--danger); background:none; font-size:13px; cursor:pointer;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      </div>
       <h4 class="pci-subject">${r.subject}</h4>
       <p class="pci-topic">${r.topic}</p>
       <div class="pci-footer">
@@ -160,7 +171,7 @@ function renderOverview() {
   `).join('');
 }
 
-// RENDER ROUTINE CARDS
+// RENDER ROUTINE CARDS WITH EDIT & DELETE
 function filterRoutineDay(day) {
   document.querySelectorAll('#routine-day-tabs .tab-chip').forEach(btn => {
     btn.classList.toggle('active', btn.textContent === day);
@@ -179,7 +190,10 @@ function renderRoutine(day) {
     <div class="period-card-item">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <span class="pci-time"><i class="fa-solid fa-clock"></i> ${r.time}</span>
-        <button onclick="deleteRoutine(${r.id})" style="color:var(--danger); background:none; font-size:14px;"><i class="fa-solid fa-trash-can"></i></button>
+        <div style="display:flex; gap:8px;">
+          <button onclick="editRoutine(${r.id})" style="color:var(--primary); background:none; font-size:14px; cursor:pointer;" title="সম্পাদনা করুন"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button onclick="deleteRoutine(${r.id})" style="color:var(--danger); background:none; font-size:14px; cursor:pointer;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
       </div>
       <h4 class="pci-subject">${r.subject}</h4>
       <p class="pci-topic">${r.topic}</p>
@@ -191,7 +205,7 @@ function renderRoutine(day) {
   `).join('');
 }
 
-// RENDER SYLLABUS CARDS
+// RENDER SYLLABUS CARDS WITH EDIT & DELETE
 function filterSyllabusTimeframe(tf) {
   document.querySelectorAll('#syllabus-timeframe-chips .chip').forEach(chip => {
     chip.classList.toggle('active', chip.getAttribute('onclick').includes(tf));
@@ -208,7 +222,13 @@ function renderSyllabus(tf) {
   }
   container.innerHTML = items.map(s => `
     <div class="syllabus-card-box">
-      <span class="badge" style="background:rgba(139,92,246,0.15); color:var(--purple); font-weight:800;">${s.timeframeLabel}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="badge" style="background:rgba(139,92,246,0.15); color:var(--purple); font-weight:800;">${s.timeframeLabel}</span>
+        <div style="display:flex; gap:8px;">
+          <button onclick="editSyllabus(${s.id})" style="color:var(--primary); background:none; font-size:14px; cursor:pointer;" title="সম্পাদনা করুন"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button onclick="deleteSyllabus(${s.id})" style="color:var(--danger); background:none; font-size:14px; cursor:pointer;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      </div>
       <h4 style="font-size:16px; font-weight:800; margin-top:8px; color:var(--text-main);">${s.subject}: ${s.chapter}</h4>
       <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">🎯 লক্ষ্য: ${s.target}</p>
       
@@ -225,7 +245,7 @@ function renderSyllabus(tf) {
   `).join('');
 }
 
-// RENDER ATTENDANCE INTERACTIVE CARDS
+// RENDER ATTENDANCE CARDS
 function renderAttendanceCards() {
   const container = document.getElementById('attendance-cards-container');
   document.getElementById('attendance-date-picker').valueAsDate = new Date();
@@ -281,7 +301,7 @@ function saveAttendance() {
   alert('উপস্থিতি ও এনগেজমেন্ট সফলতা সহকারে সংরক্ষণ করা হয়েছে!');
 }
 
-// RENDER EXAM CARDS
+// RENDER EXAM CARDS WITH EDIT & DELETE
 function filterExamType(type) {
   document.querySelectorAll('#exam-type-tabs .tab-chip').forEach(btn => {
     btn.classList.toggle('active', btn.getAttribute('onclick').includes(type));
@@ -296,7 +316,11 @@ function renderExams(type) {
     <div class="exam-card-box">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <span class="badge" style="background:rgba(245,158,11,0.15); color:var(--warning); font-weight:800;">${e.type}</span>
-        <span style="font-size:12px; font-weight:800; color:var(--primary);">পূর্ণমান: ${e.marks}</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:12px; font-weight:800; color:var(--primary);">পূর্ণমান: ${e.marks}</span>
+          <button onclick="editExam(${e.id})" style="color:var(--primary); background:none; font-size:14px; cursor:pointer;" title="সম্পাদনা করুন"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button onclick="deleteExam(${e.id})" style="color:var(--danger); background:none; font-size:14px; cursor:pointer;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
       </div>
       <h4 style="font-size:16px; font-weight:800; margin-top:8px; color:var(--text-main);">${e.subject}</h4>
       <p style="font-size:12px; color:var(--text-muted); margin-top:4px;"><i class="fa-solid fa-calendar-day"></i> তারিখ: ${e.date} (${e.time})</p>
@@ -390,8 +414,30 @@ function pickRandomStudent() {
   document.getElementById('random-student-name').textContent = `🎯 রোল ${picked.roll}: ${picked.name}`;
 }
 
-// MODAL CONTROLS
-function openAddRoutineModal() { document.getElementById('routine-modal').classList.remove('hidden'); }
+// ROUTINE MODAL & EDIT
+function openAddRoutineModal() {
+  editingRoutineId = null;
+  document.querySelector('#routine-modal h3').innerHTML = '<i class="fa-solid fa-calendar-plus text-primary"></i> নতুন পিরিয়ড যোগ করুন';
+  document.getElementById('m-subject').value = '';
+  document.getElementById('m-time').value = '';
+  document.getElementById('m-room').value = '১০২';
+  document.getElementById('m-topic').value = '';
+  document.getElementById('routine-modal').classList.remove('hidden');
+}
+
+function editRoutine(id) {
+  const item = classData.routines.find(r => r.id === id);
+  if (!item) return;
+  editingRoutineId = id;
+  document.querySelector('#routine-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-primary"></i> পিরিয়ড কার্ড সম্পাদনা করুন';
+  document.getElementById('m-day').value = item.day;
+  document.getElementById('m-subject').value = item.subject;
+  document.getElementById('m-time').value = item.time;
+  document.getElementById('m-room').value = item.room;
+  document.getElementById('m-topic').value = item.topic;
+  document.getElementById('routine-modal').classList.remove('hidden');
+}
+
 function closeRoutineModal() { document.getElementById('routine-modal').classList.add('hidden'); }
 
 function saveRoutineModal(e) {
@@ -402,23 +448,59 @@ function saveRoutineModal(e) {
   const room = document.getElementById('m-room').value;
   const topic = document.getElementById('m-topic').value;
 
-  classData.routines.push({
-    id: Date.now(),
-    day, subject, time, room, topic, teacher: classData.settings.teacherName
-  });
+  if (editingRoutineId) {
+    const item = classData.routines.find(r => r.id === editingRoutineId);
+    if (item) {
+      item.day = day;
+      item.subject = subject;
+      item.time = time;
+      item.room = room;
+      item.topic = topic;
+    }
+  } else {
+    classData.routines.push({
+      id: Date.now(),
+      day, subject, time, room, topic, teacher: classData.settings.teacherName
+    });
+  }
 
   saveStorage();
   closeRoutineModal();
   renderRoutine(day);
+  renderOverview();
 }
 
 function deleteRoutine(id) {
-  classData.routines = classData.routines.filter(r => r.id !== id);
-  saveStorage();
-  renderRoutine('রবিবার');
+  if (confirm('আপনি কি এই রুটিন পিরিয়ড কার্ডটি মুছে ফেলতে চান?')) {
+    classData.routines = classData.routines.filter(r => r.id !== id);
+    saveStorage();
+    renderRoutine('রবিবার');
+    renderOverview();
+  }
 }
 
-function openAddSyllabusModal() { document.getElementById('syllabus-modal').classList.remove('hidden'); }
+// SYLLABUS MODAL & EDIT
+function openAddSyllabusModal() {
+  editingSyllabusId = null;
+  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-book-bookmark text-purple"></i> নতুন সিলেবাস টার্গেট যোগ';
+  document.getElementById('ms-subject').value = '';
+  document.getElementById('ms-chapter').value = '';
+  document.getElementById('ms-target').value = '';
+  document.getElementById('syllabus-modal').classList.remove('hidden');
+}
+
+function editSyllabus(id) {
+  const item = classData.syllabuses.find(s => s.id === id);
+  if (!item) return;
+  editingSyllabusId = id;
+  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-purple"></i> সিলেবাস টার্গেট সম্পাদনা করুন';
+  document.getElementById('ms-timeframe').value = item.timeframe;
+  document.getElementById('ms-subject').value = item.subject;
+  document.getElementById('ms-chapter').value = item.chapter;
+  document.getElementById('ms-target').value = item.target;
+  document.getElementById('syllabus-modal').classList.remove('hidden');
+}
+
 function closeSyllabusModal() { document.getElementById('syllabus-modal').classList.add('hidden'); }
 
 function saveSyllabusModal(e) {
@@ -434,22 +516,66 @@ function saveSyllabusModal(e) {
     "9months": "আগামী ৯ মাস", "12months": "আগামী ১২ মাস (১ বছর)"
   };
 
-  classData.syllabuses.push({
-    id: Date.now(),
-    timeframe,
-    timeframeLabel: tfLabels[timeframe] || timeframe,
-    subject,
-    chapter,
-    target,
-    progress: 10
-  });
+  if (editingSyllabusId) {
+    const item = classData.syllabuses.find(s => s.id === editingSyllabusId);
+    if (item) {
+      item.timeframe = timeframe;
+      item.timeframeLabel = tfLabels[timeframe] || timeframe;
+      item.subject = subject;
+      item.chapter = chapter;
+      item.target = target;
+    }
+  } else {
+    classData.syllabuses.push({
+      id: Date.now(),
+      timeframe,
+      timeframeLabel: tfLabels[timeframe] || timeframe,
+      subject,
+      chapter,
+      target,
+      progress: 10
+    });
+  }
 
   saveStorage();
   closeSyllabusModal();
   renderSyllabus(timeframe);
 }
 
-function openAddExamModal() { document.getElementById('exam-modal').classList.remove('hidden'); }
+function deleteSyllabus(id) {
+  if (confirm('আপনি কি এই সিলেবাস টার্গেট কার্ডটি মুছে ফেলতে চান?')) {
+    classData.syllabuses = classData.syllabuses.filter(s => s.id !== id);
+    saveStorage();
+    renderSyllabus('today');
+  }
+}
+
+// EXAM MODAL & EDIT
+function openAddExamModal() {
+  editingExamId = null;
+  document.querySelector('#exam-modal h3').innerHTML = '<i class="fa-solid fa-bullseye text-warning"></i> নতুন পরীক্ষা রুটিন কার্ড';
+  document.getElementById('me-subject').value = '';
+  document.getElementById('me-date').value = '';
+  document.getElementById('me-time').value = '১০:০০ AM';
+  document.getElementById('me-marks').value = '২০';
+  document.getElementById('me-coverage').value = '';
+  document.getElementById('exam-modal').classList.remove('hidden');
+}
+
+function editExam(id) {
+  const item = classData.exams.find(e => e.id === id);
+  if (!item) return;
+  editingExamId = id;
+  document.querySelector('#exam-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-warning"></i> পরীক্ষা রুটিন সম্পাদনা করুন';
+  document.getElementById('me-type').value = item.type;
+  document.getElementById('me-subject').value = item.subject;
+  document.getElementById('me-date').value = item.date;
+  document.getElementById('me-time').value = item.time;
+  document.getElementById('me-marks').value = item.marks;
+  document.getElementById('me-coverage').value = item.coverage;
+  document.getElementById('exam-modal').classList.remove('hidden');
+}
+
 function closeExamModal() { document.getElementById('exam-modal').classList.add('hidden'); }
 
 function saveExamModal(e) {
@@ -461,14 +587,44 @@ function saveExamModal(e) {
   const marks = document.getElementById('me-marks').value;
   const coverage = document.getElementById('me-coverage').value;
 
-  classData.exams.push({
-    id: Date.now(),
-    type, subject, date, time, marks, coverage
-  });
+  if (editingExamId) {
+    const item = classData.exams.find(e => e.id === editingExamId);
+    if (item) {
+      item.type = type;
+      item.subject = subject;
+      item.date = date;
+      item.time = time;
+      item.marks = marks;
+      item.coverage = coverage;
+    }
+  } else {
+    classData.exams.push({
+      id: Date.now(),
+      type, subject, date, time, marks, coverage
+    });
+  }
 
   saveStorage();
   closeExamModal();
   renderExams(type);
+}
+
+function deleteExam(id) {
+  if (confirm('আপনি কি এই পরীক্ষা রুটিন কার্ডটি মুছে ফেলতে চান?')) {
+    classData.exams = classData.exams.filter(e => e.id !== id);
+    saveStorage();
+    renderExams('all');
+  }
+}
+
+// SETTINGS CONTROL
+function saveSettings(e) {
+  e.preventDefault();
+  classData.settings.school = document.getElementById('cfg-school-name').value;
+  classData.settings.teacherName = document.getElementById('cfg-teacher-name').value;
+  classData.settings.className = document.getElementById('cfg-class-name').value;
+  saveStorage();
+  alert('সেটিংস সফলভাবে সংরক্ষণ করা হয়েছে!');
 }
 
 // INITIALIZATION
