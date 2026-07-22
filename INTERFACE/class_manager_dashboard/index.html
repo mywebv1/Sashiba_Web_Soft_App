@@ -555,12 +555,35 @@
           </select>
         </div>
         <div class="form-group">
-          <label>বিষয়</label>
-          <input type="text" id="m-subject" class="form-input" placeholder="যেমন: গণিত" required>
+          <label>বিষয় (ড্রপডাউন থেকে নির্বাচন করুন)</label>
+          <select id="m-subject" class="form-input" required>
+            <option value="গণিত" selected>গণিত</option>
+            <option value="বাংলা">বাংলা</option>
+            <option value="ইংরেজি">ইংরেজি</option>
+            <option value="বিজ্ঞান">বিজ্ঞান</option>
+            <option value="ডিজিটাল প্রযুক্তি">ডিজিটাল প্রযুক্তি</option>
+            <option value="ইতিহাস ও সামাজিক বিজ্ঞান">ইতিহাস ও সামাজিক বিজ্ঞান</option>
+            <option value="জীবন ও জীবিকা">জীবন ও জীবিকা</option>
+            <option value="স্বাস্থ্য সুরক্ষা">স্বাস্থ্য সুরক্ষা</option>
+            <option value="ধর্ম ও নৈতিক শিক্ষা">ধর্ম ও নৈতিক শিক্ষা</option>
+            <option value="শিল্প ও সংস্কৃতি">শিল্প ও সংস্কৃতি</option>
+            <option value="পদার্থবিজ্ঞান">পদার্থবিজ্ঞান</option>
+            <option value="রসায়ন">রসায়ন</option>
+            <option value="জীববিজ্ঞান">জীববিজ্ঞান</option>
+            <option value="উচ্চতর গণিত">উচ্চতর গণিত</option>
+            <option value="হিসাববিজ্ঞান">হিসাববিজ্ঞান</option>
+            <option value="ব্যবসায় উদ্যোগ">ব্যবসায় উদ্যোগ</option>
+          </select>
         </div>
         <div class="form-group">
-          <label>সময়কাল</label>
-          <input type="text" id="m-time" class="form-input" placeholder="১০:০০ - ১০:৪৫ AM" required>
+          <label>সময়কাল (যেমন: ০৯:০০ - ০৯:৪৫)</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="m-time-text" class="form-input" style="flex:1;" placeholder="০৯:০০ - ০৯:৪৫" value="১০:০০ - ১০:৪৫" required>
+            <select id="m-time-ampm" class="form-input" style="width:90px; font-weight:800;">
+              <option value="AM" selected>AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
           <label>দায়িত্বপ্রাপ্ত শিক্ষক</label>
@@ -573,10 +596,16 @@
         <div class="form-group">
           <label><i class="fa-solid fa-bell text-warning"></i> অটো রিমাইন্ডার পাঠানোর সময়</label>
           <select id="m-alert-time" class="form-input">
+            <option value="1">ক্লাস শুরুর ১ মিনিট পূর্বে</option>
+            <option value="2">ক্লাস শুরুর ২ মিনিট পূর্বে</option>
+            <option value="3">ক্লাস শুরুর ৩ মিনিট পূর্বে</option>
             <option value="5">ক্লাস শুরুর ৫ মিনিট পূর্বে</option>
             <option value="10" selected>ক্লাস শুরুর ১০ মিনিট পূর্বে</option>
             <option value="15">ক্লাস শুরুর ১৫ মিনিট পূর্বে</option>
+            <option value="20">ক্লাস শুরুর ২০ মিনিট পূর্বে</option>
             <option value="30">ক্লাস শুরুর ৩০ মিনিট পূর্বে</option>
+            <option value="45">ক্লাস শুরুর ৪৫ মিনিট পূর্বে</option>
+            <option value="60">ক্লাস শুরুর ১ ঘণ্টা (৬০ মি.) পূর্বে</option>
           </select>
         </div>
         <div class="form-group">

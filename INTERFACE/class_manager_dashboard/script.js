@@ -520,12 +520,13 @@ function pickRandomStudent() {
 function openAddRoutineModal() {
   editingRoutineId = null;
   document.querySelector('#routine-modal h3').innerHTML = '<i class="fa-solid fa-calendar-plus text-primary"></i> নতুন পিরিয়ড যোগ করুন';
-  document.getElementById('m-subject').value = '';
-  document.getElementById('m-time').value = '';
-  document.getElementById('m-room').value = '১০২';
-  document.getElementById('m-topic').value = '';
+  if (document.getElementById('m-subject')) document.getElementById('m-subject').value = 'গণিত';
+  if (document.getElementById('m-time-text')) document.getElementById('m-time-text').value = '১০:০০ - ১০:৪৫';
+  if (document.getElementById('m-time-ampm')) document.getElementById('m-time-ampm').value = 'AM';
+  if (document.getElementById('m-room')) document.getElementById('m-room').value = '১০২';
+  if (document.getElementById('m-topic')) document.getElementById('m-topic').value = '';
   if (document.getElementById('m-teacher')) document.getElementById('m-teacher').value = classData.settings.teacherName || '';
-  if (document.getElementById('m-phone')) document.getElementById('m-phone').value = '01712345678';
+  if (document.getElementById('m-phone')) document.getElementById('m-phone').value = '01751095560';
   document.getElementById('routine-modal').classList.remove('hidden');
 }
 
@@ -535,10 +536,19 @@ function editRoutine(id) {
   editingRoutineId = id;
   document.querySelector('#routine-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-primary"></i> পিরিয়ড কার্ড সম্পাদনা করুন';
   document.getElementById('m-day').value = item.day;
-  document.getElementById('m-subject').value = item.subject;
-  document.getElementById('m-time').value = item.time;
-  document.getElementById('m-room').value = item.room;
-  document.getElementById('m-topic').value = item.topic;
+  
+  if (document.getElementById('m-subject')) document.getElementById('m-subject').value = item.subject || 'গণিত';
+  
+  // Parse time and AM/PM
+  const fullTime = item.time || '১০:০০ - ১০:৪৫ AM';
+  const isPM = fullTime.toUpperCase().includes('PM');
+  const cleanTime = fullTime.replace(/AM|PM/gi, '').trim();
+
+  if (document.getElementById('m-time-text')) document.getElementById('m-time-text').value = cleanTime;
+  if (document.getElementById('m-time-ampm')) document.getElementById('m-time-ampm').value = isPM ? 'PM' : 'AM';
+
+  document.getElementById('m-room').value = item.room || '১০২';
+  document.getElementById('m-topic').value = item.topic || '';
   if (document.getElementById('m-teacher')) document.getElementById('m-teacher').value = item.teacher || '';
   if (document.getElementById('m-phone')) document.getElementById('m-phone').value = item.phone || '';
   if (document.getElementById('m-alert-time')) document.getElementById('m-alert-time').value = item.alertTime || '10';
@@ -552,11 +562,15 @@ function saveRoutineModal(e) {
   e.preventDefault();
   const day = document.getElementById('m-day').value;
   const subject = document.getElementById('m-subject').value;
-  const time = document.getElementById('m-time').value;
+  
+  const timeText = document.getElementById('m-time-text')?.value || '১০:০০ - ১০:৪৫';
+  const timeAmPm = document.getElementById('m-time-ampm')?.value || 'AM';
+  const time = `${timeText} ${timeAmPm}`;
+
   const room = document.getElementById('m-room').value;
   const topic = document.getElementById('m-topic').value;
   const teacher = document.getElementById('m-teacher')?.value || classData.settings.teacherName;
-  const phone = document.getElementById('m-phone')?.value || '01712345678';
+  const phone = document.getElementById('m-phone')?.value || '01751095560';
   const alertTime = document.getElementById('m-alert-time')?.value || '10';
   const alertMode = document.getElementById('m-alert-mode')?.value || 'call_sms';
 
@@ -586,7 +600,7 @@ function saveRoutineModal(e) {
   renderOverview();
   
   // Show notification feedback
-  alert(`✅ পিরিয়ড কার্ড সফলভাবে সংরক্ষিত হয়েছে!\n\n📞 শিক্ষক ${teacher} (${phone})-এর মোবাইলে ক্লাস শুরুর ${alertTime} মিনিট পূর্বে অটোমেটিক রিমাইন্ডার কল ও SMS চালু করা হলো।`);
+  alert(`✅ পিরিয়ড কার্ড সফলভাবে সংরক্ষিত হয়েছে!\n\n📌 বিষয়: ${subject} (${time})\n📞 শিক্ষক ${teacher} (${phone})-এর মোবাইলে ক্লাস শুরুর ${alertTime} মিনিট পূর্বে অটোমেটিক রিমাইন্ডার কল ও SMS সেট করা হলো।`);
 }
 
 // REAL-TIME FUNCTIONAL TEST SIMULATOR FOR AUTOMATED VOICE CALL & SMS
