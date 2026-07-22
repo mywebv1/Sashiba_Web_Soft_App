@@ -655,7 +655,7 @@
         </div>
         <div class="form-group">
           <label>বিষয় (ড্রপডাউন)</label>
-          <select id="ms-subject" class="form-input" required>
+          <select id="ms-subject" class="form-input" onchange="autoFillSubjectCode(this.value)" required>
             <option value="গণিত" selected>গণিত</option>
             <option value="বাংলা">বাংলা</option>
             <option value="ইংরেজি">ইংরেজি</option>
@@ -671,28 +671,80 @@
           </select>
         </div>
         <div class="form-group">
-          <label>বিষয় কোড</label>
-          <input type="text" id="ms-subject-code" class="form-input" placeholder="যেমন: ১০৯" value="১০৯">
+          <label>বিষয় কোড (অটো ড্রপডাউন)</label>
+          <select id="ms-subject-code" class="form-input">
+            <option value="১০৯" selected>১০৯ (গণিত)</option>
+            <option value="১০১">১০১ (বাংলা)</option>
+            <option value="১০৭">১০৭ (ইংরেজি)</option>
+            <option value="১২৭">১২৭ (বিজ্ঞান)</option>
+            <option value="১৩১">১৩১ (ডিজিটাল প্রযুক্তি)</option>
+            <option value="১৫০">১৫০ (ইতিহাস ও সামাজিক বিজ্ঞান)</option>
+            <option value="১৩৬">১৩৬ (পদার্থবিজ্ঞান)</option>
+            <option value="১৩৭">১৩৭ (রসায়ন)</option>
+            <option value="১৩৮">১৩৮ (জীববিজ্ঞান)</option>
+            <option value="১২৬">১২৬ (উচ্চতর গণিত)</option>
+            <option value="১৪৬">১৪৬ (হিসাববিজ্ঞান)</option>
+            <option value="১৪৩">১৪৩ (ব্যবসায় উদ্যোগ)</option>
+          </select>
         </div>
         <div class="form-group">
-          <label>অধ্যায় / বিষয়বস্তু / টপিক বিন্যাস</label>
-          <input type="text" id="ms-chapter" class="form-input" placeholder="যেমন: অধ্যায় ৪: পরিবেশ ও গতি" required>
+          <label>অধ্যায় / বিষয়বস্তু / টপিক বিন্যাস (ড্রপডাউন)</label>
+          <select id="ms-chapter" class="form-input" required>
+            <option value="অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র" selected>অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র</option>
+            <option value="অধ্যায় ২: জ্যামিতি ও বৃত্তের পরিধি">অধ্যায় ২: জ্যামিতি ও বৃত্তের পরিধি</option>
+            <option value="অধ্যায় ৩: পরিবেশ, গতি ও বল">অধ্যায় ৩: পরিবেশ, গতি ও বল</option>
+            <option value="অধ্যায় ৪: আলোক বিজ্ঞান ও তার তরঙ্গ">অধ্যায় ৪: আলোক বিজ্ঞান ও তার তরঙ্গ</option>
+            <option value="অধ্যায় ৫: ব্যাকরণ, সমাস ও নির্মিতি">অধ্যায় ৫: ব্যাকরণ, সমাস ও নির্মিতি</option>
+            <option value="অধ্যায় ৬: English Grammar & Composition">অধ্যায় ৬: English Grammar & Composition</option>
+            <option value="অধ্যায় ৭: পাইথন প্রোগ্রামিং পরিচিতি">অধ্যায় ৭: পাইথন প্রোগ্রামিং পরিচিতি</option>
+            <option value="অধ্যায় ৮: কম্পিউটার নেটওয়ার্ক ও ডাটাবেজ">অধ্যায় ৮: কম্পিউটার নেটওয়ার্ক ও ডাটাবেজ</option>
+            <option value="অধ্যায় ৯: হিসাববিজ্ঞান মূলনীতি ও খতিয়ান">অধ্যায় ৯: হিসাববিজ্ঞান মূলনীতি ও খতিয়ান</option>
+            <option value="অধ্যায় ১০: বার্ষিক মাস্টার কারিকুলাম সামারি">অধ্যায় ১০: বার্ষিক মাস্টার কারিকুলাম সামারি</option>
+          </select>
         </div>
         <div class="form-group">
           <label>মাসিক/সাপ্তাহিক পাঠ পরিকল্পনা (Lesson Plan)</label>
-          <input type="text" id="ms-weekly-plan" class="form-input" placeholder="যেমন: সপ্তাহ ১-২: গতির সূত্রের প্রয়োগ ও সমাধান">
+          <select id="ms-weekly-plan" class="form-input">
+            <option value="সপ্তাহ ১-২: মূল সূত্র বিশ্লেষণ ও গাণিতিক সমাধান" selected>সপ্তাহ ১-২: মূল সূত্র বিশ্লেষণ ও গাণিতিক সমাধান</option>
+            <option value="সপ্তাহ ৩-৪: অধ্যায়ভিত্তিক প্রশ্ন অনুশীলন ও হোমওয়ার্ক">সপ্তাহ ৩-৪: অধ্যায়ভিত্তিক প্রশ্ন অনুশীলন ও হোমওয়ার্ক</option>
+            <option value="সপ্তাহ ৫-৬: ল্যাব প্র্যাকটিক্যাল ও দলগত কাজ">সপ্তাহ ৫-৬: ল্যাব প্র্যাকটিক্যাল ও দলগত কাজ</option>
+            <option value="সপ্তাহ ৭-৮: রিভিশন সেশন ও কুইজ পরীক্ষা">সপ্তাহ ৭-৮: রিভিশন সেশন ও কুইজ পরীক্ষা</option>
+            <option value="মাসের পাঠ পরিকল্পনা: কন্টিনিউয়াস অ্যাসেসমেন্ট">মাসের পাঠ পরিকল্পনা: কন্টিনিউয়াস অ্যাসেসমেন্ট</option>
+            <option value="বার্ষিক পাঠ পরিকল্পনা: চূড়ান্ত সাময়িক মডেল টেস্ট">বার্ষিক পাঠ পরিকল্পনা: চূড়ান্ত সাময়িক মডেল টেস্ট</option>
+          </select>
         </div>
         <div class="form-group">
           <label>প্রয়োজনীয় ক্লাস পিরিয়ডের সংখ্যা</label>
-          <input type="number" id="ms-periods" class="form-input" placeholder="যেমন: ৬" value="৬">
+          <select id="ms-periods" class="form-input">
+            <option value="২">২টি পিরিয়ড</option>
+            <option value="৪">৪টি পিরিয়ড</option>
+            <option value="৬" selected>৬টি পিরিয়ড</option>
+            <option value="৮">৮টি পিরিয়ড</option>
+            <option value="১০">১০টি পিরিয়ড</option>
+            <option value="১২">১২টি পিরিয়ড</option>
+            <option value="১৬">১৬টি পিরিয়ড</option>
+            <option value="২০">২০টি পিরিয়ড</option>
+          </select>
         </div>
         <div class="form-group">
           <label>সহায়ক বই / প্র্যাকটিক্যাল / ল্যাবওয়ার্কের বিবরণ</label>
-          <input type="text" id="ms-ref-books" class="form-input" placeholder="যেমন: NCTB বোর্ড বই ও ল্যাব প্র্যাকটিক্যাল গাইড">
+          <select id="ms-ref-books" class="form-input">
+            <option value="NCTB বোর্ড অনুমোদিত মূল বই (২০২৬)" selected>NCTB বোর্ড অনুমোদিত মূল বই (২০২৬)</option>
+            <option value="বিজ্ঞান ল্যাব ম্যানুয়াল ও প্র্যাকটিক্যাল নোটবুক">বিজ্ঞান ল্যাব ম্যানুয়াল ও প্র্যাকটিক্যাল নোটবুক</option>
+            <option value="English Grammar & Composition Supplementary">English Grammar & Composition Supplementary</option>
+            <option value="কম্পিউটার ল্যাব প্র্যাকটিক্যাল ফাইল">কম্পিউটার ল্যাব প্র্যাকটিক্যাল ফাইল</option>
+            <option value="সহায়ক মডেল কোশ্চেন ও উত্তরপত্র">সহায়ক মডেল কোশ্চেন ও উত্তরপত্র</option>
+          </select>
         </div>
         <div class="form-group">
           <label>শিখন লক্ষ্য ও মূল্যায়ন রূপরেখা</label>
-          <input type="text" id="ms-target" class="form-input" placeholder="যেমন: কুইজ টেস্ট ও মান নির্ণয় শেখানো হবে">
+          <select id="ms-target" class="form-input">
+            <option value="বীজগণিতীয় সূত্রের সঠিক প্রয়োগ ও মান নির্ণয় শিখবে" selected>বীজগণিতীয় সূত্রের সঠিক প্রয়োগ ও মান নির্ণয় শিখবে</option>
+            <option value="গাণিতিক সমস্যা সমাধান ও কুইজ টেস্টে পারদর্শিতা">গাণিতিক সমস্যা সমাধান ও কুইজ টেস্টে পারদর্শিতা</option>
+            <option value="সৃজনশীল প্রশ্ন উপস্থাপন ও নির্মিতি দক্ষতা অর্জন">সৃজনশীল প্রশ্ন উপস্থাপন ও নির্মিতি দক্ষতা অর্জন</option>
+            <option value="প্র্যাকটিক্যাল ল্যাবওয়ার্ক সম্পন্নকরণ ও প্রজেক্ট জমা">প্র্যাকটিক্যাল ল্যাবওয়ার্ক সম্পন্নকরণ ও প্রজেক্ট জমা</option>
+            <option value="১০০% সিলেবাস কভারেজ ও চূড়ান্ত বার্ষিক সফলতা">১০০% সিলেবাস কভারেজ ও চূড়ান্ত বার্ষিক সফলতা</option>
+          </select>
         </div>
         <div class="modal-actions mt-6">
           <button type="button" class="btn btn-outline" onclick="closeSyllabusModal()">বাতিল</button>
@@ -722,24 +774,54 @@
           </select>
         </div>
         <div class="form-group">
-          <label>বিষয়</label>
-          <input type="text" id="me-subject" class="form-input" placeholder="যেমন: ইংরেজি" required>
+          <label>বিষয় (ড্রপডাউন)</label>
+          <select id="me-subject" class="form-input" required>
+            <option value="গণিত" selected>গণিত</option>
+            <option value="বাংলা">বাংলা</option>
+            <option value="ইংরেজি">ইংরেজি</option>
+            <option value="বিজ্ঞান">বিজ্ঞান</option>
+            <option value="ডিজিটাল প্রযুক্তি">ডিজিটাল প্রযুক্তি</option>
+            <option value="ইতিহাস ও সামাজিক বিজ্ঞান">ইতিহাস ও সামাজিক বিজ্ঞান</option>
+            <option value="পদার্থবিজ্ঞান">পদার্থবিজ্ঞান</option>
+            <option value="রসায়ন">রসায়ন</option>
+            <option value="জীববিজ্ঞান">জীববিজ্ঞান</option>
+            <option value="উচ্চতর গণিত">উচ্চতর গণিত</option>
+            <option value="হিসাববিজ্ঞান">হিসাববিজ্ঞান</option>
+            <option value="ব্যবসায় উদ্যোগ">ব্যবসায় উদ্যোগ</option>
+          </select>
         </div>
         <div class="form-group">
           <label>তারিখ</label>
           <input type="date" id="me-date" class="form-input" required>
         </div>
         <div class="form-group">
-          <label>সময়</label>
-          <input type="text" id="me-time" class="form-input" placeholder="১০:০০ AM">
+          <label>সময়কাল (ড্রপডাউন)</label>
+          <select id="me-time" class="form-input">
+            <option value="১০:০০ AM - ১১:০০ AM" selected>১০:০০ AM - ১১:০০ AM</option>
+            <option value="১১:০০ AM - ১২:০০ PM">১১:০০ AM - ১২:০০ PM</option>
+            <option value="০২:০০ PM - ০৩:০০ PM">০২:০০ PM - ০৩:০০ PM</option>
+            <option value="০৯:০০ AM - ১২:০০ PM (৩ ঘণ্টা)">০৯:০০ AM - ১২:০০ PM (৩ ঘণ্টা)</option>
+          </select>
         </div>
         <div class="form-group">
-          <label>পূর্ণমান</label>
-          <input type="number" id="me-marks" class="form-input" value="২০">
+          <label>পূর্ণমান (ড্রপডাউন)</label>
+          <select id="me-marks" class="form-input">
+            <option value="১০">১০ নম্বর</option>
+            <option value="২০" selected>২০ নম্বর</option>
+            <option value="৩০">৩০ নম্বর</option>
+            <option value="৫০">৫০ নম্বর</option>
+            <option value="১০০">১০০ নম্বর</option>
+          </select>
         </div>
         <div class="form-group">
-          <label>সিলেবাস কভারেজ</label>
-          <input type="text" id="me-coverage" class="form-input" placeholder="অধ্যায় ১ ও ২">
+          <label>সিলেবাস কভারেজ (ড্রপডাউন)</label>
+          <select id="me-coverage" class="form-input">
+            <option value="অধ্যায় ১ ও ২ (বীজগণিত ও জ্যামিতি)" selected>অধ্যায় ১ ও ২ (বীজগণিত ও জ্যামিতি)</option>
+            <option value="অধ্যায় ৩ ও ৪ (পরিবেশ ও বল)">অধ্যায় ৩ ও ৪ (পরিবেশ ও বল)</option>
+            <option value="গদ্য, পদ্য ও ব্যাকরণ সম্পূর্ণ">গদ্য, পদ্য ও ব্যাকরণ সম্পূর্ণ</option>
+            <option value="৫০% মূল কারিকুলাম কভারেজ">৫০% মূল কারিকুলাম কভারেজ</option>
+            <option value="১০০% বার্ষিক কারিকুলাম কভারেজ">১০০% বার্ষিক কারিকুলাম কভারেজ</option>
+          </select>
         </div>
         <div class="modal-actions mt-6">
           <button type="button" class="btn btn-outline" onclick="closeExamModal()">বাতিল</button>

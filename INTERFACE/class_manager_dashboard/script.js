@@ -922,7 +922,21 @@ function saveSettings(e) {
   alert('সেটিংস সফলভাবে সংরক্ষণ করা হয়েছে!');
 }
 
-// INITIALIZATION
+// AUTOMATIC SUBJECT CODE AUTO-FILLER
+function autoFillSubjectCode(subject) {
+  const codeMap = {
+    'গণিত': '১০৯', 'বাংলা': '১০১', 'ইংরেজি': '১০৭', 'বিজ্ঞান': '১২৭',
+    'ডিজিটাল প্রযুক্তি': '১৩১', 'ইতিহাস ও সামাজিক বিজ্ঞান': '১৫০',
+    'পদার্থবিজ্ঞান': '১৩৬', 'রসায়ন': '১৩৭', 'জীববিজ্ঞান': '১৩৮',
+    'উচ্চতর গণিত': '১২৬', 'হিসাববিজ্ঞান': '১৪৬', 'ব্যবসায় উদ্যোগ': '১৪৩'
+  };
+  const codeSelect = document.getElementById('ms-subject-code');
+  if (codeSelect && codeMap[subject]) {
+    codeSelect.value = codeMap[subject];
+  }
+}
+
+// INITIALIZATION & GLOBAL ESC KEY LISTENER FOR BACK NAVIGATION / MODAL CLOSE
 document.addEventListener('DOMContentLoaded', () => {
   loadStorage();
   showSection('overview');
@@ -930,4 +944,40 @@ document.addEventListener('DOMContentLoaded', () => {
   // Start automated background schedule monitor (runs every 5 seconds)
   checkRoutineScheduleAlerts();
   setInterval(checkRoutineScheduleAlerts, 5000);
+});
+
+// ESC KEY HANDLER: ESC PRESS CLOSES OPEN MODALS OR NAVIGATES BACK
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    // Check if any modal is currently visible
+    const routineModal = document.getElementById('routine-modal');
+    const syllabusModal = document.getElementById('syllabus-modal');
+    const examModal = document.getElementById('exam-modal');
+
+    let modalClosed = false;
+
+    if (routineModal && !routineModal.classList.contains('hidden')) {
+      closeRoutineModal();
+      modalClosed = true;
+    }
+    if (syllabusModal && !syllabusModal.classList.contains('hidden')) {
+      closeSyllabusModal();
+      modalClosed = true;
+    }
+    if (examModal && !examModal.classList.contains('hidden')) {
+      closeExamModal();
+      modalClosed = true;
+    }
+
+    // If no modal was open, ESC key navigates back to main home/overview
+    if (!modalClosed) {
+      const activeNav = document.querySelector('.nav-item.active');
+      const activeSectionId = activeNav ? activeNav.id.replace('nav-', '') : 'overview';
+      if (activeSectionId !== 'overview') {
+        showSection('overview');
+      } else {
+        goHome();
+      }
+    }
+  }
 });
