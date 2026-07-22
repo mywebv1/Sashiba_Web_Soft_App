@@ -754,9 +754,6 @@ function deleteRoutine(id) {
   }
 }
 
-// SYLLABUS MODAL & EDIT
-function openAddSyllabusModal() {
-  editingSyllabusId = null;
 // SYLLABUS MODAL & EDIT WITH ACADEMIC MASTER PLAN FIELDS
 function openAddSyllabusModal() {
   editingSyllabusId = null;
