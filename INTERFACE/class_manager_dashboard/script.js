@@ -18,14 +18,14 @@ let classData = {
     { id: 6, day: "মঙ্গলবার", subject: "ডিজিটাল প্রযুক্তি", time: "১০:০০ - ১০:৪৫ AM", room: "কম্পিউটার ল্যাব", topic: "পাইথন প্রোগ্রামিং পরিচিতি", teacher: "মাগুরিব আলী", phone: "01712345678", alertTime: "10", alertMode: "call_sms", activeNow: false }
   ],
   syllabuses: [
-    { id: 1, timeframe: "today", timeframeLabel: "প্রতিদিনের সিলেবাস", subject: "গণিত", chapter: "অনুশীলনী ৩.২ (১-১০)", target: "বীজগণিতীয় সূত্রের প্রয়োগ শিখবে", progress: 80 },
-    { id: 2, timeframe: "1week", timeframeLabel: "আগামী ১ সপ্তাহ", subject: "বিজ্ঞান", chapter: "অধ্যায় ৪: পরিবেশ ও গতি", target: "সংক্ষিপ্ত কুইজ পরীক্ষা গ্রহণ", progress: 40 },
-    { id: 3, timeframe: "15days", timeframeLabel: "আগামী ১৫ দিন", subject: "বাংলা", chapter: "গদ্য অংশ সম্পূর্ণ", target: "সৃজনশীল প্রশ্ন সংশোধন", progress: 65 },
-    { id: 4, timeframe: "1month", timeframeLabel: "আগামী ১ মাস", subject: "ইংরেজি", chapter: "Writing & Grammar", target: "সাপ্তাহিক অ্যাসাইনমেন্ট জমা", progress: 35 },
-    { id: 5, timeframe: "3months", timeframeLabel: "আগামী ৩ মাস", subject: "গণিত ও বিজ্ঞান", chapter: "প্রথম সাময়িক পরীক্ষার সিলেবাস", target: "রিভিশন ও মক টেস্ট", progress: 50 },
-    { id: 6, timeframe: "6months", timeframeLabel: "আগামী ৬ মাস", subject: "সকল বিষয়", chapter: "অর্ধবার্ষিকী চূড়ান্ত প্রস্তুতি", target: "মডেল টেস্ট গ্রহণ", progress: 25 },
-    { id: 7, timeframe: "9months", timeframeLabel: "আগামী ৯ মাস", subject: "সকল বিষয়", chapter: "বার্ষিকী পূর্ব প্রস্তুতি", target: "দুর্বল শিক্ষার্থীদের রিভিশন", progress: 15 },
-    { id: 8, timeframe: "12months", timeframeLabel: "আগামী ১২ মাস (১ বছর)", subject: "সম্পূর্ণ কারিকুলাম", chapter: "বার্ষিকী ও চূড়ান্ত মূল্যায়ন", target: "১০০% সিলেবাস সমাপন", progress: 10 }
+    { id: 1, timeframe: "today", timeframeLabel: "প্রতিদিনের সিলেবাস", subject: "গণিত", subjectCode: "১০৯", chapter: "অনুশীলনী ৩.২ (১-১০)", target: "বীজগণিতীয় সূত্রের প্রয়োগ ও মান নির্ণয়", weeklyPlan: "সপ্তাহ ১: সূত্র বিশ্লেষণ ও সমাধান", periodsNeeded: 4, refBooks: "এনসিটিবি গণিত বই পৃষ্ঠা ৪৫-৪৮", progress: 80 },
+    { id: 2, timeframe: "1week", timeframeLabel: "আগামী ১ সপ্তাহ", subject: "বিজ্ঞান", subjectCode: "১২৭", chapter: "অধ্যায় ৪: পরিবেশ ও গতি", target: "সংক্ষিপ্ত কুইজ পরীক্ষা ও ল্যাব প্রদর্শন", weeklyPlan: "সপ্তাহ ২: গতির সূত্র ও পরীক্ষা", periodsNeeded: 6, refBooks: "বিজ্ঞান মূল পাঠ্যবই ও ল্যাব গাইড", progress: 40 },
+    { id: 3, timeframe: "15days", timeframeLabel: "আগামী ১৫ দিন", subject: "বাংলা", subjectCode: "১০১", chapter: "গদ্য অংশ ও ব্যাকরণ", target: "সৃজনশীল প্রশ্ন সংশোধন ও নির্মিতি", weeklyPlan: "সপ্তাহ ৩-৪: কারক ও সমাস অনুশীলন", periodsNeeded: 10, refBooks: "বাংলা সাহিত্য ও ব্যাকরণ নির্মিতি", progress: 65 },
+    { id: 4, timeframe: "1month", timeframeLabel: "আগামী ১ মাস", subject: "ইংরেজি", subjectCode: "১০৭", chapter: "Writing & Grammar Master Plan", target: "সাপ্তাহিক অ্যাসাইনমেন্ট ও স্পোকেন প্র্যাকটিস", weeklyPlan: "মাসের পাঠ পরিকল্পনা: Tense & Composition", periodsNeeded: 18, refBooks: "English Grammar & Composition", progress: 35 },
+    { id: 5, timeframe: "3months", timeframeLabel: "আগামী ৩ মাস", subject: "গণিত ও বিজ্ঞান", subjectCode: "১০৯-১২৭", chapter: "১ম সাময়িক মাস্টার কারিকুলাম", target: "রিভিশন, কন্টিনিউয়াস অ্যাসেসমেন্ট ও মক টেস্ট", weeklyPlan: "১ম ট্রাইমেস্টার সম্পূর্ণ গাইডলাইন", periodsNeeded: 45, refBooks: "NCTB বোর্ড কারিকুলাম ২০২৬", progress: 50 },
+    { id: 6, timeframe: "6months", timeframeLabel: "আগামী ৬ মাস", subject: "সকল বিষয়", subjectCode: "ALL", chapter: "অর্ধবার্ষিকী চূড়ান্ত মাস্টার প্ল্যান", target: "৫০% কারিকুলাম সমাপন ও অর্ধবার্ষিকী মূল্যায়ন", weeklyPlan: "ছয় মাসের একাডেমিক ট্র্যাকিং", periodsNeeded: 90, refBooks: "সকল বিষয়ের অনুমোদিত বোর্ড বই", progress: 25 },
+    { id: 7, timeframe: "9months", timeframeLabel: "আগামী ৯ মাস", subject: "সকল বিষয়", subjectCode: "ALL", chapter: "বার্ষিকী পূর্ব প্রস্তুতি ও প্রজেক্ট ওয়ার্ক", target: "৭৫% সিলেবাস কভারেজ ও দুর্বলদের রিভিশন", weeklyPlan: "নবম মাসের একাডেমিক প্ল্যান", periodsNeeded: 135, refBooks: "প্রজেক্ট গাইড ও অ্যাসাইনমেন্ট বুক", progress: 15 },
+    { id: 8, timeframe: "12months", timeframeLabel: "আগামী ১২ মাস (১ বছর)", subject: "সম্পূর্ণ কারিকুলাম", subjectCode: "ALL-2026", chapter: "বার্ষিকী ও চূড়ান্ত একাডেমিক মূল্যায়ন", target: "১০০% সিলেবাস সমাপন ও বার্ষিক একাডেমিক প্ল্যান সম্পন্ন", weeklyPlan: "বছরের ৩৬৫ দিনের একাডেমিক ক্যালেন্ডার", periodsNeeded: 180, refBooks: "বার্ষিক কোর্স আউটলাইন গাইড", progress: 10 }
   ],
   students: [
     { roll: 1, name: "আব্দুল্লাহ আল মামুন", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "খুব মনোযোগী" },
@@ -292,7 +292,7 @@ function renderSyllabus(tf) {
   const container = document.getElementById('syllabus-cards-container');
   const items = classData.syllabuses.filter(s => s.timeframe === tf);
   if (items.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">এই সময়সীমার জন্য কোনো সিলেবাস কার্ড যোগ করা হয়নি।</p>`;
+    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">এই সময়সীমার জন্য কোনো একাডেমিক সিলেবাস ও মাস্টার প্ল্যান যোগ করা হয়নি।</p>`;
     return;
   }
   container.innerHTML = items.map(s => `
@@ -304,12 +304,23 @@ function renderSyllabus(tf) {
           <button onclick="deleteSyllabus(${s.id})" style="color:var(--danger); background:none; font-size:14px; cursor:pointer;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
         </div>
       </div>
-      <h4 style="font-size:16px; font-weight:800; margin-top:8px; color:var(--text-main);">${s.subject}: ${s.chapter}</h4>
-      <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">🎯 লক্ষ্য: ${s.target}</p>
+
+      <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:flex-start;">
+        <h4 style="font-size:16px; font-weight:800; color:var(--text-main);">${s.subject} <span style="font-size:12px; color:var(--primary); font-weight:700;">(কোড: ${s.subjectCode || '১০১'})</span></h4>
+        <span class="badge" style="background:rgba(79,70,229,0.1); color:var(--primary); font-size:11px;"><i class="fa-solid fa-clock"></i> পিরিয়ড: ${s.periodsNeeded || 4}টি</span>
+      </div>
+
+      <p style="font-size:13px; font-weight:700; color:var(--text-main); margin-top:4px;">📖 অধ্যায়/টপিক: ${s.chapter}</p>
       
+      <div style="margin-top:8px; padding:8px; background:rgba(0,0,0,0.03); border-radius:8px; font-size:11.5px; color:var(--text-muted);">
+        <div><strong>🗓️ সপ্তাহিক পাঠ পরিকল্পনা:</strong> ${s.weeklyPlan || 'নির্ধারিত পাঠসূচি'}</div>
+        <div style="margin-top:2px;"><strong>🎯 শিখন লক্ষ্য:</strong> ${s.target}</div>
+        <div style="margin-top:2px;"><strong>📚 সহায়ক বই/ল্যাব:</strong> ${s.refBooks || 'NCTB অনুমোদিত বোর্ড বই'}</div>
+      </div>
+
       <div style="margin-top:14px;">
         <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:800; color:var(--text-main);">
-          <span>সিলেবাস অগ্রগতি</span>
+          <span>একাডেমিক অগ্রগতি</span>
           <span>${s.progress}%</span>
         </div>
         <div class="progress-bar-wrap">
@@ -746,10 +757,17 @@ function deleteRoutine(id) {
 // SYLLABUS MODAL & EDIT
 function openAddSyllabusModal() {
   editingSyllabusId = null;
-  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-book-bookmark text-purple"></i> নতুন সিলেবাস টার্গেট যোগ';
-  document.getElementById('ms-subject').value = '';
-  document.getElementById('ms-chapter').value = '';
-  document.getElementById('ms-target').value = '';
+// SYLLABUS MODAL & EDIT WITH ACADEMIC MASTER PLAN FIELDS
+function openAddSyllabusModal() {
+  editingSyllabusId = null;
+  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-book-bookmark text-purple"></i> নতুন সিলেবাস ও লেসন প্ল্যান যোগ';
+  if (document.getElementById('ms-subject')) document.getElementById('ms-subject').value = 'গণিত';
+  if (document.getElementById('ms-subject-code')) document.getElementById('ms-subject-code').value = '১০৯';
+  if (document.getElementById('ms-chapter')) document.getElementById('ms-chapter').value = '';
+  if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = '';
+  if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = '৬';
+  if (document.getElementById('ms-ref-books')) document.getElementById('ms-ref-books').value = 'NCTB বোর্ড বই ও ল্যাব প্র্যাকটিক্যাল গাইড';
+  if (document.getElementById('ms-target')) document.getElementById('ms-target').value = '';
   document.getElementById('syllabus-modal').classList.remove('hidden');
 }
 
@@ -757,11 +775,15 @@ function editSyllabus(id) {
   const item = classData.syllabuses.find(s => s.id === id);
   if (!item) return;
   editingSyllabusId = id;
-  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-purple"></i> সিলেবাস টার্গেট সম্পাদনা করুন';
-  document.getElementById('ms-timeframe').value = item.timeframe;
-  document.getElementById('ms-subject').value = item.subject;
-  document.getElementById('ms-chapter').value = item.chapter;
-  document.getElementById('ms-target').value = item.target;
+  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-purple"></i> সিলেবাস ও পাঠ পরিকল্পনা সম্পাদনা করুন';
+  document.getElementById('ms-timeframe').value = item.timeframe || 'today';
+  if (document.getElementById('ms-subject')) document.getElementById('ms-subject').value = item.subject || 'গণিত';
+  if (document.getElementById('ms-subject-code')) document.getElementById('ms-subject-code').value = item.subjectCode || '১০৯';
+  document.getElementById('ms-chapter').value = item.chapter || '';
+  if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = item.weeklyPlan || '';
+  if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = item.periodsNeeded || '৬';
+  if (document.getElementById('ms-ref-books')) document.getElementById('ms-ref-books').value = item.refBooks || '';
+  document.getElementById('ms-target').value = item.target || '';
   document.getElementById('syllabus-modal').classList.remove('hidden');
 }
 
@@ -771,7 +793,11 @@ function saveSyllabusModal(e) {
   e.preventDefault();
   const timeframe = document.getElementById('ms-timeframe').value;
   const subject = document.getElementById('ms-subject').value;
+  const subjectCode = document.getElementById('ms-subject-code')?.value || '১০১';
   const chapter = document.getElementById('ms-chapter').value;
+  const weeklyPlan = document.getElementById('ms-weekly-plan')?.value || 'সপ্তাহিক পাঠ পরিকল্পনা';
+  const periodsNeeded = document.getElementById('ms-periods')?.value || '৬';
+  const refBooks = document.getElementById('ms-ref-books')?.value || 'NCTB বোর্ড বই';
   const target = document.getElementById('ms-target').value;
 
   const tfLabels = {
@@ -786,7 +812,11 @@ function saveSyllabusModal(e) {
       item.timeframe = timeframe;
       item.timeframeLabel = tfLabels[timeframe] || timeframe;
       item.subject = subject;
+      item.subjectCode = subjectCode;
       item.chapter = chapter;
+      item.weeklyPlan = weeklyPlan;
+      item.periodsNeeded = periodsNeeded;
+      item.refBooks = refBooks;
       item.target = target;
     }
   } else {
@@ -795,7 +825,11 @@ function saveSyllabusModal(e) {
       timeframe,
       timeframeLabel: tfLabels[timeframe] || timeframe,
       subject,
+      subjectCode,
       chapter,
+      weeklyPlan,
+      periodsNeeded,
+      refBooks,
       target,
       progress: 10
     });

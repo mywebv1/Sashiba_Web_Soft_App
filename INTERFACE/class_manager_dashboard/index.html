@@ -654,16 +654,45 @@
           </select>
         </div>
         <div class="form-group">
-          <label>বিষয়</label>
-          <input type="text" id="ms-subject" class="form-input" placeholder="যেমন: বিজ্ঞান" required>
+          <label>বিষয় (ড্রপডাউন)</label>
+          <select id="ms-subject" class="form-input" required>
+            <option value="গণিত" selected>গণিত</option>
+            <option value="বাংলা">বাংলা</option>
+            <option value="ইংরেজি">ইংরেজি</option>
+            <option value="বিজ্ঞান">বিজ্ঞান</option>
+            <option value="ডিজিটাল প্রযুক্তি">ডিজিটাল প্রযুক্তি</option>
+            <option value="ইতিহাস ও সামাজিক বিজ্ঞান">ইতিহাস ও সামাজিক বিজ্ঞান</option>
+            <option value="পদার্থবিজ্ঞান">পদার্থবিজ্ঞান</option>
+            <option value="রসায়ন">রসায়ন</option>
+            <option value="জীববিজ্ঞান">জীববিজ্ঞান</option>
+            <option value="উচ্চতর গণিত">উচ্চতর গণিত</option>
+            <option value="হিসাববিজ্ঞান">হিসাববিজ্ঞান</option>
+            <option value="ব্যবসায় উদ্যোগ">ব্যবসায় উদ্যোগ</option>
+          </select>
         </div>
         <div class="form-group">
-          <label>অধ্যায় / টপিক</label>
-          <input type="text" id="ms-chapter" class="form-input" placeholder="যেমন: অধ্যায় ৪: পরিবেশ" required>
+          <label>বিষয় কোড</label>
+          <input type="text" id="ms-subject-code" class="form-input" placeholder="যেমন: ১০৯" value="১০৯">
         </div>
         <div class="form-group">
-          <label>শিখন লক্ষ্য</label>
-          <input type="text" id="ms-target" class="form-input" placeholder="কুইজ কভার করা হবে">
+          <label>অধ্যায় / বিষয়বস্তু / টপিক বিন্যাস</label>
+          <input type="text" id="ms-chapter" class="form-input" placeholder="যেমন: অধ্যায় ৪: পরিবেশ ও গতি" required>
+        </div>
+        <div class="form-group">
+          <label>মাসিক/সাপ্তাহিক পাঠ পরিকল্পনা (Lesson Plan)</label>
+          <input type="text" id="ms-weekly-plan" class="form-input" placeholder="যেমন: সপ্তাহ ১-২: গতির সূত্রের প্রয়োগ ও সমাধান">
+        </div>
+        <div class="form-group">
+          <label>প্রয়োজনীয় ক্লাস পিরিয়ডের সংখ্যা</label>
+          <input type="number" id="ms-periods" class="form-input" placeholder="যেমন: ৬" value="৬">
+        </div>
+        <div class="form-group">
+          <label>সহায়ক বই / প্র্যাকটিক্যাল / ল্যাবওয়ার্কের বিবরণ</label>
+          <input type="text" id="ms-ref-books" class="form-input" placeholder="যেমন: NCTB বোর্ড বই ও ল্যাব প্র্যাকটিক্যাল গাইড">
+        </div>
+        <div class="form-group">
+          <label>শিখন লক্ষ্য ও মূল্যায়ন রূপরেখা</label>
+          <input type="text" id="ms-target" class="form-input" placeholder="যেমন: কুইজ টেস্ট ও মান নির্ণয় শেখানো হবে">
         </div>
         <div class="modal-actions mt-6">
           <button type="button" class="btn btn-outline" onclick="closeSyllabusModal()">বাতিল</button>
