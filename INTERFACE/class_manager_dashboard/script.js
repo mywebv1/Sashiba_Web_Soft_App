@@ -113,6 +113,42 @@ function showSection(name) {
   if (name === 'ai_insights') renderAIInsights();
   if (name === 'history') renderHistory();
   if (name === 'alerts') renderAlerts();
+
+  // Update Top Bar Action Buttons Contextually
+  const addBtn = document.getElementById('top-bar-add-btn');
+  const attBtn = document.getElementById('top-bar-att-btn');
+
+  if (attBtn) {
+    attBtn.style.display = (name === 'attendance') ? 'none' : 'inline-flex';
+  }
+
+  if (addBtn) {
+    if (name === 'syllabus') {
+      addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> + নতুন সিলেবাস যোগ';
+      addBtn.style.display = 'inline-flex';
+    } else if (name === 'exams') {
+      addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> + নতুন পরীক্ষা কার্ড যোগ';
+      addBtn.style.display = 'inline-flex';
+    } else if (name === 'routine' || name === 'overview') {
+      addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> + নতুন রুটিন পিরিয়ড যোগ';
+      addBtn.style.display = 'inline-flex';
+    } else {
+      addBtn.style.display = 'none'; // Hide add button on sections without card addition
+    }
+  }
+}
+
+function handleTopBarAddCard() {
+  const activeNav = document.querySelector('.nav-item.active');
+  const activeSectionId = activeNav ? activeNav.id.replace('nav-', '') : 'overview';
+
+  if (activeSectionId === 'syllabus') {
+    openAddSyllabusModal();
+  } else if (activeSectionId === 'exams') {
+    openAddExamModal();
+  } else {
+    openAddRoutineModal();
+  }
 }
 
 function updateGlobalContext() {
