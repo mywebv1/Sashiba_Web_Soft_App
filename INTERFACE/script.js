@@ -213,6 +213,8 @@ function openPortal(type) {
     targetSrc = "./question_dashboard/index.html";
   } else if (type === "evaluation") {
     targetSrc = "./evaluation_dashboard/index.html";
+  } else if (type === "classmanager") {
+    targetSrc = "./class_manager_dashboard/index.html";
   }
   
   // আইফ্রেম সোর্স লোড করা
