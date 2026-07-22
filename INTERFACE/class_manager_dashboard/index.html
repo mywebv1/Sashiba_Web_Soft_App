@@ -213,64 +213,53 @@
                   <div class="action-card-item" onclick="openAddRoutineModal()">
                     <div class="aci-icon bg-indigo"><i class="fa-solid fa-plus"></i></div>
                     <div class="aci-info">
-                      <strong>নতুন রুটিন বা পিরিয়ড যোগ</strong>
-                      <span>সাপ্তাহিক রুটিনে নতুন বিষয় যুক্ত করুন</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right aci-arrow"></i>
-                  </div>
-
-                  <div class="action-card-item" onclick="openAddSyllabusModal()">
-                    <div class="aci-icon bg-purple"><i class="fa-solid fa-book-bookmark"></i></div>
-                    <div class="aci-info">
-                      <strong>নতুন সিলেবাস টার্গেট যোগ</strong>
-                      <span>১ দিন থেকে ১২ মাসের সিলেবাস কার্ড যুক্ত করুন</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right aci-arrow"></i>
-                  </div>
-
-                  <div class="action-card-item" onclick="openAddExamModal()">
-                    <div class="aci-icon bg-warning"><i class="fa-solid fa-bullseye"></i></div>
-                    <div class="aci-info">
-                      <strong>পরীক্ষার নতুন ডেট ও সিলেবাস যোগ</strong>
-                      <span>ক্লাস টেস্ট থেকে বার্ষিকী পরীক্ষার কার্ড তৈরি করুন</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right aci-arrow"></i>
-                  </div>
-
-                  <div class="action-card-item" onclick="showSection('live_control')">
-                    <div class="aci-icon bg-emerald"><i class="fa-solid fa-stopwatch"></i></div>
-                    <div class="aci-info">
-                      <strong>লেকচার টাইমার ও Randomizer</strong>
-                      <span>লাইভ প্রশ্ন উত্তর ও ক্লাস টাইমার পরিচালনা করুন</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right aci-arrow"></i>
-                  </div>
-                </div>
+                      <strong>নতুন রুটিন বা পিরিয়ড যোগ<        <!-- SECTION 2: SMART CLASS ROUTINE & TIMELINE (Final v1.0) -->
+        <section id="section-routine" class="content-section hidden">
+          
+          <!-- 1. Smart Header (Context Layer) -->
+          <div class="smart-context-header-card mb-5">
+            <div class="sch-top flex-between flex-wrap gap-3">
+              <div class="sch-badge-group flex-align-center gap-2">
+                <span class="badge-live-now"><i class="fa-solid fa-circle text-danger fa-pulse"></i> চলমান (NOW): গণিত (০৯:০০ - ০৯:৪৫ AM)</span>
+                <span class="badge-next-up"><i class="fa-solid fa-forward text-primary"></i> পরবর্তী (NEXT): বাংলা (০৯:৪৫ AM)</span>
               </div>
-
-              <!-- AI Classroom Highlight Card -->
-              <div class="interactive-card bg-ai-gradient">
-                <div class="ic-header">
-                  <h3 class="text-white"><i class="fa-solid fa-brain"></i> AI শ্রেণিকক্ষ স্মার্ট অ্যানালিটিক্স</h3>
-                </div>
-                <div class="ai-quick-text">
-                  <p>আজকে বীজগণিতীয় সূত্রের পারফরম্যান্স ৮৫%। <strong>রাহাত হোসেন (রোল ৩)</strong> অনুপস্থিত রয়েছে, অভিভাবককে মেসেজ পাঠানো উচিত।</p>
-                  <button class="btn-sm btn-white-outline mt-3" onclick="showSection('ai_insights')">সব ইনসাইট দেখুন ➔</button>
-                </div>
+              <div class="role-switcher-wrap flex-align-center gap-2">
+                <span class="text-xs text-muted fw-bold"><i class="fa-solid fa-user-gear"></i> রোল ভিউ:</span>
+                <select id="role-view-select" class="form-input-compact shadow-sm" onchange="switchRoleView(this.value)">
+                  <option value="teacher" selected>👨‍🏫 শিক্ষক ভিউ (Teacher)</option>
+                  <option value="student">👨‍🎓 শিক্ষার্থী ভিউ (Student)</option>
+                  <option value="admin">🏢 এডমিন ভিউ (Admin)</option>
+                  <option value="parent">👨‍👩‍👦 অভিভাবক ভিউ (Parent)</option>
+                </select>
+                <button class="btn-icon-circle shadow-sm" title="নোটিফিকেশন বেল" onclick="showSection('alerts')">
+                  <i class="fa-solid fa-bell text-warning"></i>
+                  <span class="dot-indicator"></span>
+                </button>
               </div>
-
             </div>
 
+            <!-- Daily Goal Tracker & AI Message -->
+            <div class="sch-bottom-grid mt-4">
+              <div class="goal-tracker-box">
+                <div class="flex-between text-xs fw-bold mb-1">
+                  <span>🎯 আজকের ক্লাসের লক্ষ্য ট্র্যাকার</span>
+                  <span id="daily-goal-percent">৭৫% অর্জিত</span>
+                </div>
+                <div class="progress-bar-wrap"><div class="progress-fill bg-success" style="width:75%;"></div></div>
+              </div>
+              <div class="ai-context-banner">
+                <i class="fa-solid fa-robot text-purple"></i>
+                <span><strong>AI বার্তা:</strong> আজকে বীজগণিত সূত্রের ওপর উপস্থিতি ৯৬%। ২ জন শিক্ষার্থীর রিভিশন দরকার।</span>
+              </div>
+            </div>
           </div>
-        </section>
 
-        <!-- SECTION 2: CLASS ROUTINE & TIMETABLE CARDS -->
-        <section id="section-routine" class="content-section hidden">
-          <div class="interactive-card">
+          <!-- Day Tabs Selector -->
+          <div class="interactive-card mb-4">
             <div class="ic-header space-between">
               <div>
-                <h3><i class="fa-solid fa-calendar-week text-primary"></i> ইন্টারঅ্যাক্টিভ ক্লাস রুটিন ও পিরিয়ড কার্ডসমূহ</h3>
-                <span class="section-subtitle">বার এবং বিষয় অনুযায়ী আপনার ক্লাসের রুটিন পরিবর্তন ও পরিচালনা করুন</span>
+                <h3><i class="fa-solid fa-calendar-week text-primary"></i> ইন্টারঅ্যাক্টিভ সাপ্তাহিক অ্যাডাপ্টিভ টাইমলাইন</h3>
+                <span class="section-subtitle">ভার্টিকাল টাইমলাইনে শ্রেণি ও বিষয়ভিত্তিক স্মার্ট কার্ড পরিচালনা</span>
               </div>
               <button class="btn btn-primary" onclick="openAddRoutineModal()"><i class="fa-solid fa-plus"></i> + নতুন পিরিয়ড যোগ করুন</button>
             </div>
@@ -282,41 +271,217 @@
               <button class="tab-chip" onclick="filterRoutineDay('বুধবার')">বুধবার</button>
               <button class="tab-chip" onclick="filterRoutineDay('বৃহস্পতিবার')">বৃহস্পতিবার</button>
             </div>
+          </div>
 
-            <!-- Routine Cards Grid View -->
-            <div class="routine-cards-grid mt-6" id="routine-cards-container">
-              <!-- Rendered via JS -->
+          <!-- 2. Adaptive Vertical Timeline Routine Grid -->
+          <div class="vertical-timeline-container" id="routine-cards-container">
+            <!-- Rendered via JS -->
+          </div>
+
+          <!-- 3. Special Schedules Grid -->
+          <div class="special-schedule-card mt-6">
+            <h4 class="mb-3 text-main font-bold"><i class="fa-solid fa-star text-warning"></i> বিশেষ সময়সূচি ও ইভেন্ট তালিকা</h4>
+            <div class="special-chips-grid">
+              <div class="chip-item blue"><i class="fa-solid fa-users"></i> প্রাত্যহিক সমাবেশ (০৮:৪৫ AM)</div>
+              <div class="chip-item orange"><i class="fa-solid fa-utensils"></i> টিফিন ও বিরতি (১২:০০ PM)</div>
+              <div class="chip-item green"><i class="fa-solid fa-mosque"></i> জোহরের নামাজ ও প্রার্থনা (০১:১৫ PM)</div>
+              <div class="chip-item purple"><i class="fa-solid fa-book-reader"></i> লাইব্রেরি ও বিজ্ঞান ল্যাব (০২:০০ PM)</div>
             </div>
           </div>
+
+          <!-- 4. AI Assistant Panel Widget -->
+          <div class="ai-assistant-panel-card mt-6">
+            <div class="ic-header">
+              <h3><i class="fa-solid fa-brain text-purple"></i> AI অ্যাসিস্ট্যান্ট প্যানেল ও প্রেডিক্টিভ অ্যানালিটিক্স</h3>
+            </div>
+            <div class="ai-panel-grid mt-3">
+              <div class="ai-panel-box">
+                <h5><i class="fa-solid fa-user-nurse text-primary"></i> বিকল্প শিক্ষক সাজেশন</h5>
+                <p>মাগুরিব স্যারের অনুপস্থিতিতে বিজ্ঞান ক্লাসে সাবস্টিটিউট শিক্ষক: <strong>রহিম স্যার (ফ্রি পিরিয়ড)</strong></p>
+              </div>
+              <div class="ai-panel-box">
+                <h5><i class="fa-solid fa-bullseye text-warning"></i> পার্সোনালাইজড কুইজ</h5>
+                <p>দুর্বল ৫ জন শিক্ষার্থীর জন্য ৩টি অটো-জেনারেটেড রিভিশন কুইজ সেট করা হয়েছে।</p>
+              </div>
+              <div class="ai-panel-box">
+                <h5><i class="fa-solid fa-clock-rotate-left text-success"></i> Spaced Repetition</h5>
+                <p>গত সপ্তাহের কারক ও সমাস অধ্যায়টির রিভিশন রিমাইন্ডার আজ পাঠাতে হবে।</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Daily Summary Footer Bar -->
+          <div class="daily-summary-footer-card mt-6">
+            <h4 class="summary-title"><i class="fa-solid fa-chart-pie text-emerald"></i> আজকের দৈনিক সারসংক্ষেপ (Daily Summary)</h4>
+            <div class="summary-metrics-grid">
+              <div class="sm-item">
+                <span class="sm-label">মোট ক্লাস</span>
+                <span class="sm-val" id="ds-total-classes">৬টি</span>
+              </div>
+              <div class="sm-item">
+                <span class="sm-label">সম্পন্ন ক্লাস</span>
+                <span class="sm-val text-success" id="ds-done-classes">৪টি</span>
+              </div>
+              <div class="sm-item">
+                <span class="sm-label">বাকি ক্লাস</span>
+                <span class="sm-val text-warning" id="ds-pending-classes">২টি</span>
+              </div>
+              <div class="sm-item">
+                <span class="sm-label">মোট শিক্ষণ সময়</span>
+                <span class="sm-val text-primary">৪ ঘণ্টা ২০ মি.</span>
+              </div>
+              <div class="sm-item">
+                <span class="sm-label">উপস্থিতির হার</span>
+                <span class="sm-val text-purple" id="ds-att-rate">৯২%</span>
+              </div>
+              <div class="sm-item">
+                <span class="sm-label">আজকের অর্জন</span>
+                <span class="sm-val text-amber">৩টি ব্যাজ 🏆</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Bottom Communication & Footer Toolbar -->
+          <div class="routine-footer-toolbar mt-6">
+            <div class="rft-left flex-align-center gap-3">
+              <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> প্রিন্ট</button>
+              <button class="btn btn-outline btn-sm" onclick="exportPDF()"><i class="fa-solid fa-file-pdf text-danger"></i> PDF এক্সপোর্ট</button>
+              <span class="sync-badge"><i class="fa-solid fa-wifi text-success"></i> অফলাইন সিঙ্কড</span>
+            </div>
+            <div class="rft-right flex-align-center gap-2">
+              <span class="text-xs text-muted">স্মার্ট রুটিন v1.0 | ভাষা: বাংলা</span>
+            </div>
+          </div>
+
         </section>
 
-        <!-- SECTION 3: CLASS SYLLABUS CARDS -->
+        <!-- SECTION 3: SMART SYLLABUS CARDS (Final v1.0 Layout) -->
         <section id="section-syllabus" class="content-section hidden">
-          <div class="interactive-card">
-            <div class="ic-header space-between">
+          
+          <!-- 1. Header (Context & Academic Year) -->
+          <div class="smart-syllabus-header-card mb-5">
+            <div class="ssh-top flex-between flex-wrap gap-3">
               <div>
-                <h3><i class="fa-solid fa-book-bookmark text-purple"></i> সময়ভিত্তিক সিলেবাস পরিকল্পনা ও কভারেজ কার্ড</h3>
-                <span class="section-subtitle">১ দিন থেকে ১২ মাসের সময়সীমা অনুযায়ী সিলেবাসের রূপরেখা ও অগ্রগতি ট্র্যাকিং</span>
+                <h3 class="font-bold text-main mb-1"><i class="fa-solid fa-book-bookmark text-purple"></i> স্মার্ট সিলেবাস মডিউল (Smart Syllabus v1.0)</h3>
+                <span class="text-xs text-muted" id="syllabus-meta-subtitle">শিক্ষাবর্ষ: ২০২৬ | শ্রেণি: অষ্টম (শাখা-ক) | বিষয়: বীজগণিত ও কারিকুলাম</span>
               </div>
-              <button class="btn btn-primary" onclick="openAddSyllabusModal()"><i class="fa-solid fa-plus"></i> + নতুন সিলেবাস যোগ</button>
+              <div class="flex-align-center gap-2">
+                <select id="term-selector" class="form-input-compact shadow-sm" onchange="filterSyllabusTerm(this.value)">
+                  <option value="all" selected>সকল টার্ম সিলেবাস</option>
+                  <option value="half_yearly">অর্ধবার্ষিক পরীক্ষা (Half-Yearly)</option>
+                  <option value="annual">বার্ষিক পরীক্ষা (Annual Exam)</option>
+                </select>
+                <button class="btn btn-primary" onclick="openAddSyllabusModal()"><i class="fa-solid fa-plus"></i> + নতুন সিলেবাস অধ্যায়</button>
+              </div>
             </div>
 
-            <!-- Timeframe Filter Chips -->
-            <div class="filter-chips-bar" id="syllabus-timeframe-chips">
-              <button class="chip active" onclick="filterSyllabusTimeframe('today')">প্রতিদিনের সিলেবাস</button>
-              <button class="chip" onclick="filterSyllabusTimeframe('1week')">আগামী ১ সপ্তাহ</button>
-              <button class="chip" onclick="filterSyllabusTimeframe('15days')">আগামী ১৫ দিন</button>
-              <button class="chip" onclick="filterSyllabusTimeframe('1month')">আগামী ১ মাস</button>
-              <button class="chip" onclick="filterSyllabusTimeframe('3months')">আগামী ৩ মাস</button>
-              <button class="chip" onclick="filterSyllabusTimeframe('6months')">আগামী ৬ মাস</button>
-              <button class="chip" onclick="filterSyllabusTimeframe('9months')">আগামী ৯ মাস</button>
-              <button class="chip" onclick="filterSyllabusTimeframe('12months')">আগামী ১২ মাস (১ বছর)</button>
-            </div>
-
-            <div class="syllabus-cards-grid mt-6" id="syllabus-cards-container">
-              <!-- Rendered via JS -->
+            <!-- Progress Bar & Countdown -->
+            <div class="ssh-bottom-grid mt-4">
+              <div class="syll-progress-box">
+                <div class="flex-between text-xs fw-bold mb-1">
+                  <span>📊 সার্বিক সিলেবাস অগ্রগতি</span>
+                  <span id="syll-total-percent">৬৮% সম্পন্ন</span>
+                </div>
+                <div class="progress-bar-wrap"><div class="progress-fill bg-purple" id="syll-total-progress-fill" style="width:68%;"></div></div>
+              </div>
+              <div class="countdown-timer-box">
+                <i class="fa-solid fa-hourglass-half text-warning"></i>
+                <div>
+                  <span class="cd-title">বার্ষিক পরীক্ষা শুরু হতে বাকি:</span>
+                  <strong class="cd-digits text-danger" id="syll-countdown-digits">১২৪ দিন ০০ ঘণ্টা ১৫ মিনিট</strong>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- 2. Navigation (Timeline, Search & Filter Bar) -->
+          <div class="interactive-card mb-4">
+            <div class="syllabus-nav-toolbar">
+              <div class="snt-search flex-1">
+                <div class="search-input-wrap">
+                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                  <input type="text" id="syllabus-search-input" placeholder="অধ্যায়, টপিক বা বিষয় দিয়ে খুঁজুন..." onkeyup="searchSyllabusCards(this.value)" class="form-input">
+                </div>
+              </div>
+              <div class="snt-filters flex-gap-center flex-wrap">
+                <select id="syll-status-filter" class="form-input-compact" onchange="filterSyllabusByStatus(this.value)">
+                  <option value="all" selected>সকল অবস্থা</option>
+                  <option value="not_started">⚪ শুরু হয়নি</option>
+                  <option value="running">🟢 চলছে</option>
+                  <option value="completed">💙 সম্পন্ন</option>
+                  <option value="revision_needed">🔴 রিভিশন বাকি</option>
+                </select>
+
+                <select id="syll-priority-filter" class="form-input-compact" onchange="filterSyllabusByPriority(this.value)">
+                  <option value="all" selected>সকল গুরুত্ব (Priority)</option>
+                  <option value="High">🔴 High Priority</option>
+                  <option value="Medium">🟡 Medium Priority</option>
+                  <option value="Low">🟢 Low Priority</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 12 Months Timeline Chips -->
+            <div class="months-timeline-bar mt-3" id="syllabus-month-chips">
+              <button class="month-chip active" onclick="filterSyllabusMonth('all')">সব মাস</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('জানুয়ারি')">জানুয়ারি</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('ফেব্রুয়ারি')">ফেব্রুয়ারি</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('মার্চ')">মার্চ</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('এপ্রিল')">এপ্রিল</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('মে')">মে</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('জুন')">জুন</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('জুলাই')">জুলাই</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('আগস্ট')">আগস্ট</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('সেপ্টেম্বর')">সেপ্টেম্বর</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('অক্টোবর')">অক্টোবর</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('নভেম্বর')">নভেম্বর</button>
+              <button class="month-chip" onclick="filterSyllabusMonth('ডিসেম্বর')">ডিসেম্বর</button>
+            </div>
+          </div>
+
+          <!-- 3. Chapter Cards Container (Accordion / Expandable Glass Cards) -->
+          <div class="syllabus-chapter-cards-grid" id="syllabus-cards-container">
+            <!-- Rendered via JS -->
+          </div>
+
+          <!-- 4. Summary & Analytics Dashboard -->
+          <div class="syllabus-analytics-summary-card mt-6">
+            <h4 class="summary-title mb-3"><i class="fa-solid fa-chart-line text-purple"></i> সিলেবাস সারসংক্ষেপ ও অ্যানালিটিক্স (Summary & Analytics)</h4>
+            <div class="analytics-metrics-grid">
+              <div class="am-item">
+                <span class="am-label">মোট সিলেবাস কভারেজ</span>
+                <span class="am-val text-purple" id="syll-stat-coverage">৬৮%</span>
+              </div>
+              <div class="am-item">
+                <span class="am-label">সম্পন্ন অধ্যায়</span>
+                <span class="am-val text-success" id="syll-stat-completed">৮টি অধ্যায়</span>
+              </div>
+              <div class="am-item">
+                <span class="am-label">বাকি অধ্যায়</span>
+                <span class="am-val text-warning" id="syll-stat-pending">৪টি অধ্যায়</span>
+              </div>
+              <div class="am-item">
+                <span class="am-label">বাকি মোট ক্লাস</span>
+                <span class="am-val text-primary" id="syll-stat-classes">১৮টি ক্লাস</span>
+              </div>
+              <div class="am-item wide">
+                <span class="am-label">সমাপ্তির পূর্বাভাস (Completion Forecast)</span>
+                <span class="am-val text-emerald" id="syll-stat-forecast">✅ বর্তমান গতিতে আগামী ১৫ নভেম্বরের মধ্যে সিলেবাস সম্পন্ন হবে।</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Syllabus Footer Bar -->
+          <div class="syllabus-footer-bar mt-6 flex-between flex-wrap gap-3">
+            <div class="sfb-left flex-align-center gap-3">
+              <button class="btn btn-outline btn-sm" onclick="exportPDF()"><i class="fa-solid fa-file-pdf text-danger"></i> PDF এক্সপোর্ট</button>
+              <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> প্রিন্ট</button>
+              <span class="text-xs text-muted">ভার্সন: v1.0.4 (অফিসিয়াল বোর্ড অনুমোদিত)</span>
+            <div class="sfb-right text-xs text-muted">
+              সর্বশেষ আপডেট: <strong id="syll-last-updated">২৩ জুলাই, ২০২৬</strong>
+            </div>
+          </div>
+
         </section>
 
         <!-- SECTION 4: ATTENDANCE & PARTICIPATION -->

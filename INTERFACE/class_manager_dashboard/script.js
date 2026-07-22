@@ -18,14 +18,72 @@ let classData = {
     { id: 6, day: "মঙ্গলবার", subject: "ডিজিটাল প্রযুক্তি", time: "১০:০০ - ১০:৪৫ AM", room: "কম্পিউটার ল্যাব", topic: "পাইথন প্রোগ্রামিং পরিচিতি", teacher: "মাগুরিব আলী", phone: "01712345678", alertTime: "10", alertMode: "call_sms", activeNow: false }
   ],
   syllabuses: [
-    { id: 1, timeframe: "today", timeframeLabel: "প্রতিদিনের সিলেবাস", subject: "গণিত", subjectCode: "১০৯", chapter: "অনুশীলনী ৩.২ (১-১০)", target: "বীজগণিতীয় সূত্রের প্রয়োগ ও মান নির্ণয়", weeklyPlan: "সপ্তাহ ১: সূত্র বিশ্লেষণ ও সমাধান", periodsNeeded: 4, refBooks: "এনসিটিবি গণিত বই পৃষ্ঠা ৪৫-৪৮", progress: 80 },
-    { id: 2, timeframe: "1week", timeframeLabel: "আগামী ১ সপ্তাহ", subject: "বিজ্ঞান", subjectCode: "১২৭", chapter: "অধ্যায় ৪: পরিবেশ ও গতি", target: "সংক্ষিপ্ত কুইজ পরীক্ষা ও ল্যাব প্রদর্শন", weeklyPlan: "সপ্তাহ ২: গতির সূত্র ও পরীক্ষা", periodsNeeded: 6, refBooks: "বিজ্ঞান মূল পাঠ্যবই ও ল্যাব গাইড", progress: 40 },
-    { id: 3, timeframe: "15days", timeframeLabel: "আগামী ১৫ দিন", subject: "বাংলা", subjectCode: "১০১", chapter: "গদ্য অংশ ও ব্যাকরণ", target: "সৃজনশীল প্রশ্ন সংশোধন ও নির্মিতি", weeklyPlan: "সপ্তাহ ৩-৪: কারক ও সমাস অনুশীলন", periodsNeeded: 10, refBooks: "বাংলা সাহিত্য ও ব্যাকরণ নির্মিতি", progress: 65 },
-    { id: 4, timeframe: "1month", timeframeLabel: "আগামী ১ মাস", subject: "ইংরেজি", subjectCode: "১০৭", chapter: "Writing & Grammar Master Plan", target: "সাপ্তাহিক অ্যাসাইনমেন্ট ও স্পোকেন প্র্যাকটিস", weeklyPlan: "মাসের পাঠ পরিকল্পনা: Tense & Composition", periodsNeeded: 18, refBooks: "English Grammar & Composition", progress: 35 },
-    { id: 5, timeframe: "3months", timeframeLabel: "আগামী ৩ মাস", subject: "গণিত ও বিজ্ঞান", subjectCode: "১০৯-১২৭", chapter: "১ম সাময়িক মাস্টার কারিকুলাম", target: "রিভিশন, কন্টিনিউয়াস অ্যাসেসমেন্ট ও মক টেস্ট", weeklyPlan: "১ম ট্রাইমেস্টার সম্পূর্ণ গাইডলাইন", periodsNeeded: 45, refBooks: "NCTB বোর্ড কারিকুলাম ২০২৬", progress: 50 },
-    { id: 6, timeframe: "6months", timeframeLabel: "আগামী ৬ মাস", subject: "সকল বিষয়", subjectCode: "ALL", chapter: "অর্ধবার্ষিকী চূড়ান্ত মাস্টার প্ল্যান", target: "৫০% কারিকুলাম সমাপন ও অর্ধবার্ষিকী মূল্যায়ন", weeklyPlan: "ছয় মাসের একাডেমিক ট্র্যাকিং", periodsNeeded: 90, refBooks: "সকল বিষয়ের অনুমোদিত বোর্ড বই", progress: 25 },
-    { id: 7, timeframe: "9months", timeframeLabel: "আগামী ৯ মাস", subject: "সকল বিষয়", subjectCode: "ALL", chapter: "বার্ষিকী পূর্ব প্রস্তুতি ও প্রজেক্ট ওয়ার্ক", target: "৭৫% সিলেবাস কভারেজ ও দুর্বলদের রিভিশন", weeklyPlan: "নবম মাসের একাডেমিক প্ল্যান", periodsNeeded: 135, refBooks: "প্রজেক্ট গাইড ও অ্যাসাইনমেন্ট বুক", progress: 15 },
-    { id: 8, timeframe: "12months", timeframeLabel: "আগামী ১২ মাস (১ বছর)", subject: "সম্পূর্ণ কারিকুলাম", subjectCode: "ALL-2026", chapter: "বার্ষিকী ও চূড়ান্ত একাডেমিক মূল্যায়ন", target: "১০০% সিলেবাস সমাপন ও বার্ষিক একাডেমিক প্ল্যান সম্পন্ন", weeklyPlan: "বছরের ৩৬৫ দিনের একাডেমিক ক্যালেন্ডার", periodsNeeded: 180, refBooks: "বার্ষিক কোর্স আউটলাইন গাইড", progress: 10 }
+    {
+      id: 1,
+      month: "জুলাই",
+      term: "half_yearly",
+      subject: "গণিত",
+      subjectCode: "১০৯",
+      chapterName: "অধ্যায় ৩: বীজগণিতীয় রাশি ও সমীকরণ",
+      learningOutcomes: "বীজগণিতীয় সূত্রের প্রয়োগ, মান নির্ণয় ও উৎপাদকে বিশ্লেষণ করতে পারবে।",
+      status: "running", // not_started, running, completed, revision_needed
+      progress: 75,
+      priority: "High", // High, Medium, Low
+      piIndicator: "PI 8.3.1 (পারদর্শিতা সূচক)",
+      requiredClasses: 6,
+      totalHours: "৪.৫ ঘণ্টা",
+      checklist: [
+        { text: "সূত্র ৩.১ বিশ্লেষণ ও উদাহরণ সমাধান", checked: true },
+        { text: "অনুশীলনী ৩.২ সমস্যা ১-১০ সমাধান", checked: true },
+        { text: "উৎপাদকে বিশ্লেষণ ও সৃজনশীল খতিয়ান", checked: false },
+        { text: "শ্রেণি মূল্যায়ন ও কুইজ গ্রহণ", checked: false }
+      ],
+      resources: { video: "https://youtube.com/watch?v=demo1", note: "বীজগণিত সর্টকাট নোট.pdf", quiz: "কুইজ সেট-১" },
+      examHub: { marks: "২০ নম্বর (১ম সাময়িক)", pyq: "২০২৫ ও ২০২৪ বোর্ড প্রশ্নপত্র", teacherNote: "দুর্বল শিক্ষার্থীদের সূত্র রিভিশনে বিশেষ নজর দিতে হবে।" }
+    },
+    {
+      id: 2,
+      month: "আগস্ট",
+      term: "half_yearly",
+      subject: "বিজ্ঞান",
+      subjectCode: "১২৭",
+      chapterName: "অধ্যায় ৪: পরিবেশ, বল ও গতিবিদ্যা",
+      learningOutcomes: "গতির সমীকরণ, বলের প্রভাব ও পরিবেশগত বাস্তুতন্ত্র ব্যাখ্যা করতে পারবে।",
+      status: "not_started",
+      progress: 20,
+      priority: "Medium",
+      piIndicator: "PI 8.4.2 (বিজ্ঞান অনুসন্ধান)",
+      requiredClasses: 8,
+      totalHours: "৬.০ ঘণ্টা",
+      checklist: [
+        { text: "গতির নিউটনীয় ১ম ও ২য় সূত্র", checked: true },
+        { text: "বিজ্ঞান ল্যাব পরীক্ষা ও ঢালু তলের প্রয়োগ", checked: false },
+        { text: "পরিবেশের ভারসাম্য ও বাস্তুতন্ত্র পোস্টার", checked: false }
+      ],
+      resources: { video: "https://youtube.com/watch?v=demo2", note: "গতিবিদ্যা ল্যাব গাইড.pdf", quiz: "বিজ্ঞান কুইজ-২" },
+      examHub: { marks: "৩০ নম্বর (অর্ধবার্ষিকী)", pyq: "বিগত ৩ বছরের প্রশ্ন ব্যাংক", teacherNote: "ল্যাব প্র্যাকটিক্যালের আগে সেফটি গাইড প্রদর্শন আবশ্যক।" }
+    },
+    {
+      id: 3,
+      month: "সেপ্টেম্বর",
+      term: "annual",
+      subject: "বাংলা",
+      subjectCode: "১০১",
+      chapterName: "অধ্যায় ৫: শব্দরূপ, সমাস ও গদ্য নির্মিতি",
+      learningOutcomes: "সমাসের প্রকারভেদ নির্ণয় ও মানসম্পন্ন প্রবন্ধ রচনা করতে পারবে।",
+      status: "completed",
+      progress: 100,
+      priority: "Low",
+      piIndicator: "PI 8.1.1 (ভাষা ও ব্যাকরণ)",
+      requiredClasses: 5,
+      totalHours: "৩.৫ ঘণ্টা",
+      checklist: [
+        { text: "দ্বিগু ও বহুব্রীহি সমাস অনুশীলন", checked: true },
+        { text: "সৃজনশীল অনুচ্ছেদ লিখন প্র্যাকটিস", checked: true }
+      ],
+      resources: { video: "https://youtube.com/watch?v=demo3", note: "সমাস সারণি নোট.pdf", quiz: "বাংলা কুইজ-১" },
+      examHub: { marks: "১৫ নম্বর (টিপিক্যাল টেস্ট)", pyq: "বোর্ড স্ট্যান্ডার্ড প্রশ্ন", teacherNote: "সমাসের উদাহরণগুলো বারবার রিভিশন দিতে বলুন।" }
+    }
   ],
   students: [
     { roll: 1, name: "আব্দুল্লাহ আল মামুন", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "খুব মনোযোগী" },
@@ -107,7 +165,7 @@ function showSection(name) {
 
   if (name === 'overview') renderOverview();
   if (name === 'routine') renderRoutine('রবিবার');
-  if (name === 'syllabus') renderSyllabus('today');
+  if (name === 'syllabus') renderSyllabus();
   if (name === 'attendance') renderAttendanceCards();
   if (name === 'exams') renderExams('all');
   if (name === 'ai_insights') renderAIInsights();
@@ -239,115 +297,274 @@ function filterRoutineDay(day) {
   renderRoutine(day);
 }
 
+// RENDER ADAPTIVE VERTICAL TIMELINE ROUTINE (Final v1.0)
+function filterRoutineDay(day) {
+  document.querySelectorAll('#routine-day-tabs .tab-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent === day);
+  });
+  renderRoutine(day);
+}
+
 function renderRoutine(day) {
   const container = document.getElementById('routine-cards-container');
+  if (!container) return;
   const items = classData.routines.filter(r => r.day === day);
   if (items.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">এই দিনে কোনো পিরিয়ড কার্ড নির্ধারিত নেই।</p>`;
+    container.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding:20px;">এই দিনে কোনো পিরিয়ড বা স্মার্ট কার্ড নির্ধারণ করা হয়নি।</p>`;
     return;
   }
+
   container.innerHTML = items.map(r => `
-    <div class="period-card-item">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span class="pci-time"><i class="fa-solid fa-clock"></i> ${r.time}</span>
-        <div style="display:flex; gap:8px;">
-          <button onclick="editRoutine(${r.id})" style="color:var(--primary); background:none; font-size:14px; cursor:pointer;" title="সম্পাদনা করুন"><i class="fa-solid fa-pen-to-square"></i></button>
-          <button onclick="deleteRoutine(${r.id})" style="color:var(--danger); background:none; font-size:14px; cursor:pointer;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
+    <div class="v-timeline-card ${r.activeNow ? 'status-active' : ''}">
+      <div class="vtc-top-bar">
+        <span class="vtc-time-badge"><i class="fa-solid fa-clock text-primary"></i> ${r.time} (${r.day})</span>
+        <div class="flex-align-center gap-2">
+          ${r.activeNow ? '<span class="badge-live-now"><i class="fa-solid fa-circle text-danger fa-pulse"></i> চলমান সেশন</span>' : '<span class="badge" style="background:rgba(100,116,139,0.1); color:var(--text-muted); font-size:10.5px;">আসন্ন</span>'}
+          <button onclick="editRoutine(${r.id})" style="color:var(--primary); background:none; font-size:13px;" title="সম্পাদনা"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button onclick="deleteRoutine(${r.id})" style="color:var(--danger); background:none; font-size:13px;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
         </div>
       </div>
 
-      <h4 class="pci-subject">${r.subject}</h4>
-      <p class="pci-topic">${r.topic}</p>
-
-      <div style="margin-top:10px; padding:8px 10px; background:rgba(79,70,229,0.06); border-radius:8px; border:1px dashed var(--primary-light);">
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px;">
-          <span style="font-weight:700; color:var(--text-main);"><i class="fa-solid fa-user-tie text-primary"></i> ${r.teacher || 'শিক্ষক'}</span>
-          <span style="color:var(--text-muted); font-size:11px;"><i class="fa-solid fa-phone"></i> ${r.phone || '01700000000'}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:10.5px; color:var(--text-muted);">
-          <span><i class="fa-solid fa-bell text-warning"></i> ${r.alertTime || 10} মি. পূর্বে অটো রিমাইন্ডার</span>
-          <button onclick="triggerTestTeacherAlert('${r.teacher}', '${r.phone}', '${r.subject}', '${r.time}', '${r.room}')" class="btn-sm btn-green" style="padding:2px 8px; font-size:10.5px;" title="টেস্ট রিং ও SMS পাঠান">
-            <i class="fa-solid fa-paper-plane"></i> টেস্ট রিং/SMS
-          </button>
-        </div>
+      <div class="mt-2 flex-between flex-wrap gap-2">
+        <h4 style="font-size:16px; font-weight:800; color:var(--text-main); margin:0;">
+          ${r.subject} <span style="font-size:12px; color:var(--text-muted); font-weight:600;">(কক্ষ: ${r.room})</span>
+        </h4>
+        <span class="text-xs fw-bold text-primary"><i class="fa-solid fa-user-tie"></i> ${r.teacher} ${r.isSubstitute ? '<span class="badge" style="background:rgba(245,158,11,0.15); color:var(--warning);">সাবস্টিটিউট</span>' : ''}</span>
       </div>
 
-      <div class="pci-footer mt-3">
-        <span><i class="fa-solid fa-door-open"></i> কক্ষ ${r.room}</span>
-        <span class="badge" style="background:rgba(16,185,129,0.12); color:var(--success); font-size:10px;">অটো স্মার্ট কল অন</span>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:4px; font-weight:600;"><i class="fa-solid fa-book-open"></i> ${r.topic || 'অধ্যায় ও নির্ধারিত পাঠসূচি'}</p>
+
+      <!-- 1. Class Action Buttons (Connected Architecture) -->
+      <div class="class-actions-bar mt-3">
+        <span class="text-xs fw-bold text-primary mr-1"><i class="fa-solid fa-bolt"></i> অ্যাকশন:</span>
+        <button class="btn-action-primary" onclick="startClassSession(${r.id})"><i class="fa-solid fa-play"></i> ▶️ ক্লাস শুরু করুন</button>
+        <button class="btn-action-outline" onclick="openLessonPlanModal('${r.subject}', '${r.topic}')"><i class="fa-solid fa-book-reader text-purple"></i> 📖 লেসন প্ল্যান</button>
+        <button class="btn-action-outline" onclick="openPresentationModal('${r.subject}')"><i class="fa-solid fa-desktop text-primary"></i> 🖥️ প্রেজেন্টেশন</button>
+        <button class="btn-action-outline" onclick="showSection('attendance')"><i class="fa-solid fa-user-check text-success"></i>  উপস্থিতি</button>
+      </div>
+
+      <!-- 2. Resources & Syllabus Link Bar -->
+      <div class="mt-3 flex-between flex-wrap gap-2" style="background:var(--bg-app); padding:8px 12px; border-radius:8px;">
+        <div class="flex-align-center gap-2 flex-wrap">
+          <span class="text-xs fw-bold text-muted"><i class="fa-solid fa-folder-open"></i> রিসোর্স:</span>
+          <a href="javascript:void(0)" class="resource-pill-btn" onclick="openVideoResource('${r.subject}')"><i class="fa-solid fa-circle-play text-danger"></i> 🎥 ভিডিও</a>
+          <a href="javascript:void(0)" class="resource-pill-btn" onclick="openNoteResource('${r.subject}')"><i class="fa-solid fa-file-lines text-primary"></i> 📄 নোট</a>
+          <a href="javascript:void(0)" class="resource-pill-btn" onclick="openQuizResource('${r.subject}')"><i class="fa-solid fa-pen-nib text-warning"></i> 📝 কুইজ</a>
+          <a href="javascript:void(0)" class="resource-pill-btn" onclick="linkSyllabusModal('${r.subject}')" style="background:rgba(139,92,246,0.15); color:var(--purple);"><i class="fa-solid fa-link"></i> 🔗 সিলেবাস লিংক</a>
+        </div>
+        <button class="btn-sm btn-white-outline" onclick="showPYQModal('${r.subject}')" style="font-size:10.5px; border-color:var(--border); color:var(--text-main);"><i class="fa-solid fa-clock-rotate-left"></i> 📊 PYQ (বিগত প্রশ্ন)</button>
+      </div>
+
+      <!-- 3. AI Insight Banner -->
+      <div class="mt-2 flex-between flex-wrap gap-2 text-xs" style="color:var(--text-muted);">
+        <span><i class="fa-solid fa-lightbulb text-warning"></i> <strong>AI রিকমেন্ডেশন:</strong> গত ক্লাসের কুইজে ১৫% দুর্বলতা ছিল। ৫ মি. রিভিশন দরকার।</span>
+        <span class="fw-bold text-success"><i class="fa-solid fa-chart-line"></i> প্রোগ্রেস: ৭৫%</span>
       </div>
     </div>
   `).join('');
+
+  // Update Daily Summary metrics
+  document.getElementById('ds-total-classes').textContent = `${items.length}টি`;
+  document.getElementById('ds-done-classes').textContent = `${items.filter(i=>!i.activeNow).length}টি`;
+  document.getElementById('ds-pending-classes').textContent = `${items.filter(i=>i.activeNow).length}টি`;
 }
 
-// RENDER SYLLABUS CARDS WITH EDIT & DELETE
-function filterSyllabusTimeframe(tf) {
-  document.querySelectorAll('#syllabus-timeframe-chips .chip').forEach(chip => {
-    chip.classList.toggle('active', chip.getAttribute('onclick').includes(tf));
+// RENDER SMART SYLLABUS CARDS (Final v1.0 Accordion Glass Cards)
+let currentSyllableMonth = 'all';
+let currentSyllableStatus = 'all';
+let currentSyllablePriority = 'all';
+let currentSyllableTerm = 'all';
+let currentSyllableSearch = '';
+
+function filterSyllabusMonth(m) {
+  currentSyllableMonth = m;
+  document.querySelectorAll('#syllabus-month-chips .month-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.includes(m) || (m==='all' && btn.textContent==='সব মাস'));
   });
-  renderSyllabus(tf);
+  renderSyllabus();
 }
+function filterSyllabusByStatus(st) { currentSyllableStatus = st; renderSyllabus(); }
+function filterSyllabusByPriority(pr) { currentSyllablePriority = pr; renderSyllabus(); }
+function filterSyllabusTerm(tm) { currentSyllableTerm = tm; renderSyllabus(); }
+function searchSyllabusCards(q) { currentSyllableSearch = q.toLowerCase(); renderSyllabus(); }
 
-function renderSyllabus(tf) {
+function renderSyllabus() {
   const container = document.getElementById('syllabus-cards-container');
-  const items = classData.syllabuses.filter(s => s.timeframe === tf);
+  if (!container) return;
+
+  let items = classData.syllabuses;
+  if (currentSyllableMonth !== 'all') items = items.filter(s => s.month === currentSyllableMonth);
+  if (currentSyllableStatus !== 'all') items = items.filter(s => s.status === currentSyllableStatus);
+  if (currentSyllablePriority !== 'all') items = items.filter(s => s.priority === currentSyllablePriority);
+  if (currentSyllableTerm !== 'all') items = items.filter(s => s.term === currentSyllableTerm);
+  if (currentSyllableSearch) {
+    items = items.filter(s => 
+      s.subject.toLowerCase().includes(currentSyllableSearch) ||
+      (s.chapterName && s.chapterName.toLowerCase().includes(currentSyllableSearch)) ||
+      (s.learningOutcomes && s.learningOutcomes.toLowerCase().includes(currentSyllableSearch))
+    );
+  }
+
   if (items.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">এই সময়সীমার জন্য কোনো একাডেমিক সিলেবাস ও ১২ মাসের বাৎসরিক মাস্টার কার্ড যোগ করা হয়নি।</p>`;
+    container.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding:30px;">কোনো মানানসই সিলেবাস অধ্যায় বা কার্ড পাওয়া যায়নি।</p>`;
     return;
   }
+
+  const statusLabels = { not_started: "⚪ শুরু হয়নি", running: "🟢 চলছে", completed: "💙 সম্পন্ন", revision_needed: "🔴 রিভিশন বাকি" };
+
   container.innerHTML = items.map(s => `
-    <div class="syllabus-card-box">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span class="badge" style="background:rgba(139,92,246,0.15); color:var(--purple); font-weight:800;">${s.timeframeLabel}</span>
-        <div style="display:flex; gap:8px;">
-          <button onclick="editSyllabus(${s.id})" style="color:var(--primary); background:none; font-size:14px; cursor:pointer;" title="সম্পাদনা করুন"><i class="fa-solid fa-pen-to-square"></i></button>
-          <button onclick="deleteSyllabus(${s.id})" style="color:var(--danger); background:none; font-size:14px; cursor:pointer;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
+    <div class="glass-chapter-card" id="gcc-card-${s.id}">
+      <div class="gcc-header" onclick="toggleChapterAccordion(${s.id})">
+        <div class="flex-align-center gap-3">
+          <button class="btn-icon-circle" style="width:28px; height:28px;"><i class="fa-solid fa-chevron-down" id="acc-icon-${s.id}"></i></button>
+          <div>
+            <div class="flex-align-center gap-2">
+              <span class="status-tag ${s.status}">${statusLabels[s.status] || 'চলছে'}</span>
+              <span class="priority-tag ${s.priority}">${s.priority} Priority</span>
+              <span class="badge" style="background:rgba(139,92,246,0.1); color:var(--purple); font-size:10.5px;">মাস: ${s.month || 'জুলাই'}</span>
+            </div>
+            <h4 style="font-size:15px; font-weight:800; color:var(--text-main); margin-top:4px;">
+              ${s.chapterName || s.chapter} <span style="font-size:12px; color:var(--primary);">(${s.subject})</span>
+            </h4>
+          </div>
+        </div>
+
+        <div class="flex-align-center gap-4">
+          <div style="text-align:right;">
+            <div class="text-xs font-bold text-muted">প্রোগ্রেস</div>
+            <div class="text-sm font-extrabold text-primary">${s.progress}%</div>
+          </div>
+          <div style="width:100px;">
+            <div class="progress-bar-wrap" style="height:6px;"><div class="progress-fill bg-purple" style="width:${s.progress}%;"></div></div>
+          </div>
+          <div class="flex-gap-center" onclick="event.stopPropagation()">
+            <button onclick="editSyllabus(${s.id})" style="color:var(--primary); background:none; font-size:13px;" title="সম্পাদনা"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="deleteSyllabus(${s.id})" style="color:var(--danger); background:none; font-size:13px;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
+          </div>
         </div>
       </div>
 
-      <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:flex-start;">
-        <h4 style="font-size:16px; font-weight:800; color:var(--text-main);">${s.subject} <span style="font-size:12px; color:var(--primary); font-weight:700;">(কোড: ${s.subjectCode || '১০৯'})</span></h4>
-        <span class="badge" style="background:rgba(79,70,229,0.1); color:var(--primary); font-size:11px;"><i class="fa-solid fa-clock"></i> পিরিয়ড স্থায়িত্ব: ${s.duration || '১ ঘণ্টা'} (${s.periodsNeeded || '৬'}টি পিরিয়ড)</span>
-      </div>
-
-      <!-- Schedule & Working Days Bar -->
-      <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; background:rgba(16,185,129,0.08); padding:6px 10px; border-radius:6px; font-size:11px; font-weight:700; color:var(--success);">
-        <span><i class="fa-solid fa-calendar-day"></i> ক্লাসের শুরু: ${s.startDate || '২০২৬-০৭-২৫'} (${s.startTime || '০৯:০০ AM'})</span>
-        <span><i class="fa-solid fa-briefcase"></i> ${s.workingDays || '১৮০টি মোট কার্যদিবস'}</span>
-      </div>
-
-      <!-- Holidays & Exams Bar -->
-      <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; background:rgba(245,158,11,0.08); padding:6px 10px; border-radius:6px; font-size:10.5px; font-weight:700; color:#b45309;">
-        <span><i class="fa-solid fa-umbrella-beach"></i> ${s.holidays || '৮৫ দিন মোট ছুটি'}</span>
-        <span><i class="fa-solid fa-bullseye"></i> বাৎসরিক পরীক্ষা ম্যাট্রিক্স অন</span>
-      </div>
-
-      <div style="margin-top:8px;">
-        <span style="font-size:12.5px; font-weight:800; color:var(--primary);"><i class="fa-solid fa-layer-group"></i> নির্বাচিত অধ্যায়সমূহ (${Array.isArray(s.chapters) ? s.chapters.length : 1}টি):</span>
-        <div style="font-size:12px; font-weight:700; color:var(--text-main); margin-top:3px; line-height:1.4;">
-          ${Array.isArray(s.chapters) ? s.chapters.map(c => `<span class="badge" style="background:rgba(79,70,229,0.08); color:var(--primary); margin:2px 3px 2px 0; display:inline-block;">${c}</span>`).join('') : s.chapter}
+      <div class="gcc-body" id="gcc-body-${s.id}">
+        <!-- Learning Outcome & PI Indicator -->
+        <div class="flex-between flex-wrap gap-2 mb-3">
+          <div>
+            <strong class="text-xs text-primary display-block mb-1"><i class="fa-solid fa-bullseye"></i> শিখনফল (Learning Outcome):</strong>
+            <p style="font-size:12.5px; color:var(--text-main); font-weight:600; margin:0;">${s.learningOutcomes || 'শিক্ষার্থীরা ধারণা অর্জন করতে পারবে।'}</p>
+          </div>
+          <div class="text-right">
+            <span class="badge" style="background:rgba(16,185,129,0.12); color:var(--success); font-size:11px; font-weight:700;"><i class="fa-solid fa-award"></i> ${s.piIndicator || 'PI 8.3.1'}</span>
+            <div class="text-xs text-muted mt-1">প্রয়োজনীয় সময়: <strong>${s.requiredClasses || 6}টি ক্লাস (${s.totalHours || '৪ ঘণ্টা'})</strong></div>
+          </div>
         </div>
-      </div>
-      
-      <div style="margin-top:8px; padding:8px; background:rgba(0,0,0,0.03); border-radius:8px; font-size:11.5px; color:var(--text-muted);">
-        <div><strong>🗓️ ১২ মাসের পাঠ পরিকল্পনা:</strong> ${s.weeklyPlan || 'নির্ধারিত পাঠসূচি'}</div>
-        <div style="margin-top:3px; color:#b45309; font-weight:700;"><strong>🎯 বাৎসরিক পরীক্ষা ও নম্বর বিভাজন:</strong> ${s.examSchedule || '১ম সাময়িক, অর্ধবার্ষিকী ও বার্ষিকী পরীক্ষা'}</div>
-        <div style="margin-top:3px; color:var(--purple); font-weight:700;"><strong>➡️ পর্যায়ক্রমিক ফ্লো:</strong> ${s.nextClass || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM)'}</div>
-        <div style="margin-top:3px;"><strong>🎯 শিখন লক্ষ্য:</strong> ${s.target}</div>
-        <div style="margin-top:3px;"><strong>📚 সহায়ক বই/ল্যাব:</strong> ${s.refBooks || 'NCTB অনুমোদিত বোর্ড বই'}</div>
-      </div>
 
-      <div style="margin-top:14px;">
-        <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:800; color:var(--text-main);">
-          <span>১২ মাসের সার্বিক কভারেজ অগ্রগতি</span>
-          <span>${s.progress}%</span>
+        <!-- Topic Checklist -->
+        <div class="topic-checklist-box mt-3">
+          <div class="flex-between text-xs fw-bold mb-2">
+            <span><i class="fa-solid fa-list-check text-purple"></i> টপিকভিত্তিক স্মার্ট চেকলিস্ট</span>
+            <span class="text-muted">টিক চিহ্ন দিন</span>
+          </div>
+          ${s.checklist ? s.checklist.map((item, idx) => `
+            <label class="checklist-item ${item.checked ? 'checked' : ''}">
+              <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleChecklistItem(${s.id}, ${idx})">
+              <span>${item.text}</span>
+            </label>
+          `).join('') : '<p class="text-xs text-muted">কোনো চেকলিস্ট নির্ধারিত নেই।</p>'}
         </div>
-        <div class="progress-bar-wrap">
-          <div class="progress-fill" style="width:${s.progress}%;"></div>
+
+        <!-- Resources & Exam Hub Grid -->
+        <div class="resources-exam-hub-grid">
+          <div class="hub-box">
+            <h6><i class="fa-solid fa-folder-open text-primary"></i> লার্নিং রিসোর্স</h6>
+            <div class="flex-gap-center flex-wrap">
+              <a href="${s.resources?.video || '#'}" target="_blank" class="resource-pill-btn"><i class="fa-solid fa-play text-danger"></i> 🎥 ভিডিও লেকচার</a>
+              <a href="#" onclick="alert('নোট ডাউনলোড হচ্ছে...')" class="resource-pill-btn"><i class="fa-solid fa-file-pdf text-primary"></i> 📄 লেকচার নোট</a>
+              <a href="#" onclick="alert('কুইজ চালু হচ্ছে...')" class="resource-pill-btn"><i class="fa-solid fa-pen-nib text-warning"></i> 📝 অনলাইন কুইজ</a>
+            </div>
+          </div>
+
+          <div class="hub-box">
+            <h6><i class="fa-solid fa-square-poll-vertical text-warning"></i> পরীক্ষা প্রস্তুতি (Exam Hub)</h6>
+            <div class="text-xs color-text-muted">
+              <div><strong>মান বণ্টন:</strong> ${s.examHub?.marks || '২০ নম্বর'}</div>
+              <div><strong>বিগত প্রশ্ন:</strong> ${s.examHub?.pyq || '২০২৫ বোর্ড প্রশ্ন'}</div>
+              <div class="text-danger fw-bold mt-1"><strong>শিক্ষকের নোট:</strong> ${s.examHub?.teacherNote || 'রিভিশন দেওয়া জরুরি।'}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   `).join('');
+
+  // Update Summary Analytics
+  const total = classData.syllabuses.length;
+  const completed = classData.syllabuses.filter(s=>s.status==='completed').length;
+  const pending = total - completed;
+  document.getElementById('syll-stat-completed').textContent = `${completed}টি অধ্যায়`;
+  document.getElementById('syll-stat-pending').textContent = `${pending}টি অধ্যায়`;
+  const avgProgress = Math.round(classData.syllabuses.reduce((acc, curr) => acc + (curr.progress||0), 0) / (total || 1));
+  document.getElementById('syll-stat-coverage').textContent = `${avgProgress}%`;
+  document.getElementById('syll-total-percent').textContent = `${avgProgress}% সম্পন্ন`;
+  document.getElementById('syll-total-progress-fill').style.width = `${avgProgress}%`;
+}
+
+// TOGGLE ACCORDION
+function toggleChapterAccordion(id) {
+  const body = document.getElementById(`gcc-body-${id}`);
+  const icon = document.getElementById(`acc-icon-${id}`);
+  if (body) {
+    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+  }
+  if (icon) {
+    icon.className = body.style.display === 'none' ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-down';
+  }
+}
+
+// TOGGLE CHECKLIST & CONFETTI ANIMATION
+function toggleChecklistItem(syllabusId, itemIdx) {
+  const item = classData.syllabuses.find(s => s.id === syllabusId);
+  if (item && item.checklist && item.checklist[itemIdx]) {
+    item.checklist[itemIdx].checked = !item.checklist[itemIdx].checked;
+    
+    // Recalculate progress
+    const checkedCount = item.checklist.filter(c => c.checked).length;
+    item.progress = Math.round((checkedCount / item.checklist.length) * 100);
+    if (item.progress === 100) item.status = 'completed';
+    else if (item.progress > 0) item.status = 'running';
+
+    saveStorage();
+    renderSyllabus();
+
+    if (item.checklist[itemIdx].checked) {
+      showConfettiToast("🎉 চমৎকার! টপিক সম্পন্ন হয়েছে (+প্রোগ্রেস যুক্ত হয়েছে)");
+    }
+  }
+}
+
+function showConfettiToast(msg) {
+  const toast = document.createElement('div');
+  toast.className = 'confetti-toast';
+  toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+// CLASS ACTIONS CONNECTED ARCHITECTURE HANDLERS
+function startClassSession(routineId) {
+  alert(`🚀 পিরিয়ড #${routineId} লাইভ ক্লাস সেশন সফলভাবে শুরু হয়েছে! লেসন প্ল্যান ও প্রেজেন্টেশন অটো-লোড হচ্ছে...`);
+  showSection('live_control');
+}
+function openLessonPlanModal(subject, topic) {
+  alert(`📖 [${subject}] লেসন প্ল্যান:\n- টপিক: ${topic}\n- পদ্ধতি: প্রেজেন্টেশন ও ব্ল্যাকবোর্ড প্র্যাকটিস\n- সময়: ৪৫ মিনিট`);
+}
+function openPresentationModal(subject) {
+  alert(`🖥️ [${subject}] ইন্টারঅ্যাক্টিভ প্রেজেন্টেশন স্লাইড সেশন প্রস্তুত করা হচ্ছে...`);
+}
+function linkSyllabusModal(subject) {
+  showSection('syllabus');
+  searchSyllabusCards(subject);
+}
+function switchRoleView(role) {
+  alert(`👤 রোল পরিবর্তন করা হয়েছে: ${role.toUpperCase()} ভিউ একটিভ!`);
 }
 
 function openAddSyllabusModal() {
