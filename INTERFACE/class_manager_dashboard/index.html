@@ -76,18 +76,56 @@
     <!-- ========== MAIN CONTENT ========== -->
     <main class="main-content">
 
-      <!-- TOP BAR -->
+      <!-- TOP BAR WITH GLOBAL CONTEXT SELECTORS -->
       <header class="top-bar">
         <div class="top-bar-left">
           <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
           <div>
             <h2 class="page-title" id="section-title">স্মার্ট ক্লাস ম্যানেজার</h2>
-            <span class="section-subtitle" id="section-subtitle">শিক্ষকের শ্রেণিকক্ষ পরিচালনার সম্পূর্ণ ডিজিটাল ড্যাশবোর্ড</span>
+            <span class="section-subtitle" id="global-context-subtitle">ঢাকা বোর্ড | অষ্টম শ্রেণি (ক) | সাধারণ বিভাগ</span>
           </div>
         </div>
+
+        <!-- Global Context Selector Bar across all tabs -->
+        <div class="global-context-bar flex-gap-center">
+          <select id="global-board-select" class="form-input-compact shadow-sm" onchange="updateGlobalContext()" title="শিক্ষা বোর্ড নির্বাচন">
+            <option value="ঢাকা বোর্ড" selected>ঢাকা বোর্ড</option>
+            <option value="রাজশাহী বোর্ড">রাজশাহী বোর্ড</option>
+            <option value="চট্টগ্রাম বোর্ড">চট্টগ্রাম বোর্ড</option>
+            <option value="কুমিল্লা বোর্ড">কুমিল্লা বোর্ড</option>
+            <option value="যশোর বোর্ড">যশোর বোর্ড</option>
+            <option value="সিলেট বোর্ড">সিলেট বোর্ড</option>
+            <option value="বরিশাল বোর্ড">বরিশাল বোর্ড</option>
+            <option value="দিনাজপুর বোর্ড">দিনাজপুর বোর্ড</option>
+            <option value="ময়মনসিংহ বোর্ড">ময়মনসিংহ বোর্ড</option>
+            <option value="মাদ্রাসা বোর্ড">মাদ্রাসা বোর্ড</option>
+            <option value="কারিগরি বোর্ড">কারিগরি বোর্ড</option>
+          </select>
+
+          <select id="global-class-select" class="form-input-compact shadow-sm" onchange="updateGlobalContext()" title="শ্রেণি নির্বাচন">
+            <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
+            <option value="সপ্তম">সপ্তম শ্রেণি</option>
+            <option value="অষ্টম" selected>অষ্টম শ্রেণি</option>
+            <option value="নবম">নবম শ্রেণি</option>
+            <option value="দশম">দশম শ্রেণি</option>
+          </select>
+
+          <select id="global-section-select" class="form-input-compact shadow-sm" onchange="updateGlobalContext()" title="শাখা নির্বাচন">
+            <option value="ক" selected>শাখা - ক</option>
+            <option value="খ">শাখা - খ</option>
+            <option value="গ">শাখা - গ</option>
+          </select>
+
+          <select id="global-group-select" class="form-input-compact shadow-sm" onchange="updateGlobalContext()" title="বিভাগ নির্বাচন">
+            <option value="সাধারণ" selected>সাধারণ বিভাগ</option>
+            <option value="বিজ্ঞান">বিজ্ঞান বিভাগ</option>
+            <option value="মানবিক">মানবিক বিভাগ</option>
+            <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা বিভাগ</option>
+          </select>
+        </div>
+
         <div class="top-bar-right">
           <button class="theme-toggle-btn" onclick="toggleDarkMode()" id="dark-mode-btn" title="ডার্ক মোড টগল"><i class="fa-solid fa-moon"></i></button>
-          <button class="lang-btn">বাংলা</button>
           <button class="btn btn-primary" onclick="openAddRoutineModal()"><i class="fa-solid fa-plus"></i> + নতুন কার্ড যোগ</button>
           <button class="btn btn-green" onclick="showSection('attendance')"><i class="fa-solid fa-user-check"></i> উপস্থিতি নিন</button>
         </div>

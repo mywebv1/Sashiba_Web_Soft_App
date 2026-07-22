@@ -115,22 +115,43 @@ function showSection(name) {
   if (name === 'alerts') renderAlerts();
 }
 
-function goHome() {
-  if (window.parent && window.parent !== window && window.parent.showHome) {
-    window.parent.showHome();
-  } else {
-    window.location.href = "../index.html";
+function updateGlobalContext() {
+  const board = document.getElementById('global-board-select')?.value || 'ঢাকা বোর্ড';
+  const cls = document.getElementById('global-class-select')?.value || 'অষ্টম';
+  const sec = document.getElementById('global-section-select')?.value || 'ক';
+  const grp = document.getElementById('global-group-select')?.value || 'সাধারণ';
+
+  classData.settings.board = board;
+  classData.settings.className = `${cls} (শাখা-${sec})`;
+  classData.settings.group = grp;
+
+  const subtitle = document.getElementById('global-context-subtitle');
+  if (subtitle) {
+    subtitle.textContent = `${board} | ${cls} শ্রেণি (শাখা-${sec}) | ${grp}`;
   }
-}
 
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('collapsed');
-}
+  // Also sync live control selectors if visible
+  if (document.getElementById('live-board-select')) {
+    document.getElementById('live-board-select').value = board;
+    document.getElementById('live-class-select').value = cls;
+    document.getElementById('live-section-select').value = sec;
+    document.getElementById('live-group-select').value = grp;
+    if (typeof updateLiveContext === 'function') updateLiveContext();
+  }
 
-function toggleDarkMode() {
-  document.body.classList.toggle('dark-mode');
-  const isDark = document.body.classList.contains('dark-mode');
-  document.getElementById('dark-mode-btn').innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+  // Also sync attendance selectors if visible
+  if (document.getElementById('att-class-select')) {
+    document.getElementById('att-class-select').value = cls;
+    document.getElementById('att-section-select').value = sec;
+    document.getElementById('att-group-select').value = grp;
+  }
+
+  saveStorage();
+  
+  // Re-render currently active view with new context
+  const activeNav = document.querySelector('.nav-item.active');
+  const activeSectionId = activeNav ? activeNav.id.replace('nav-', '') : 'overview';
+  showSection(activeSectionId);
 }
 
 // RENDER OVERVIEW CARDS
@@ -369,13 +390,18 @@ function renderAIInsights() {
 // RENDER HISTORY CARDS
 function renderHistory() {
   const container = document.getElementById('history-cards-container');
+  const board = classData.settings.board || 'ঢাকা বোর্ড';
+  const className = classData.settings.className || 'অষ্টম (শাখা-ক)';
+  const group = classData.settings.group || 'সাধারণ';
+
   container.innerHTML = classData.history.map(h => `
     <div class="history-card-box">
       <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted); font-weight:700;">
-        <span>${h.date}</span>
+        <span>${h.date} | ${board}</span>
         <span class="badge" style="background:rgba(16,185,129,0.15); color:var(--success);">উপস্থিতি ${h.attendance}</span>
       </div>
       <h4 style="font-size:15px; font-weight:800; margin-top:6px; color:var(--text-main);">${h.subject}</h4>
+      <p style="font-size:11.5px; color:var(--primary); font-weight:700; margin-top:2px;"><i class="fa-solid fa-graduation-cap"></i> শ্রেণি: ${h.class || className} | বিভাগ: ${group}</p>
       <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">${h.remark}</p>
     </div>
   `).join('');
@@ -384,12 +410,17 @@ function renderHistory() {
 // RENDER ALERTS
 function renderAlerts() {
   const container = document.getElementById('alerts-container');
+  const board = classData.settings.board || 'ঢাকা বোর্ড';
+  const className = classData.settings.className || 'অষ্টম (শাখা-ক)';
+  const group = classData.settings.group || 'সাধারণ';
+
   container.innerHTML = classData.alerts.map(a => `
     <div class="interactive-card" style="border-left:4px solid ${a.type === 'urgent' ? 'var(--danger)' : 'var(--warning)'}; margin-bottom:12px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <h4 style="color:${a.type === 'urgent' ? 'var(--danger)' : 'var(--warning)'}; font-size:15px; font-weight:800;">${a.title}</h4>
-        <span style="font-size:11px; color:var(--text-muted); font-weight:700;">${a.time}</span>
+        <span style="font-size:11px; color:var(--text-muted); font-weight:700;">${a.time} | ${board}</span>
       </div>
+      <p style="font-size:11.5px; color:var(--text-muted); font-weight:700; margin-top:2px;">শ্রেণি: ${className} | বিভাগ: ${group}</p>
       <p style="font-size:13px; margin-top:6px; color:var(--text-main);">${a.desc}</p>
     </div>
   `).join('');
