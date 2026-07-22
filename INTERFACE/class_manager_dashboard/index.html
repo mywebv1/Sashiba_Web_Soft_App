@@ -351,6 +351,56 @@
 
         <!-- SECTION 6: LIVE CONTROL HUB -->
         <section id="section-live_control" class="content-section hidden">
+          <!-- Class Meta Context Bar -->
+          <div class="interactive-card mb-4">
+            <div class="ic-header space-between flex-wrap gap-4">
+              <div class="flex-align-center gap-3">
+                <i class="fa-solid fa-graduation-cap text-primary" style="font-size:22px;"></i>
+                <div>
+                  <h4 style="margin:0; font-size:15px; font-weight:800;">লাইভ ক্লাসের অবস্থান ও পরিচয়</h4>
+                  <span style="font-size:12px; color:var(--text-muted);" id="live-context-summary">শ্রেণি: অষ্টম | শাখা: ক | বিভাগ: সাধারণ | বোর্ড: ঢাকা বোর্ড</span>
+                </div>
+              </div>
+
+              <div class="flex-gap-center flex-wrap">
+                <select id="live-board-select" class="form-input-compact" onchange="updateLiveContext()">
+                  <option value="ঢাকা বোর্ড" selected>ঢাকা বোর্ড</option>
+                  <option value="রাজশাহী বোর্ড">রাজশাহী বোর্ড</option>
+                  <option value="চট্টগ্রাম বোর্ড">চট্টগ্রাম বোর্ড</option>
+                  <option value="কুমিল্লা বোর্ড">কুমিল্লা বোর্ড</option>
+                  <option value="যশোর বোর্ড">যশোর বোর্ড</option>
+                  <option value="সিলেট বোর্ড">সিলেট বোর্ড</option>
+                  <option value="বরিশাল বোর্ড">বরিশাল বোর্ড</option>
+                  <option value="দিনাজপুর বোর্ড">দিনাজপুর বোর্ড</option>
+                  <option value="ময়মনসিংহ বোর্ড">ময়মনসিংহ বোর্ড</option>
+                  <option value="মাদ্রাসা বোর্ড">মাদ্রাসা বোর্ড</option>
+                  <option value="কারিগরি বোর্ড">কারিগরি বোর্ড</option>
+                </select>
+
+                <select id="live-class-select" class="form-input-compact" onchange="updateLiveContext()">
+                  <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
+                  <option value="সপ্তম">সপ্তম শ্রেণি</option>
+                  <option value="অষ্টম" selected>অষ্টম শ্রেণি</option>
+                  <option value="নবম">নবম শ্রেণি</option>
+                  <option value="দশম">দশম শ্রেণি</option>
+                </select>
+
+                <select id="live-section-select" class="form-input-compact" onchange="updateLiveContext()">
+                  <option value="ক" selected>শাখা - ক</option>
+                  <option value="খ">শাখা - খ</option>
+                  <option value="গ">শাখা - গ</option>
+                </select>
+
+                <select id="live-group-select" class="form-input-compact" onchange="updateLiveContext()">
+                  <option value="সাধারণ" selected>সাধারণ বিভাগ</option>
+                  <option value="বিজ্ঞান">বিজ্ঞান বিভাগ</option>
+                  <option value="মানবিক">মানবিক বিভাগ</option>
+                  <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা বিভাগ</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div class="interactive-grid-layout">
             
             <div class="interactive-card text-center">
@@ -376,6 +426,7 @@
                   <i class="fa-solid fa-user-graduate"></i>
                 </div>
                 <div class="selected-student-display mt-4" id="random-student-name">আজকের প্রশ্নের উত্তর কে দেবে?</div>
+                <div class="mt-2" style="font-size:12px; font-weight:700; color:var(--text-muted);" id="random-student-meta">শ্রেণি: অষ্টম (ক) | সাধারণ বিভাগ</div>
                 <button class="btn btn-primary mt-6" onclick="pickRandomStudent()"><i class="fa-solid fa-dice"></i> এলোমেলো শিক্ষার্থী বাছাই করুন</button>
               </div>
             </div>

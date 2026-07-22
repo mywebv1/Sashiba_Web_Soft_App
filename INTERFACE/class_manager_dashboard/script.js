@@ -430,11 +430,44 @@ function resetLiveTimer() {
   updateTimerDisplay();
 }
 
-// RANDOMIZER
+// LIVE CONTROL CONTEXT UPDATE & RANDOMIZER
+function updateLiveContext() {
+  const board = document.getElementById('live-board-select')?.value || 'ঢাকা বোর্ড';
+  const cls = document.getElementById('live-class-select')?.value || 'অষ্টম';
+  const sec = document.getElementById('live-section-select')?.value || 'ক';
+  const grp = document.getElementById('live-group-select')?.value || 'সাধারণ';
+
+  const summary = document.getElementById('live-context-summary');
+  if (summary) {
+    summary.textContent = `শ্রেণি: ${cls} | শাখা: ${sec} | বিভাগ: ${grp} | বোর্ড: ${board}`;
+  }
+
+  const meta = document.getElementById('random-student-meta');
+  if (meta) {
+    meta.textContent = `শ্রেণি: ${cls} (${sec}) | ${grp} | ${board}`;
+  }
+}
+
 function pickRandomStudent() {
-  const students = classData.students;
+  const cls = document.getElementById('live-class-select')?.value || 'অষ্টম';
+  const sec = document.getElementById('live-section-select')?.value || 'ক';
+  const grp = document.getElementById('live-group-select')?.value || 'সাধারণ';
+  const board = document.getElementById('live-board-select')?.value || 'ঢাকা বোর্ড';
+
+  const filtered = classData.students.filter(s => 
+    (s.className === cls || !s.className) && 
+    (s.section === sec || !s.section) && 
+    (s.group === grp || !s.group || grp === 'সাধারণ')
+  );
+
+  const students = filtered.length > 0 ? filtered : classData.students;
   const picked = students[Math.floor(Math.random() * students.length)];
+  
   document.getElementById('random-student-name').textContent = `🎯 রোল ${picked.roll}: ${picked.name}`;
+  const meta = document.getElementById('random-student-meta');
+  if (meta) {
+    meta.textContent = `শ্রেণি: ${picked.className || cls} (${picked.section || sec}) | বিভাগ: ${picked.group || grp} | বোর্ড: ${board}`;
+  }
 }
 
 // ROUTINE MODAL & EDIT
