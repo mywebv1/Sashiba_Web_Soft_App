@@ -688,10 +688,10 @@
           </select>
         </div>
         <div class="form-group">
-          <label>অধ্যায় / বিষয়বস্তু / টপিক বিন্যাস (ড্রপডাউন)</label>
-          <select id="ms-chapter" class="form-input" required>
+          <label><i class="fa-solid fa-layer-group text-primary"></i> একদিনে/সেশনে একাধিক অধ্যায় ও বিষয়বস্তু নির্বাচন (Multi-Chapter Selection)</label>
+          <select id="ms-chapter" class="form-input" multiple style="height:110px;" title="Ctrl চেপে একাধিক অধ্যায় বেছে নিন">
             <option value="অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র" selected>অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র</option>
-            <option value="অধ্যায় ২: জ্যামিতি ও বৃত্তের পরিধি">অধ্যায় ২: জ্যামিতি ও বৃত্তের পরিধি</option>
+            <option value="অধ্যায় ২: জ্যামিতি ও বৃত্তের পরিধি" selected>অধ্যায় ২: জ্যামিতি ও বৃত্তের পরিধি</option>
             <option value="অধ্যায় ৩: পরিবেশ, গতি ও বল">অধ্যায় ৩: পরিবেশ, গতি ও বল</option>
             <option value="অধ্যায় ৪: আলোক বিজ্ঞান ও তার তরঙ্গ">অধ্যায় ৪: আলোক বিজ্ঞান ও তার তরঙ্গ</option>
             <option value="অধ্যায় ৫: ব্যাকরণ, সমাস ও নির্মিতি">অধ্যায় ৫: ব্যাকরণ, সমাস ও নির্মিতি</option>
@@ -699,18 +699,35 @@
             <option value="অধ্যায় ৭: পাইথন প্রোগ্রামিং পরিচিতি">অধ্যায় ৭: পাইথন প্রোগ্রামিং পরিচিতি</option>
             <option value="অধ্যায় ৮: কম্পিউটার নেটওয়ার্ক ও ডাটাবেজ">অধ্যায় ৮: কম্পিউটার নেটওয়ার্ক ও ডাটাবেজ</option>
             <option value="অধ্যায় ৯: হিসাববিজ্ঞান মূলনীতি ও খতিয়ান">অধ্যায় ৯: হিসাববিজ্ঞান মূলনীতি ও খতিয়ান</option>
-            <option value="অধ্যায় ১০: বার্ষিক মাস্টার কারিকুলাম সামারি">অধ্যায় ১০: বার্ষিক মাস্টার কারিকুলাম সামারি</option>
+            <option value="অধ্যায় ১০: বার্ষিক মাস্টার কারিকুলাম রিভিশন">অধ্যায় ১০: বার্ষিক মাস্টার কারিকুলাম রিভিশন</option>
           </select>
+          <span style="font-size:10.5px; color:var(--text-muted);"><i class="fa-solid fa-circle-info"></i> কিবোর্ডের <strong>Ctrl</strong> চেপে একসাথে ১ থেকে ৫টি অধ্যায় নির্বাচন করতে পারবেন।</span>
         </div>
+
         <div class="form-group">
-          <label>মাসিক/সাপ্তাহিক পাঠ পরিকল্পনা (Lesson Plan)</label>
+          <label><i class="fa-solid fa-calendar-week text-success"></i> ১২ মাসের পূর্ণাঙ্গ একাডেমিক ক্যালেন্ডার ও ছুটি (Annual Calendar & Holidays)</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <select id="ms-working-days" class="form-input">
+              <option value="১৮০টি মোট কার্যদিবস (বছরে)" selected>১৮০টি মোট কার্যদিবস (বছরে)</option>
+              <option value="২০০টি মোট কার্যদিবস (বছরে)">২০০টি মোট কার্যদিবস (বছরে)</option>
+              <option value="২২০টি মোট কার্যদিবস (বছরে)">২২০টি মোট কার্যদিবস (বছরে)</option>
+            </select>
+            <select id="ms-holidays" class="form-input">
+              <option value="৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)" selected>৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)</option>
+              <option value="৭০ দিন মোট ছুটি (সরকারি ও উৎসব)">৭০ দিন মোট ছুটি (সরকারি ও উৎসব)</option>
+              <option value="৯০ দিন মোট ছুটি (সরকারি ও উৎসব)">৯০ দিন মোট ছুটি (সরকারি ও উৎসব)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-map-location-dot text-purple"></i> ১২ মাসের বিষয়ভিত্তিক বার্ষিক রোডম্যাপ (12-Month Course Roadmap)</label>
           <select id="ms-weekly-plan" class="form-input">
-            <option value="সপ্তাহ ১-২: মূল সূত্র বিশ্লেষণ ও গাণিতিক সমাধান" selected>সপ্তাহ ১-২: মূল সূত্র বিশ্লেষণ ও গাণিতিক সমাধান</option>
-            <option value="সপ্তাহ ৩-৪: অধ্যায়ভিত্তিক প্রশ্ন অনুশীলন ও হোমওয়ার্ক">সপ্তাহ ৩-৪: অধ্যায়ভিত্তিক প্রশ্ন অনুশীলন ও হোমওয়ার্ক</option>
-            <option value="সপ্তাহ ৫-৬: ল্যাব প্র্যাকটিক্যাল ও দলগত কাজ">সপ্তাহ ৫-৬: ল্যাব প্র্যাকটিক্যাল ও দলগত কাজ</option>
-            <option value="সপ্তাহ ৭-৮: রিভিশন সেশন ও কুইজ পরীক্ষা">সপ্তাহ ৭-৮: রিভিশন সেশন ও কুইজ পরীক্ষা</option>
-            <option value="মাসের পাঠ পরিকল্পনা: কন্টিনিউয়াস অ্যাসেসমেন্ট">মাসের পাঠ পরিকল্পনা: কন্টিনিউয়াস অ্যাসেসমেন্ট</option>
-            <option value="বার্ষিক পাঠ পরিকল্পনা: চূড়ান্ত সাময়িক মডেল টেস্ট">বার্ষিক পাঠ পরিকল্পনা: চূড়ান্ত সাময়িক মডেল টেস্ট</option>
+            <option value="১ম-৩য় মাস: অধ্যায় ১-৪ (মৌলিক ধারণা ও ১ম সাময়িক)" selected>১ম-৩য় মাস: অধ্যায় ১-৪ (মৌলিক ধারণা ও ১ম সাময়িক)</option>
+            <option value="৪র্থ-৬ষ্ঠ মাস: অধ্যায় ৫-৭ (অর্ধবার্ষিকী প্রস্তুতি)">৪র্থ-৬ষ্ঠ মাস: অধ্যায় ৫-৭ (অর্ধবার্ষিকী প্রস্তুতি)</option>
+            <option value="৭ম-৯ম মাস: অধ্যায় ৮-১০ (প্রজেক্ট ও ৩য় সাময়িক)">৭ম-৯ম মাস: অধ্যায় ৮-১০ (প্রজেক্ট ও ৩য় সাময়িক)</option>
+            <option value="১০ম-১২তম মাস: অল-অধ্যায় রিভিশন ও বার্ষিক পরীক্ষা">১০ম-১২তম মাস: অল-অধ্যায় রিভিশন ও বার্ষিক পরীক্ষা</option>
+            <option value="১২ মাসের মাস্টার প্ল্যান: প্রতিটি অধ্যায় কভারেজ">১২ মাসের মাস্টার প্ল্যান: প্রতিটি অধ্যায় কভারেজ</option>
           </select>
         </div>
         <div class="form-group">

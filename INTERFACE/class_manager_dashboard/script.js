@@ -292,7 +292,7 @@ function renderSyllabus(tf) {
   const container = document.getElementById('syllabus-cards-container');
   const items = classData.syllabuses.filter(s => s.timeframe === tf);
   if (items.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">এই সময়সীমার জন্য কোনো একাডেমিক সিলেবাস ও পাঠ পরিকল্পনা কার্ড যোগ করা হয়নি।</p>`;
+    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">এই সময়সীমার জন্য কোনো একাডেমিক সিলেবাস ও ১২ মাসের মাস্টার কার্ড যোগ করা হয়নি।</p>`;
     return;
   }
   container.innerHTML = items.map(s => `
@@ -316,10 +316,21 @@ function renderSyllabus(tf) {
         <span><i class="fa-solid fa-hourglass-half"></i> ব্যাপ্তি: ${s.duration || '১ ঘণ্টা'}</span>
       </div>
 
-      <p style="font-size:13px; font-weight:700; color:var(--text-main); margin-top:8px;">📖 অধ্যায়/টপিক: ${s.chapter}</p>
+      <!-- Working Days vs Holidays Bar -->
+      <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; background:rgba(245,158,11,0.08); padding:6px 10px; border-radius:6px; font-size:10.5px; font-weight:700; color:#b45309;">
+        <span><i class="fa-solid fa-briefcase"></i> ${s.workingDays || '১৮০টি মোট কার্যদিবস (বছরে)'}</span>
+        <span><i class="fa-solid fa-umbrella-beach"></i> ${s.holidays || '৮৫ দিন মোট ছুটি'}</span>
+      </div>
+
+      <div style="margin-top:8px;">
+        <span style="font-size:12.5px; font-weight:800; color:var(--primary);"><i class="fa-solid fa-layer-group"></i> নির্বাচিত অধ্যায়সমূহ (${Array.isArray(s.chapters) ? s.chapters.length : 1}টি):</span>
+        <div style="font-size:12px; font-weight:700; color:var(--text-main); margin-top:3px; line-height:1.4;">
+          ${Array.isArray(s.chapters) ? s.chapters.map(c => `<span class="badge" style="background:rgba(79,70,229,0.08); color:var(--primary); margin:2px 3px 2px 0; display:inline-block;">${c}</span>`).join('') : s.chapter}
+        </div>
+      </div>
       
       <div style="margin-top:8px; padding:8px; background:rgba(0,0,0,0.03); border-radius:8px; font-size:11.5px; color:var(--text-muted);">
-        <div><strong>🗓️ সপ্তাহিক পাঠ পরিকল্পনা:</strong> ${s.weeklyPlan || 'নির্ধারিত পাঠসূচি'}</div>
+        <div><strong>🗓️ ১২ মাসের পাঠ পরিকল্পনা:</strong> ${s.weeklyPlan || 'নির্ধারিত পাঠসূচি'}</div>
         <div style="margin-top:3px; color:var(--purple); font-weight:700;"><strong>➡️ পর্যায়ক্রমিক ফ্লো:</strong> ${s.nextClass || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM)'}</div>
         <div style="margin-top:3px;"><strong>🎯 শিখন লক্ষ্য:</strong> ${s.target}</div>
         <div style="margin-top:3px;"><strong>📚 সহায়ক বই/ল্যাব:</strong> ${s.refBooks || 'NCTB অনুমোদিত বোর্ড বই'}</div>
@@ -327,7 +338,7 @@ function renderSyllabus(tf) {
 
       <div style="margin-top:14px;">
         <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:800; color:var(--text-main);">
-          <span>একাডেমিক অগ্রগতি ট্র্যাকিং (১২ মাস)</span>
+          <span>১২ মাসের সার্বিক কভারেজ অগ্রগতি</span>
           <span>${s.progress}%</span>
         </div>
         <div class="progress-bar-wrap">
@@ -779,11 +790,22 @@ function editSyllabus(id) {
   const item = classData.syllabuses.find(s => s.id === id);
   if (!item) return;
   editingSyllabusId = id;
-  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-purple"></i> সিলেবাস ও পাঠ পরিকল্পনা সম্পাদনা করুন';
+  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-purple"></i> সিলেবাস ও ১২ মাসের মাস্টার প্ল্যান সম্পাদনা';
   document.getElementById('ms-timeframe').value = item.timeframe || 'today';
   if (document.getElementById('ms-subject')) document.getElementById('ms-subject').value = item.subject || 'গণিত';
   if (document.getElementById('ms-subject-code')) document.getElementById('ms-subject-code').value = item.subjectCode || '১০৯';
-  document.getElementById('ms-chapter').value = item.chapter || '';
+  
+  // Set multi-selected chapters
+  const chapterSelect = document.getElementById('ms-chapter');
+  if (chapterSelect) {
+    const selectedList = Array.isArray(item.chapters) ? item.chapters : [item.chapter];
+    Array.from(chapterSelect.options).forEach(opt => {
+      opt.selected = selectedList.includes(opt.value);
+    });
+  }
+
+  if (document.getElementById('ms-working-days')) document.getElementById('ms-working-days').value = item.workingDays || '১৮০টি মোট কার্যদিবস (বছরে)';
+  if (document.getElementById('ms-holidays')) document.getElementById('ms-holidays').value = item.holidays || '৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)';
   if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = item.weeklyPlan || '';
   if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = item.periodsNeeded || '৬';
   if (document.getElementById('ms-start-date')) document.getElementById('ms-start-date').value = item.startDate || '2026-07-25';
@@ -802,8 +824,15 @@ function saveSyllabusModal(e) {
   const timeframe = document.getElementById('ms-timeframe').value;
   const subject = document.getElementById('ms-subject').value;
   const subjectCode = document.getElementById('ms-subject-code')?.value || '১০৯';
-  const chapter = document.getElementById('ms-chapter').value;
-  const weeklyPlan = document.getElementById('ms-weekly-plan')?.value || 'সপ্তাহিক পাঠ পরিকল্পনা';
+  
+  // Extract all multi-selected chapters
+  const chapterSelect = document.getElementById('ms-chapter');
+  const selectedChapters = chapterSelect ? Array.from(chapterSelect.selectedOptions).map(opt => opt.value) : ['অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র'];
+  const primaryChapter = selectedChapters.join(', ');
+
+  const workingDays = document.getElementById('ms-working-days')?.value || '১৮০টি মোট কার্যদিবস (বছরে)';
+  const holidays = document.getElementById('ms-holidays')?.value || '৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)';
+  const weeklyPlan = document.getElementById('ms-weekly-plan')?.value || '১২ মাসের বিষয়ভিত্তিক রোডম্যাপ';
   const periodsNeeded = document.getElementById('ms-periods')?.value || '৬';
   const startDate = document.getElementById('ms-start-date')?.value || '২০২৬-০৭-২৫';
   const startTime = document.getElementById('ms-start-time')?.value || '০৯:০০ AM';
@@ -825,7 +854,10 @@ function saveSyllabusModal(e) {
       item.timeframeLabel = tfLabels[timeframe] || timeframe;
       item.subject = subject;
       item.subjectCode = subjectCode;
-      item.chapter = chapter;
+      item.chapter = primaryChapter;
+      item.chapters = selectedChapters;
+      item.workingDays = workingDays;
+      item.holidays = holidays;
       item.weeklyPlan = weeklyPlan;
       item.periodsNeeded = periodsNeeded;
       item.startDate = startDate;
@@ -842,7 +874,10 @@ function saveSyllabusModal(e) {
       timeframeLabel: tfLabels[timeframe] || timeframe,
       subject,
       subjectCode,
-      chapter,
+      chapter: primaryChapter,
+      chapters: selectedChapters,
+      workingDays,
+      holidays,
       weeklyPlan,
       periodsNeeded,
       startDate,
