@@ -292,7 +292,7 @@ function renderSyllabus(tf) {
   const container = document.getElementById('syllabus-cards-container');
   const items = classData.syllabuses.filter(s => s.timeframe === tf);
   if (items.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">এই সময়সীমার জন্য কোনো একাডেমিক সিলেবাস ও ১২ মাসের মাস্টার কার্ড যোগ করা হয়নি।</p>`;
+    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">এই সময়সীমার জন্য কোনো একাডেমিক সিলেবাস ও ১২ মাসের বাৎসরিক মাস্টার কার্ড যোগ করা হয়নি।</p>`;
     return;
   }
   container.innerHTML = items.map(s => `
@@ -307,19 +307,19 @@ function renderSyllabus(tf) {
 
       <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:flex-start;">
         <h4 style="font-size:16px; font-weight:800; color:var(--text-main);">${s.subject} <span style="font-size:12px; color:var(--primary); font-weight:700;">(কোড: ${s.subjectCode || '১০৯'})</span></h4>
-        <span class="badge" style="background:rgba(79,70,229,0.1); color:var(--primary); font-size:11px;"><i class="fa-solid fa-clock"></i> ${s.periodsNeeded || '৬'}টি পিরিয়ড</span>
+        <span class="badge" style="background:rgba(79,70,229,0.1); color:var(--primary); font-size:11px;"><i class="fa-solid fa-clock"></i> পিরিয়ড স্থায়িত্ব: ${s.duration || '১ ঘণ্টা'} (${s.periodsNeeded || '৬'}টি পিরিয়ড)</span>
       </div>
 
-      <!-- Schedule & Duration Bar -->
+      <!-- Schedule & Working Days Bar -->
       <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; background:rgba(16,185,129,0.08); padding:6px 10px; border-radius:6px; font-size:11px; font-weight:700; color:var(--success);">
-        <span><i class="fa-solid fa-calendar-day"></i> শুরু: ${s.startDate || '২০২৬-০৭-২৫'} (${s.startTime || '০৯:০০ AM'})</span>
-        <span><i class="fa-solid fa-hourglass-half"></i> ব্যাপ্তি: ${s.duration || '১ ঘণ্টা'}</span>
+        <span><i class="fa-solid fa-calendar-day"></i> ক্লাসের শুরু: ${s.startDate || '২০২৬-০৭-২৫'} (${s.startTime || '০৯:০০ AM'})</span>
+        <span><i class="fa-solid fa-briefcase"></i> ${s.workingDays || '১৮০টি মোট কার্যদিবস'}</span>
       </div>
 
-      <!-- Working Days vs Holidays Bar -->
+      <!-- Holidays & Exams Bar -->
       <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; background:rgba(245,158,11,0.08); padding:6px 10px; border-radius:6px; font-size:10.5px; font-weight:700; color:#b45309;">
-        <span><i class="fa-solid fa-briefcase"></i> ${s.workingDays || '১৮০টি মোট কার্যদিবস (বছরে)'}</span>
         <span><i class="fa-solid fa-umbrella-beach"></i> ${s.holidays || '৮৫ দিন মোট ছুটি'}</span>
+        <span><i class="fa-solid fa-bullseye"></i> বাৎসরিক পরীক্ষা ম্যাট্রিক্স অন</span>
       </div>
 
       <div style="margin-top:8px;">
@@ -331,6 +331,7 @@ function renderSyllabus(tf) {
       
       <div style="margin-top:8px; padding:8px; background:rgba(0,0,0,0.03); border-radius:8px; font-size:11.5px; color:var(--text-muted);">
         <div><strong>🗓️ ১২ মাসের পাঠ পরিকল্পনা:</strong> ${s.weeklyPlan || 'নির্ধারিত পাঠসূচি'}</div>
+        <div style="margin-top:3px; color:#b45309; font-weight:700;"><strong>🎯 বাৎসরিক পরীক্ষা ও নম্বর বিভাজন:</strong> ${s.examSchedule || '১ম সাময়িক, অর্ধবার্ষিকী ও বার্ষিকী পরীক্ষা'}</div>
         <div style="margin-top:3px; color:var(--purple); font-weight:700;"><strong>➡️ পর্যায়ক্রমিক ফ্লো:</strong> ${s.nextClass || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM)'}</div>
         <div style="margin-top:3px;"><strong>🎯 শিখন লক্ষ্য:</strong> ${s.target}</div>
         <div style="margin-top:3px;"><strong>📚 সহায়ক বই/ল্যাব:</strong> ${s.refBooks || 'NCTB অনুমোদিত বোর্ড বই'}</div>
@@ -347,6 +348,134 @@ function renderSyllabus(tf) {
       </div>
     </div>
   `).join('');
+}
+
+function openAddSyllabusModal() {
+  editingSyllabusId = null;
+  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-book-bookmark text-purple"></i> নতুন ১২ মাসের বাৎসরিক মাস্টার সিলেবাস যোগ';
+  if (document.getElementById('ms-timeframe')) document.getElementById('ms-timeframe').value = '12months';
+  if (document.getElementById('ms-subject')) document.getElementById('ms-subject').value = 'গণিত';
+  if (document.getElementById('ms-subject-code')) document.getElementById('ms-subject-code').value = '১০৯';
+  if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = '১ম-৩য় মাস: অধ্যায় ১-৪ (মৌলিক ধারণা ও ১ম সাময়িক)';
+  if (document.getElementById('ms-exam-schedule')) document.getElementById('ms-exam-schedule').value = '১ম সাময়িক (মার্চ): ২০ নম্বর | অর্ধবার্ষিকী (জুন): ৫০ নম্বর | ৩য় সাময়িক (সেপ্টেম্বর): ২০ নম্বর | বার্ষিকী (ডিসেম্বর): ১০০ নম্বর';
+  if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = '৬';
+  if (document.getElementById('ms-duration')) document.getElementById('ms-duration').value = '১ ঘণ্টা';
+  if (document.getElementById('ms-ref-books')) document.getElementById('ms-ref-books').value = 'NCTB বোর্ড অনুমোদিত মূল বই (২০২৬)';
+  if (document.getElementById('ms-target')) document.getElementById('ms-target').value = 'বীজগণিতীয় সূত্রের সঠিক প্রয়োগ ও মান নির্ণয় শিখবে';
+  document.getElementById('syllabus-modal').classList.remove('hidden');
+}
+
+function editSyllabus(id) {
+  const item = classData.syllabuses.find(s => s.id === id);
+  if (!item) return;
+  editingSyllabusId = id;
+  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-purple"></i> ১২ মাসের বাৎসরিক সিলেবাস সম্পাদনা';
+  document.getElementById('ms-timeframe').value = item.timeframe || '12months';
+  if (document.getElementById('ms-subject')) document.getElementById('ms-subject').value = item.subject || 'গণিত';
+  if (document.getElementById('ms-subject-code')) document.getElementById('ms-subject-code').value = item.subjectCode || '১০৯';
+  
+  // Set multi-selected chapters
+  const chapterSelect = document.getElementById('ms-chapter');
+  if (chapterSelect) {
+    const selectedList = Array.isArray(item.chapters) ? item.chapters : [item.chapter];
+    Array.from(chapterSelect.options).forEach(opt => {
+      opt.selected = selectedList.includes(opt.value);
+    });
+  }
+
+  if (document.getElementById('ms-working-days')) document.getElementById('ms-working-days').value = item.workingDays || '১৮০টি মোট কার্যদিবস (বছরে)';
+  if (document.getElementById('ms-holidays')) document.getElementById('ms-holidays').value = item.holidays || '৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)';
+  if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = item.weeklyPlan || '১ম-৩য় মাস: অধ্যায় ১-৪ (মৌলিক ধারণা ও ১ম সাময়িক)';
+  if (document.getElementById('ms-exam-schedule')) document.getElementById('ms-exam-schedule').value = item.examSchedule || '১ম সাময়িক (মার্চ): ২০ নম্বর | অর্ধবার্ষিকী (জুন): ৫০ নম্বর | ৩য় সাময়িক (সেপ্টেম্বর): ২০ নম্বর | বার্ষিকী (ডিসেম্বর): ১০০ নম্বর';
+  if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = item.periodsNeeded || '৬';
+  if (document.getElementById('ms-start-date')) document.getElementById('ms-start-date').value = item.startDate || '2026-07-25';
+  if (document.getElementById('ms-start-time')) document.getElementById('ms-start-time').value = item.startTime || '০৯:০০ AM';
+  if (document.getElementById('ms-duration')) document.getElementById('ms-duration').value = item.duration || '১ ঘণ্টা';
+  if (document.getElementById('ms-next-class')) document.getElementById('ms-next-class').value = item.nextClass || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)';
+  if (document.getElementById('ms-ref-books')) document.getElementById('ms-ref-books').value = item.refBooks || '';
+  document.getElementById('ms-target').value = item.target || '';
+  document.getElementById('syllabus-modal').classList.remove('hidden');
+}
+
+function closeSyllabusModal() { document.getElementById('syllabus-modal').classList.add('hidden'); }
+
+function saveSyllabusModal(e) {
+  e.preventDefault();
+  const timeframe = document.getElementById('ms-timeframe').value;
+  const subject = document.getElementById('ms-subject').value;
+  const subjectCode = document.getElementById('ms-subject-code')?.value || '১০৯';
+  
+  // Extract all multi-selected chapters
+  const chapterSelect = document.getElementById('ms-chapter');
+  const selectedChapters = chapterSelect ? Array.from(chapterSelect.selectedOptions).map(opt => opt.value) : ['অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র'];
+  const primaryChapter = selectedChapters.join(', ');
+
+  const workingDays = document.getElementById('ms-working-days')?.value || '১৮০টি মোট কার্যদিবস (বছরে)';
+  const holidays = document.getElementById('ms-holidays')?.value || '৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)';
+  const weeklyPlan = document.getElementById('ms-weekly-plan')?.value || '১২ মাসের বিষয়ভিত্তিক রোডম্যাপ';
+  const examSchedule = document.getElementById('ms-exam-schedule')?.value || '১ম সাময়িক, অর্ধবার্ষিকী ও বার্ষিকী পরীক্ষা';
+  const periodsNeeded = document.getElementById('ms-periods')?.value || '৬';
+  const startDate = document.getElementById('ms-start-date')?.value || '২০২৬-০৭-২৫';
+  const startTime = document.getElementById('ms-start-time')?.value || '০৯:০০ AM';
+  const duration = document.getElementById('ms-duration')?.value || '১ ঘণ্টা';
+  const nextClass = document.getElementById('ms-next-class')?.value || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)';
+  const refBooks = document.getElementById('ms-ref-books')?.value || 'NCTB বোর্ড বই';
+  const target = document.getElementById('ms-target').value;
+
+  const tfLabels = {
+    today: "প্রতিদিনের সিলেবাস", "1week": "আগামী ১ সপ্তাহ", "15days": "আগামী ১৫ দিন",
+    "1month": "আগামী ১ মাস", "3months": "আগামী ৩ মাস", "6months": "আগামী ৬ মাস",
+    "9months": "আগামী ৯ মাস", "12months": "১২ মাসের বাৎসরিক মাস্টার সিলেবাস"
+  };
+
+  if (editingSyllabusId) {
+    const item = classData.syllabuses.find(s => s.id === editingSyllabusId);
+    if (item) {
+      item.timeframe = timeframe;
+      item.timeframeLabel = tfLabels[timeframe] || timeframe;
+      item.subject = subject;
+      item.subjectCode = subjectCode;
+      item.chapter = primaryChapter;
+      item.chapters = selectedChapters;
+      item.workingDays = workingDays;
+      item.holidays = holidays;
+      item.weeklyPlan = weeklyPlan;
+      item.examSchedule = examSchedule;
+      item.periodsNeeded = periodsNeeded;
+      item.startDate = startDate;
+      item.startTime = startTime;
+      item.duration = duration;
+      item.nextClass = nextClass;
+      item.refBooks = refBooks;
+      item.target = target;
+    }
+  } else {
+    classData.syllabuses.push({
+      id: Date.now(),
+      timeframe,
+      timeframeLabel: tfLabels[timeframe] || timeframe,
+      subject,
+      subjectCode,
+      chapter: primaryChapter,
+      chapters: selectedChapters,
+      workingDays,
+      holidays,
+      weeklyPlan,
+      examSchedule,
+      periodsNeeded,
+      startDate,
+      startTime,
+      duration,
+      nextClass,
+      refBooks,
+      target,
+      progress: 10
+    });
+  }
+
+  saveStorage();
+  closeSyllabusModal();
+  renderSyllabus(timeframe);
 }
 
 // RENDER ATTENDANCE CARDS WITH CLASS/SECTION/GROUP FILTERS

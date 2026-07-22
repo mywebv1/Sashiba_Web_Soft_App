@@ -641,16 +641,15 @@
       </div>
       <form onsubmit="saveSyllabusModal(event)" class="mt-4">
         <div class="form-group">
-          <label>সময়সীমা</label>
-          <select id="ms-timeframe" class="form-input">
-            <option value="today">প্রতিদিনের সিলেবাস</option>
-            <option value="1week">আগামী ১ সপ্তাহ</option>
-            <option value="15days">আগামী ১৫ দিন</option>
-            <option value="1month">আগামী ১ মাস</option>
-            <option value="3months">আগামী ৩ মাস</option>
-            <option value="6months">আগামী ৬ মাস</option>
-            <option value="9months">আগামী ৯ মাস</option>
-            <option value="12months">আগামী ১২ মাস (১ বছর)</option>
+          <label><i class="fa-solid fa-calendar-check text-purple"></i> সিলেবাসের ধরণ ও সময়সীমা (Plan Mode)</label>
+          <select id="ms-timeframe" class="form-input" onchange="toggleSyllabusFormMode(this.value)">
+            <option value="12months" selected>🗓️ ১২ মাসের বাৎসরিক মাস্টার সিলেবাস (Annual Master Plan)</option>
+            <option value="6months">🗓️ ৬ মাসের অর্ধবার্ষিকী সিলেবাস (Half-Yearly Plan)</option>
+            <option value="3months">🗓️ ৩ মাসের টার্ম/ত্রৈমাসিক সিলেবাস (Quarterly Plan)</option>
+            <option value="1month">🗓️ ১ মাসের মাসিক পাঠ পরিকল্পনা (Monthly Lesson Plan)</option>
+            <option value="15days">🗓️ ১৫ দিনের ফোর্টনাইটলি প্ল্যান (Fortnightly Plan)</option>
+            <option value="1week">🗓️ ১ সপ্তাহের উইকলি লেসন প্ল্যান (Weekly Plan)</option>
+            <option value="today">📌 ১ দিনের দৈনিক ক্লাস টপিক (Daily Class Topic)</option>
           </select>
         </div>
         <div class="form-group">
@@ -728,6 +727,15 @@
             <option value="৭ম-৯ম মাস: অধ্যায় ৮-১০ (প্রজেক্ট ও ৩য় সাময়িক)">৭ম-৯ম মাস: অধ্যায় ৮-১০ (প্রজেক্ট ও ৩য় সাময়িক)</option>
             <option value="১০ম-১২তম মাস: অল-অধ্যায় রিভিশন ও বার্ষিক পরীক্ষা">১০ম-১২তম মাস: অল-অধ্যায় রিভিশন ও বার্ষিক পরীক্ষা</option>
             <option value="১২ মাসের মাস্টার প্ল্যান: প্রতিটি অধ্যায় কভারেজ">১২ মাসের মাস্টার প্ল্যান: প্রতিটি অধ্যায় কভারেজ</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-bullseye text-warning"></i> ১২ মাসের বাৎসরিক পরীক্ষার রুটিন ও নম্বর বিভাজন (Annual Exams Breakdown)</label>
+          <select id="ms-exam-schedule" class="form-input">
+            <option value="১ম সাময়িক (মার্চ): ২০ নম্বর | অর্ধবার্ষিকী (জুন): ৫০ নম্বর | ৩য় সাময়িক (সেপ্টেম্বর): ২০ নম্বর | বার্ষিকী (ডিসেম্বর): ১০০ নম্বর" selected>১ম সাময়িক (মার্চ): ২০ নম্বর | অর্ধবার্ষিকী (জুন): ৫০ নম্বর | ৩য় সাময়িক (সেপ্টেম্বর): ২০ নম্বর | বার্ষিকী (ডিসেম্বর): ১০০ নম্বর</option>
+            <option value="সাপ্তাহিক কুইজ টেস্ট (প্রতি শুক্র) + অর্ধবার্ষিকী (জুন) + বার্ষিকী (ডিসেম্বর)">সাপ্তাহিক কুইজ টেস্ট (প্রতি শুক্র) + অর্ধবার্ষিকী (জুন) + বার্ষিকী (ডিসেম্বর)</option>
+            <option value="মাসিক টিউটোরিয়াল টেস্ট (প্রতি মাসের ৩০ তারিখ) + বার্ষিকী পরীক্ষা (নভেম্বর)">মাসিক টিউটোরিয়াল টেস্ট (প্রতি মাসের ৩০ তারিখ) + বার্ষিকী পরীক্ষা (নভেম্বর)</option>
           </select>
         </div>
         <div class="form-group">
