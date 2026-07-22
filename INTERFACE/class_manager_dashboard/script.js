@@ -516,17 +516,6 @@ function pickRandomStudent() {
   }
 }
 
-// ROUTINE MODAL & EDIT
-function openAddRoutineModal() {
-  editingRoutineId = null;
-  document.querySelector('#routine-modal h3').innerHTML = '<i class="fa-solid fa-calendar-plus text-primary"></i> নতুন পিরিয়ড যোগ করুন';
-  document.getElementById('m-subject').value = '';
-  document.getElementById('m-time').value = '';
-  document.getElementById('m-room').value = '১০২';
-  document.getElementById('m-topic').value = '';
-  document.getElementById('routine-modal').classList.remove('hidden');
-}
-
 // ROUTINE MODAL, EDIT & AUTOMATED TEACHER ALERT SIMULATION
 function openAddRoutineModal() {
   editingRoutineId = null;
