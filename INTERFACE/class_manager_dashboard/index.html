@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>স্মার্ট ক্লাস ম্যানেজার | স্মার্ট শিক্ষা বাতায়ন</title>
-  <meta name="description" content="সশিবা স্মার্ট ক্লাস ম্যানেজার - শ্রেণিকক্ষ পরিচালনার ডিজিটাল আর্কিটেক্ট।">
+  <title>স্মার্ট ক্লাস ম্যানেজার | সশিবা স্মার্ট শিক্ষা বাতায়ন</title>
+  <meta name="description" content="সশিবা স্মার্ট ক্লাস ম্যানেজার - শ্রেণিকক্ষ পরিচালনা, রুটিন ও পরীক্ষার ডিজিটাল আর্কিটেক্ট।">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
@@ -28,22 +28,22 @@
           <i class="fa-solid fa-house"></i><span>হোম (মূল পোর্টাল)</span>
         </a>
         <a href="javascript:void(0)" class="nav-item active" onclick="showSection('overview')" id="nav-overview">
-          <i class="fa-solid fa-gauge-high"></i><span>ড্যাশবোর্ড ওভারভিউ</span>
+          <i class="fa-solid fa-chart-line"></i><span>ড্যাশবোর্ড ওভারভিউ</span>
         </a>
         <a href="javascript:void(0)" class="nav-item" onclick="showSection('routine')" id="nav-routine">
-          <i class="fa-solid fa-clock"></i><span>🕒 ক্লাস রুটিন</span>
+          <i class="fa-solid fa-clock"></i><span>🕒 ক্লাস রুটিন ও লাইভ</span>
         </a>
         <a href="javascript:void(0)" class="nav-item" onclick="showSection('syllabus')" id="nav-syllabus">
           <i class="fa-solid fa-book-bookmark"></i><span>🕒 ক্লাস সিলেবাস</span>
         </a>
         <a href="javascript:void(0)" class="nav-item" onclick="showSection('attendance')" id="nav-attendance">
-          <i class="fa-solid fa-users-check"></i><span>👥 উপস্থিতি ও অংশগ্রহণ</span>
+          <i class="fa-solid fa-user-check"></i><span>👥 উপস্থিতি ও সক্রিয়তা</span>
         </a>
         <a href="javascript:void(0)" class="nav-item" onclick="showSection('exams')" id="nav-exams">
           <i class="fa-solid fa-bullseye"></i><span>🎯 পরীক্ষার রুটিন</span>
         </a>
         <a href="javascript:void(0)" class="nav-item" onclick="showSection('live_control')" id="nav-live_control">
-          <i class="fa-solid fa-tower-cell"></i><span>🚀 লাইভ কন্ট্রোল</span>
+          <i class="fa-solid fa-tower-cell"></i><span>🚀 লাইভ কন্ট্রোল হাব</span>
           <span class="nav-badge live-badge">LIVE</span>
         </a>
         <a href="javascript:void(0)" class="nav-item" onclick="showSection('ai_insights')" id="nav-ai_insights">
@@ -54,7 +54,7 @@
           <i class="fa-solid fa-clock-rotate-left"></i><span>🕒 ক্লাস ইতিহাস</span>
         </a>
         <a href="javascript:void(0)" class="nav-item" onclick="showSection('alerts')" id="nav-alerts">
-          <i class="fa-solid fa-triangle-exclamation"></i><span>🚨 সতর্কতা ও করণীয়</span>
+          <i class="fa-solid fa-bell"></i><span>🚨 সতর্কতা ও নোটিশ</span>
           <span class="nav-badge warn-badge" id="alert-count-badge">৩</span>
         </a>
 
@@ -82,14 +82,14 @@
           <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
           <div>
             <h2 class="page-title" id="section-title">স্মার্ট ক্লাস ম্যানেজার</h2>
-            <p class="page-subtitle" id="section-subtitle">শিক্ষকের শ্রেণিকক্ষ পরিচালনার সম্পূর্ণ ডিজিটাল ড্যাশবোর্ড</p>
+            <span class="section-subtitle" id="section-subtitle">শিক্ষকের শ্রেণিকক্ষ পরিচালনার সম্পূর্ণ ডিজিটাল ড্যাশবোর্ড</span>
           </div>
         </div>
         <div class="top-bar-right">
           <button class="theme-toggle-btn" onclick="toggleDarkMode()" id="dark-mode-btn" title="ডার্ক মোড টগল"><i class="fa-solid fa-moon"></i></button>
           <button class="lang-btn">বাংলা</button>
-          <button class="btn btn-primary" onclick="openAddRoutineModal()"><i class="fa-solid fa-plus"></i> নতুন রুটিন</button>
-          <button class="btn btn-success" onclick="showSection('attendance')"><i class="fa-solid fa-user-check"></i> উপস্থিতি নিন</button>
+          <button class="btn btn-primary" onclick="openAddRoutineModal()"><i class="fa-solid fa-plus"></i> + নতুন কার্ড যোগ</button>
+          <button class="btn btn-green" onclick="showSection('attendance')"><i class="fa-solid fa-user-check"></i> উপস্থিতি নিন</button>
         </div>
       </header>
 
@@ -97,127 +97,170 @@
 
         <!-- SECTION 1: OVERVIEW -->
         <section id="section-overview" class="content-section">
-          <!-- Quick Stats Row -->
-          <div class="stats-grid">
-            <div class="stat-card blue">
-              <div class="stat-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-              <div class="stat-info">
-                <span class="stat-label">আজকের মোট ক্লাস</span>
-                <h3 class="stat-value" id="stat-total-classes">০৫ টি</h3>
+          <!-- Top Interactive Stats Grid Cards -->
+          <div class="stats-overview-grid">
+            <div class="stat-glass-card blue">
+              <div class="sgc-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+              <div class="sgc-details">
+                <span class="sgc-label">আজকের মোট ক্লাস</span>
+                <h3 class="sgc-val" id="stat-total-classes">০৫ টি পিরিয়ড</h3>
+                <span class="sgc-sub"><i class="fa-solid fa-circle-play text-emerald"></i> চলমান: গণিত (১০:০০ AM)</span>
               </div>
             </div>
-            <div class="stat-card green">
-              <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
-              <div class="stat-info">
-                <span class="stat-label">গড় উপস্থিতি</span>
-                <h3 class="stat-value" id="stat-attendance-rate">৯৪%</h3>
+            <div class="stat-glass-card green">
+              <div class="sgc-icon"><i class="fa-solid fa-users"></i></div>
+              <div class="sgc-details">
+                <span class="sgc-label">আজকের গড় উপস্থিতি</span>
+                <h3 class="sgc-val" id="stat-attendance-rate">৯৪.৫%</h3>
+                <span class="sgc-sub"><i class="fa-solid fa-user-check"></i> উপস্থিত: ৩৭/৪০ জন</span>
               </div>
             </div>
-            <div class="stat-card purple">
-              <div class="stat-icon"><i class="fa-solid fa-list-check"></i></div>
-              <div class="stat-info">
-                <span class="stat-label">সিলেবাস অগ্রগতি</span>
-                <h3 class="stat-value" id="stat-syllabus-progress">৭২%</h3>
+            <div class="stat-glass-card purple">
+              <div class="sgc-icon"><i class="fa-solid fa-book-open-reader"></i></div>
+              <div class="sgc-details">
+                <span class="sgc-label">সিলেবাস সেশন কভারেজ</span>
+                <h3 class="sgc-val" id="stat-syllabus-progress">৭২.০%</h3>
+                <span class="sgc-sub"><i class="fa-solid fa-chart-line"></i> লক্ষ্যপূরণ অত্যন্ত সন্তোষজনক</span>
               </div>
             </div>
-            <div class="stat-card orange">
-              <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
-              <div class="stat-info">
-                <span class="stat-label">আসন্ন পরীক্ষা</span>
-                <h3 class="stat-value" id="stat-upcoming-exams">মাসিক টেস্ট (২ দিন পর)</h3>
+            <div class="stat-glass-card orange">
+              <div class="sgc-icon"><i class="fa-solid fa-bullseye"></i></div>
+              <div class="sgc-details">
+                <span class="sgc-label">আসন্ন নিকটতম পরীক্ষা</span>
+                <h3 class="sgc-val" id="stat-upcoming-exams">গণিত ক্লাস টেস্ট</h3>
+                <span class="sgc-sub"><i class="fa-solid fa-calendar-day"></i> আগামী ২৫ জুলাই (২০ নম্বর)</span>
               </div>
             </div>
           </div>
 
-          <!-- Active Class & Quick Tracker Grid -->
-          <div class="dashboard-grid mt-6">
-            <div class="card active-class-card">
-              <div class="card-header">
-                <h3><i class="fa-solid fa-circle-play text-red"></i> চলমান/পরবর্তী ক্লাস ট্র্যাকার</h3>
-                <span class="badge badge-live">লাইভ স্ট্যাটাস</span>
+          <!-- Main Interactive Dashboard Grid -->
+          <div class="interactive-grid-layout mt-6">
+            
+            <!-- Left Column: Active Class Widget & Quick Routine Cards -->
+            <div class="flex-col-gap">
+              
+              <!-- Ongoing Class Live Widget Card -->
+              <div class="interactive-card border-accent-blue">
+                <div class="ic-header">
+                  <h3><i class="fa-solid fa-tower-broadcast text-danger pulse-dot"></i> চলমান লাইভ ক্লাস ও সময় ট্র্যাকার</h3>
+                  <span class="live-pill"><i class="fa-solid fa-circle"></i> লাইভ সেশন</span>
+                </div>
+                <div class="ic-body" id="active-class-widget">
+                  <!-- JS Dynamic Content -->
+                </div>
               </div>
-              <div class="active-class-body" id="active-class-widget">
-                <!-- Rendered dynamically via JS -->
+
+              <!-- Today's Routine Card Grid -->
+              <div class="interactive-card">
+                <div class="ic-header space-between">
+                  <h3><i class="fa-solid fa-calendar-day text-primary"></i> আজকের নির্ধারিত ক্লাস কার্ডসমূহ</h3>
+                  <button class="btn-outline btn-sm" onclick="showSection('routine')">পূর্ণাঙ্গ রুটিন ➔</button>
+                </div>
+                <div class="cards-interactive-grid" id="today-routine-cards">
+                  <!-- JS Dynamic Cards -->
+                </div>
               </div>
+
             </div>
 
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fa-solid fa-bullseye"></i> দ্রুত একশন ও রিমাইন্ডার</h3>
+            <!-- Right Column: Interactive Quick Actions & Class Announcements -->
+            <div class="flex-col-gap">
+              
+              <!-- Quick Action Manager Card -->
+              <div class="interactive-card">
+                <div class="ic-header">
+                  <h3><i class="fa-solid fa-bolt text-warning"></i> দ্রুত ক্লাস ম্যানেজার একশন</h3>
+                </div>
+                <div class="quick-action-cards-list">
+                  <div class="action-card-item" onclick="openAddRoutineModal()">
+                    <div class="aci-icon bg-indigo"><i class="fa-solid fa-plus"></i></div>
+                    <div class="aci-info">
+                      <strong>নতুন রুটিন বা পিরিয়ড যোগ</strong>
+                      <span>সাপ্তাহিক রুটিনে নতুন বিষয় যুক্ত করুন</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right aci-arrow"></i>
+                  </div>
+
+                  <div class="action-card-item" onclick="openAddSyllabusModal()">
+                    <div class="aci-icon bg-purple"><i class="fa-solid fa-book-bookmark"></i></div>
+                    <div class="aci-info">
+                      <strong>নতুন সিলেবাস টার্গেট যোগ</strong>
+                      <span>১ দিন থেকে ১২ মাসের সিলেবাস কার্ড যুক্ত করুন</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right aci-arrow"></i>
+                  </div>
+
+                  <div class="action-card-item" onclick="openAddExamModal()">
+                    <div class="aci-icon bg-warning"><i class="fa-solid fa-bullseye"></i></div>
+                    <div class="aci-info">
+                      <strong>পরীক্ষার নতুন ডেট ও সিলেবাস যোগ</strong>
+                      <span>ক্লাস টেস্ট থেকে বার্ষিকী পরীক্ষার কার্ড তৈরি করুন</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right aci-arrow"></i>
+                  </div>
+
+                  <div class="action-card-item" onclick="showSection('live_control')">
+                    <div class="aci-icon bg-emerald"><i class="fa-solid fa-stopwatch"></i></div>
+                    <div class="aci-info">
+                      <strong>লেকচার টাইমার ও Randomizer</strong>
+                      <span>লাইভ প্রশ্ন উত্তর ও ক্লাস টাইমার পরিচালনা করুন</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right aci-arrow"></i>
+                  </div>
+                </div>
               </div>
-              <div class="quick-actions-list">
-                <div class="quick-action-item" onclick="showSection('live_control')">
-                  <div class="action-icon bg-indigo"><i class="fa-solid fa-stopwatch"></i></div>
-                  <div>
-                    <strong>স্মার্ট ক্লাস টাইমার চালু করুন</strong>
-                    <p>লেকচার সময়সীমা ও কুইজ কাউন্টডাউন</p>
-                  </div>
+
+              <!-- AI Classroom Highlight Card -->
+              <div class="interactive-card bg-ai-gradient">
+                <div class="ic-header">
+                  <h3 class="text-white"><i class="fa-solid fa-brain"></i> AI শ্রেণিকক্ষ স্মার্ট অ্যানালিটিক্স</h3>
                 </div>
-                <div class="quick-action-item" onclick="showSection('routine')">
-                  <div class="action-icon bg-emerald"><i class="fa-solid fa-calendar-week"></i></div>
-                  <div>
-                    <strong>সাপ্তাহিক ক্লাস রুটিন পরিবর্তন</strong>
-                    <p>সময় ও শিক্ষক আপডেট করুন</p>
-                  </div>
-                </div>
-                <div class="quick-action-item" onclick="showSection('alerts')">
-                  <div class="action-icon bg-amber"><i class="fa-solid fa-bell"></i></div>
-                  <div>
-                    <strong>জরুরি নোটিশ পাঠান</strong>
-                    <p>শিক্ষার্থী ও অভিভাবকদের অ্যালার্ট</p>
-                  </div>
+                <div class="ai-quick-text">
+                  <p>আজকে বীজগণিতীয় সূত্রের পারফরম্যান্স ৮৫%। <strong>রাহাত হোসেন (রোল ৩)</strong> অনুপস্থিত রয়েছে, অভিভাবককে মেসেজ পাঠানো উচিত।</p>
+                  <button class="btn-sm btn-white-outline mt-3" onclick="showSection('ai_insights')">সব ইনসাইট দেখুন ➔</button>
                 </div>
               </div>
+
             </div>
+
           </div>
         </section>
 
-        <!-- SECTION 2: CLASS ROUTINE -->
+        <!-- SECTION 2: CLASS ROUTINE & TIMETABLE CARDS -->
         <section id="section-routine" class="content-section hidden">
-          <div class="card">
-            <div class="card-header space-between">
+          <div class="interactive-card">
+            <div class="ic-header space-between">
               <div>
-                <h3><i class="fa-solid fa-clock"></i> সাপ্তাহিক শ্রেণিকক্ষ রুটিন</h3>
-                <p>রবিবার থেকে বৃহস্পতিবারের ক্লাসের সময়সূচী</p>
+                <h3><i class="fa-solid fa-calendar-week text-primary"></i> ইন্টারঅ্যাক্টিভ ক্লাস রুটিন ও পিরিয়ড কার্ডসমূহ</h3>
+                <span class="section-subtitle">বার এবং বিষয় অনুযায়ী আপনার ক্লাসের রুটিন পরিবর্তন ও পরিচালনা করুন</span>
               </div>
-              <button class="btn btn-primary" onclick="openAddRoutineModal()"><i class="fa-solid fa-plus"></i> রুটিনে নতুন পিরিয়ড যোগ</button>
+              <button class="btn btn-primary" onclick="openAddRoutineModal()"><i class="fa-solid fa-plus"></i> + নতুন পিরিয়ড যোগ করুন</button>
             </div>
             
-            <div class="day-tabs" id="routine-day-tabs">
-              <button class="tab-btn active" onclick="filterRoutineDay('রবিবার')">রবিবার</button>
-              <button class="tab-btn" onclick="filterRoutineDay('সোমবার')">সোমবার</button>
-              <button class="tab-btn" onclick="filterRoutineDay('মঙ্গলবার')">মঙ্গলবার</button>
-              <button class="tab-btn" onclick="filterRoutineDay('বুধবার')">বুধবার</button>
-              <button class="tab-btn" onclick="filterRoutineDay('বৃহস্পতিবার')">বৃহস্পতিবার</button>
+            <div class="day-tabs-bar" id="routine-day-tabs">
+              <button class="tab-chip active" onclick="filterRoutineDay('রবিবার')">রবিবার</button>
+              <button class="tab-chip" onclick="filterRoutineDay('সোমবার')">সোমবার</button>
+              <button class="tab-chip" onclick="filterRoutineDay('মঙ্গলবার')">মঙ্গলবার</button>
+              <button class="tab-chip" onclick="filterRoutineDay('বুধবার')">বুধবার</button>
+              <button class="tab-chip" onclick="filterRoutineDay('বৃহস্পতিবার')">বৃহস্পতিবার</button>
             </div>
 
-            <div class="routine-table-container mt-4">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>সময়কাল</th>
-                    <th>বিষয়</th>
-                    <th>শ্রেণি ও শাখা</th>
-                    <th>কক্ষ নং</th>
-                    <th>বিষয়বস্তু / অধ্যায়</th>
-                    <th>শিক্ষক</th>
-                    <th>অ্যাকশন</th>
-                  </tr>
-                </thead>
-                <tbody id="routine-table-body">
-                  <!-- Rendered dynamically via JS -->
-                </tbody>
-              </table>
+            <!-- Routine Cards Grid View -->
+            <div class="routine-cards-grid mt-6" id="routine-cards-container">
+              <!-- Rendered via JS -->
             </div>
           </div>
         </section>
 
-        <!-- SECTION 3: CLASS SYLLABUS -->
+        <!-- SECTION 3: CLASS SYLLABUS CARDS -->
         <section id="section-syllabus" class="content-section hidden">
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fa-solid fa-book-bookmark"></i> সময়ভিত্তিক সিলেবাস পরিকল্পনা</h3>
-              <p>১ দিন থেকে ১২ মাসের সময়সীমা অনুযায়ী সিলেবাসের রূপরেখা ও ট্র্যাকিং</p>
+          <div class="interactive-card">
+            <div class="ic-header space-between">
+              <div>
+                <h3><i class="fa-solid fa-book-bookmark text-purple"></i> সময়ভিত্তিক সিলেবাস পরিকল্পনা ও কভারেজ কার্ড</h3>
+                <span class="section-subtitle">১ দিন থেকে ১২ মাসের সময়সীমা অনুযায়ী সিলেবাসের রূপরেখা ও অগ্রগতি ট্র্যাকিং</span>
+              </div>
+              <button class="btn btn-primary" onclick="openAddSyllabusModal()"><i class="fa-solid fa-plus"></i> + নতুন সিলেবাস যোগ</button>
             </div>
 
             <!-- Timeframe Filter Chips -->
@@ -238,59 +281,45 @@
           </div>
         </section>
 
-        <!-- SECTION 4: ATTENDANCE & ENGAGEMENT -->
+        <!-- SECTION 4: ATTENDANCE & PARTICIPATION -->
         <section id="section-attendance" class="content-section hidden">
-          <div class="card">
-            <div class="card-header space-between">
+          <div class="interactive-card">
+            <div class="ic-header space-between">
               <div>
-                <h3><i class="fa-solid fa-users-check"></i> দৈনিক উপস্থিতি ও ক্লাস পার্টিসিপেশন ট্র্যাকার</h3>
-                <p>শিক্ষার্থীদের উপস্থিতি ও ক্লাসে সক্রিয়তা পর্যবেক্ষণ</p>
+                <h3><i class="fa-solid fa-users-check text-success"></i> দৈনিক স্মার্ট উপস্থিতি ও ক্লাস এনগেজমেন্ট কার্ড</h3>
+                <span class="section-subtitle">শিক্ষার্থীদের সরাসরি উপস্থিতি, বিলম্ব ও পার্টিসিপেশন স্টার মার্ক প্রদান</span>
               </div>
-              <div class="flex gap-2">
-                <input type="date" class="form-input" id="attendance-date-picker">
-                <button class="btn btn-success" onclick="saveAttendance()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন</button>
+              <div class="flex-gap-center">
+                <input type="date" class="form-input-compact" id="attendance-date-picker">
+                <button class="btn btn-green" onclick="saveAttendance()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন</button>
               </div>
             </div>
 
-            <div class="attendance-table-container mt-4">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>রোল</th>
-                    <th>শিক্ষার্থীর নাম</th>
-                    <th>উপস্থিতি স্ট্যাটাস</th>
-                    <th>অংশগ্রহণ স্টার (১-৫)</th>
-                    <th>মনোযোগের মান</th>
-                    <th>মন্তব্য</th>
-                  </tr>
-                </thead>
-                <tbody id="attendance-table-body">
-                  <!-- Rendered via JS -->
-                </tbody>
-              </table>
+            <div class="attendance-cards-grid mt-6" id="attendance-cards-container">
+              <!-- Rendered via JS -->
             </div>
           </div>
         </section>
 
-        <!-- SECTION 5: EXAM ROUTINE -->
+        <!-- SECTION 5: EXAM ROUTINE CARDS -->
         <section id="section-exams" class="content-section hidden">
-          <div class="card">
-            <div class="card-header space-between">
+          <div class="interactive-card">
+            <div class="ic-header space-between">
               <div>
-                <h3><i class="fa-solid fa-bullseye"></i> ক্যাটাগরিভিত্তিক পরীক্ষার রুটিন</h3>
-                <p>ক্লাস টেস্ট থেকে বার্ষিকী পরীক্ষার সময়সূচী ও সিলেবাস নির্ধারণ</p>
+                <h3><i class="fa-solid fa-bullseye text-warning"></i> ক্যাটাগরিভিত্তিক পরীক্ষার রুটিন ও সিলেবাস কার্ড</h3>
+                <span class="section-subtitle">ক্লাস টেস্ট থেকে বার্ষিকী পরীক্ষার সময়সূচী, মান বণ্টন ও তারিখ নির্ধারণ</span>
               </div>
-              <button class="btn btn-primary" onclick="openAddExamModal()"><i class="fa-solid fa-plus"></i> নতুন পরীক্ষা সময়সূচী</button>
+              <button class="btn btn-primary" onclick="openAddExamModal()"><i class="fa-solid fa-plus"></i> + নতুন পরীক্ষা কার্ড যোগ</button>
             </div>
 
-            <div class="day-tabs" id="exam-type-tabs">
-              <button class="tab-btn active" onclick="filterExamType('all')">সকল পরীক্ষা</button>
-              <button class="tab-btn" onclick="filterExamType('ক্লাস টেস্ট')">ক্লাস টেস্ট</button>
-              <button class="tab-btn" onclick="filterExamType('সাপ্তাহিক টেস্ট')">সাপ্তাহিক টেস্ট</button>
-              <button class="tab-btn" onclick="filterExamType('মাসিক টেস্ট')">মাসিক টেস্ট</button>
-              <button class="tab-btn" onclick="filterExamType('ত্রৈমাসিক টেস্ট')">ত্রৈমাসিক টেস্ট</button>
-              <button class="tab-btn" onclick="filterExamType('অর্ধবার্ষিকী')">অর্ধবার্ষিকী</button>
-              <button class="tab-btn" onclick="filterExamType('বার্ষিকী')">বার্ষিকী</button>
+            <div class="day-tabs-bar" id="exam-type-tabs">
+              <button class="tab-chip active" onclick="filterExamType('all')">সকল পরীক্ষা</button>
+              <button class="tab-chip" onclick="filterExamType('ক্লাস টেস্ট')">ক্লাস টেস্ট</button>
+              <button class="tab-chip" onclick="filterExamType('সাপ্তাহিক টেস্ট')">সাপ্তাহিক টেস্ট</button>
+              <button class="tab-chip" onclick="filterExamType('মাসিক টেস্ট')">মাসিক টেস্ট</button>
+              <button class="tab-chip" onclick="filterExamType('ত্রৈমাসিক টেস্ট')">ত্রৈমাসিক টেস্ট</button>
+              <button class="tab-chip" onclick="filterExamType('অর্ধবার্ষিকী')">অর্ধবার্ষিকী</button>
+              <button class="tab-chip" onclick="filterExamType('বার্ষিকী')">বার্ষিকী</button>
             </div>
 
             <div class="exams-grid mt-6" id="exams-cards-container">
@@ -299,42 +328,47 @@
           </div>
         </section>
 
-        <!-- SECTION 6: LIVE CONTROL -->
+        <!-- SECTION 6: LIVE CONTROL HUB -->
         <section id="section-live_control" class="content-section hidden">
-          <div class="dashboard-grid">
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fa-solid fa-stopwatch text-indigo"></i> ক্লাস লেকচার টাইমার ও কাউন্টডাউন</h3>
+          <div class="interactive-grid-layout">
+            
+            <div class="interactive-card text-center">
+              <div class="ic-header">
+                <h3><i class="fa-solid fa-stopwatch text-indigo"></i> লাইভ লেকচার ও কুইজ কাউন্টডাউন টাইমার</h3>
               </div>
-              <div class="timer-display-box">
+              <div class="timer-display-box mt-4">
                 <div class="timer-digits" id="live-timer-digits">৪০:০০</div>
-                <div class="timer-controls mt-4">
-                  <button class="btn btn-success" onclick="startLiveTimer()"><i class="fa-solid fa-play"></i> শুরু</button>
+                <div class="timer-controls mt-6 flex-center-gap">
+                  <button class="btn btn-green" onclick="startLiveTimer()"><i class="fa-solid fa-play"></i> শুরু করুন</button>
                   <button class="btn btn-warning" onclick="pauseLiveTimer()"><i class="fa-solid fa-pause"></i> বিরতি</button>
-                  <button class="btn btn-danger" onclick="resetLiveTimer()"><i class="fa-solid fa-rotate-left"></i> রিক্যাপ</button>
+                  <button class="btn btn-danger" onclick="resetLiveTimer()"><i class="fa-solid fa-rotate-left"></i> রিসেট (৪০ মি.)</button>
                 </div>
               </div>
             </div>
 
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fa-solid fa-dice text-purple"></i> এলোমেলো শিক্ষার্থী নির্বাচন চাকা (Randomizer)</h3>
+            <div class="interactive-card text-center">
+              <div class="ic-header">
+                <h3><i class="fa-solid fa-shuffle text-purple"></i> র‍্যান্ডম শিক্ষার্থী নির্বাচন কার্ড (Randomizer)</h3>
               </div>
-              <div class="randomizer-box">
-                <div class="selected-student-display" id="random-student-name">প্রশ্ন উত্তর দিতে প্রস্তুত?</div>
-                <button class="btn btn-primary mt-4" onclick="pickRandomStudent()"><i class="fa-solid fa-shuffle"></i> শিক্ষার্থী নির্বাচন করুন</button>
+              <div class="randomizer-box mt-4">
+                <div class="selected-student-avatar-ring">
+                  <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div class="selected-student-display mt-4" id="random-student-name">আজকের প্রশ্নের উত্তর কে দেবে?</div>
+                <button class="btn btn-primary mt-6" onclick="pickRandomStudent()"><i class="fa-solid fa-dice"></i> এলোমেলো শিক্ষার্থী বাছাই করুন</button>
               </div>
             </div>
+
           </div>
         </section>
 
-        <!-- SECTION 7: AI INSIGHTS -->
+        <!-- SECTION 7: AI INSIGHTS & ACTIONS -->
         <section id="section-ai_insights" class="content-section hidden">
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fa-solid fa-brain text-purple"></i> AI শ্রেণিকক্ষ অ্যানালিটিক্স ও শিক্ষকের করণীয়</h3>
+          <div class="interactive-card">
+            <div class="ic-header">
+              <h3><i class="fa-solid fa-brain text-purple"></i> AI শ্রেণিকক্ষ পারফরম্যান্স অ্যানালিটিক্স ও সুপারিশ</h3>
             </div>
-            <div class="ai-insights-grid mt-4" id="ai-insights-container">
+            <div class="ai-insights-grid mt-6" id="ai-insights-container">
               <!-- Rendered via JS -->
             </div>
           </div>
@@ -342,36 +376,23 @@
 
         <!-- SECTION 8: CLASS HISTORY -->
         <section id="section-history" class="content-section hidden">
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fa-solid fa-clock-rotate-left"></i> সম্পন্নকৃত ক্লাসের ইতিহাস ও রেকর্ড</h3>
+          <div class="interactive-card">
+            <div class="ic-header">
+              <h3><i class="fa-solid fa-clock-rotate-left text-primary"></i> সম্পন্নকৃত ক্লাসের ডিজিটাল রেকর্ড ও ইতিহাস</h3>
             </div>
-            <div class="routine-table-container mt-4">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>তারিখ</th>
-                    <th>বিষয় ও অধ্যায়</th>
-                    <th>শ্রেণি</th>
-                    <th>উপস্থিতি</th>
-                    <th>শিক্ষকের মন্তব্য</th>
-                  </tr>
-                </thead>
-                <tbody id="history-table-body">
-                  <!-- Rendered via JS -->
-                </tbody>
-              </table>
+            <div class="history-cards-grid mt-6" id="history-cards-container">
+              <!-- Rendered via JS -->
             </div>
           </div>
         </section>
 
-        <!-- SECTION 9: ALERTS -->
+        <!-- SECTION 9: ALERTS & NOTICES -->
         <section id="section-alerts" class="content-section hidden">
-          <div class="card">
-            <div class="card-header">
-              <h3><i class="fa-solid fa-triangle-exclamation text-red"></i> জরুরি সতর্কতা ও শিক্ষকের করণীয় তালিকা</h3>
+          <div class="interactive-card">
+            <div class="ic-header">
+              <h3><i class="fa-solid fa-bell text-danger"></i> জরুরি সতর্কতা ও ডাইনামিক নোটিশ কার্ড</h3>
             </div>
-            <div class="alerts-list mt-4" id="alerts-container">
+            <div class="alerts-list mt-6" id="alerts-container">
               <!-- Rendered via JS -->
             </div>
           </div>
@@ -379,11 +400,11 @@
 
         <!-- SECTION 10: SETTINGS -->
         <section id="section-settings" class="content-section hidden">
-          <div class="card max-w-2xl">
-            <div class="card-header">
-              <h3><i class="fa-solid fa-gear"></i> সিস্টেম কনফিগারেশন</h3>
+          <div class="interactive-card max-w-2xl">
+            <div class="ic-header">
+              <h3><i class="fa-solid fa-gear text-primary"></i> শ্রেণিকক্ষ ও শিক্ষক কনফিগারেশন সেটিংস</h3>
             </div>
-            <form onsubmit="saveSettings(event)" class="settings-form mt-4">
+            <form onsubmit="saveSettings(event)" class="settings-form mt-6">
               <div class="form-group">
                 <label>বিদ্যালয়ের নাম</label>
                 <input type="text" id="cfg-school-name" class="form-input">
@@ -396,7 +417,7 @@
                 <label>দায়িত্বপ্রাপ্ত শ্রেণি ও শাখা</label>
                 <input type="text" id="cfg-class-name" class="form-input">
               </div>
-              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন</button>
+              <button type="submit" class="btn btn-primary mt-4"><i class="fa-solid fa-floppy-disk"></i> সেটিং সংরক্ষণ করুন</button>
             </form>
           </div>
         </section>
@@ -405,13 +426,16 @@
     </main>
   </div>
 
-  <!-- Add Routine Modal -->
+  <!-- ADD ROUTINE MODAL -->
   <div class="modal-backdrop hidden" id="routine-modal">
-    <div class="modal-box">
-      <h3>নতুন পিরিয়ড যোগ করুন</h3>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-calendar-plus text-primary"></i> নতুন পিরিয়ড যোগ করুন</h3>
+        <button class="close-btn" onclick="closeRoutineModal()">&times;</button>
+      </div>
       <form onsubmit="saveRoutineModal(event)" class="mt-4">
         <div class="form-group">
-          <label>বার</label>
+          <label>বার বেছে নিন</label>
           <select id="m-day" class="form-input">
             <option value="রবিবার">রবিবার</option>
             <option value="সোমবার">সোমবার</option>
@@ -422,10 +446,10 @@
         </div>
         <div class="form-group">
           <label>বিষয়</label>
-          <input type="text" id="m-subject" class="form-input" required>
+          <input type="text" id="m-subject" class="form-input" placeholder="যেমন: গণিত" required>
         </div>
         <div class="form-group">
-          <label>সময়</label>
+          <label>সময়কাল</label>
           <input type="text" id="m-time" class="form-input" placeholder="১০:০০ - ১০:৪৫ AM" required>
         </div>
         <div class="form-group">
@@ -434,11 +458,99 @@
         </div>
         <div class="form-group">
           <label>অধ্যায়/বিষয়বস্তু</label>
-          <input type="text" id="m-topic" class="form-input" placeholder="পাঠ ২.১">
+          <input type="text" id="m-topic" class="form-input" placeholder="যেমন: অধ্যায় ৩ - বীজগণিত">
         </div>
-        <div class="modal-actions mt-4">
-          <button type="button" class="btn btn-danger" onclick="closeRoutineModal()">বাতিল</button>
-          <button type="submit" class="btn btn-success">সংরক্ষণ করুন</button>
+        <div class="modal-actions mt-6">
+          <button type="button" class="btn btn-outline" onclick="closeRoutineModal()">বাতিল</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> কার্ড যোগ করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD SYLLABUS MODAL -->
+  <div class="modal-backdrop hidden" id="syllabus-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-book-bookmark text-purple"></i> নতুন সিলেবাস টার্গেট যোগ</h3>
+        <button class="close-btn" onclick="closeSyllabusModal()">&times;</button>
+      </div>
+      <form onsubmit="saveSyllabusModal(event)" class="mt-4">
+        <div class="form-group">
+          <label>সময়সীমা</label>
+          <select id="ms-timeframe" class="form-input">
+            <option value="today">প্রতিদিনের সিলেবাস</option>
+            <option value="1week">আগামী ১ সপ্তাহ</option>
+            <option value="15days">আগামী ১৫ দিন</option>
+            <option value="1month">আগামী ১ মাস</option>
+            <option value="3months">আগামী ৩ মাস</option>
+            <option value="6months">আগামী ৬ মাস</option>
+            <option value="9months">আগামী ৯ মাস</option>
+            <option value="12months">আগামী ১২ মাস (১ বছর)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>বিষয়</label>
+          <input type="text" id="ms-subject" class="form-input" placeholder="যেমন: বিজ্ঞান" required>
+        </div>
+        <div class="form-group">
+          <label>অধ্যায় / টপিক</label>
+          <input type="text" id="ms-chapter" class="form-input" placeholder="যেমন: অধ্যায় ৪: পরিবেশ" required>
+        </div>
+        <div class="form-group">
+          <label>শিখন লক্ষ্য</label>
+          <input type="text" id="ms-target" class="form-input" placeholder="কুইজ কভার করা হবে">
+        </div>
+        <div class="modal-actions mt-6">
+          <button type="button" class="btn btn-outline" onclick="closeSyllabusModal()">বাতিল</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> সেভ করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD EXAM MODAL -->
+  <div class="modal-backdrop hidden" id="exam-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bullseye text-warning"></i> নতুন পরীক্ষা রুটিন কার্ড</h3>
+        <button class="close-btn" onclick="closeExamModal()">&times;</button>
+      </div>
+      <form onsubmit="saveExamModal(event)" class="mt-4">
+        <div class="form-group">
+          <label>পরীক্ষার ধরন</label>
+          <select id="me-type" class="form-input">
+            <option value="ক্লাস টেস্ট">ক্লাস টেস্ট</option>
+            <option value="সাপ্তাহিক টেস্ট">সাপ্তাহিক টেস্ট</option>
+            <option value="মাসিক টেস্ট">মাসিক টেস্ট</option>
+            <option value="ত্রৈমাসিক টেস্ট">ত্রৈমাসিক টেস্ট</option>
+            <option value="অর্ধবার্ষিকী">অর্ধবার্ষিকী</option>
+            <option value="বার্ষিকী">বার্ষিকী</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>বিষয়</label>
+          <input type="text" id="me-subject" class="form-input" placeholder="যেমন: ইংরেজি" required>
+        </div>
+        <div class="form-group">
+          <label>তারিখ</label>
+          <input type="date" id="me-date" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label>সময়</label>
+          <input type="text" id="me-time" class="form-input" placeholder="১০:০০ AM">
+        </div>
+        <div class="form-group">
+          <label>পূর্ণমান</label>
+          <input type="number" id="me-marks" class="form-input" value="২০">
+        </div>
+        <div class="form-group">
+          <label>সিলেবাস কভারেজ</label>
+          <input type="text" id="me-coverage" class="form-input" placeholder="অধ্যায় ১ ও ২">
+        </div>
+        <div class="modal-actions mt-6">
+          <button type="button" class="btn btn-outline" onclick="closeExamModal()">বাতিল</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> পরীক্ষা কার্ড যোগ</button>
         </div>
       </form>
     </div>
