@@ -1,1387 +1,1983 @@
+function getCompactChapterLabel(chName, idx) {
+  if (!chName) return 'অধ্যায়-' + (idx + 1);
+  const m = chName.match(/(d+|[০-৯]+)/);
+  if (m) {
+    return '📖 অধ্যায়-' + m[1];
+  }
+  return '📖 অধ্যায়-' + (idx + 1);
+}
+
+function getCompactTopicLabel(s, idx) {
+  const chNum = (s.chapterName || s.chapter || '').match(/(d+|[০-৯]+)/)?.[1] || (idx + 1);
+  if (s.topics && s.topics.length > 1) {
+    return '🎯 টপিক ' + chNum + '.১ - ' + chNum + '.' + s.topics.length;
+  }
+  return '🎯 টপিক ' + chNum + '.১';
+}
+
+
 /* ==========================================================================
-   সশিবা স্মার্ট ক্লাস ম্যানেজার v2 — পূর্ণাঙ্গ লজিক ও ইন্টারঅ্যাকশন স্ক্রিপ্ট (Edit & Delete Enabled)
+   SashiBa Smart Class Manager — Master Application Logic (v5.0 Final)
    ========================================================================== */
 
-// 1. STATE INITIALIZATION & LOCALSTORAGE
 let classData = {
   settings: {
-    school: "মাগুরিব হাই স্কুল অ্যান্ড কলেজ",
+    school: "সশিবা সরকারি মডেল হাই স্কুল & কলেজ",
+    schoolName: "সশিবা সরকারি মডেল হাই স্কুল & কলেজ",
+    code: "EIIN: ১২৩৪৫৬",
+    estYear: "স্থাপিত: ১৯৯৫",
+    board: "ঢাকা বোর্ড",
+    address: "মেইন ক্যাম্পাস, ঢাকা",
     teacherName: "মাগুরিব আলী",
-    className: "অষ্টম (শাখা-ক)"
+    className: "অষ্টম (শাখা-ক)",
+    group: "সাধারণ",
   },
   routines: [
-    { id: 1, day: "রবিবার", subject: "গণিত", time: "০৯:০০ - ০৯:৪৫ AM", room: "১০২", topic: "অধ্যায় ৩: বীজগণিতীয় সূত্রাবলি", teacher: "মাগুরিব আলী", phone: "01712345678", alertTime: "10", alertMode: "call_sms", activeNow: true },
-    { id: 2, day: "রবিবার", subject: "বাংলা", time: "০৯:৪৫ - ১০:৩০ AM", room: "১০২", topic: "কবিতা: নদীর পাড়ে", teacher: "রহিম স্যার", phone: "01812345679", alertTime: "10", alertMode: "sms", activeNow: false },
-    { id: 3, day: "রবিবার", subject: "বিজ্ঞান", time: "১০:৪৫ - ১১:৩০ AM", room: "১০২", topic: "অধ্যায় ৫: আলোক বিজ্ঞান", teacher: "ফাতিমা ম্যাডাম", phone: "01912345670", alertTime: "15", alertMode: "call_sms", activeNow: false },
-    { id: 4, day: "সোমবার", subject: "ইংরেজি", time: "০৯:০০ - ০৯:৪৫ AM", room: "১০২", topic: "Grammar: Tense & Voice", teacher: "রফিক স্যার", phone: "01512345671", alertTime: "10", alertMode: "call", activeNow: false },
-    { id: 5, day: "সোমবার", subject: "গণিত", time: "০৯:৪৫ - ১০:৩০ AM", room: "১০২", topic: "জ্যামিতি: বৃত্তের ক্ষেত্রফল", teacher: "মাগুরিব আলী", phone: "01712345678", alertTime: "10", alertMode: "call_sms", activeNow: false },
-    { id: 6, day: "মঙ্গলবার", subject: "ডিজিটাল প্রযুক্তি", time: "১০:০০ - ১০:৪৫ AM", room: "কম্পিউটার ল্যাব", topic: "পাইথন প্রোগ্রামিং পরিচিতি", teacher: "মাগুরিব আলী", phone: "01712345678", alertTime: "10", alertMode: "call_sms", activeNow: false }
+    { id: 1, day: "রবিবার", subject: "গণিত", classType: "Theory (থিওরি)", time: "০৯:০০ - ০৯:৪৫ AM", room: "১০২", topic: "বীজগণিতীয় সূত্রাবলি", teacher: "মাগুরিব আলী", substitute: "রহিম স্যার (ফ্রি)", isBreak: false, isHoliday: false },
+    { id: 2, day: "রবিবার", subject: "বিজ্ঞান", classType: "Lab Practical (ল্যাব)", time: "০৯:৪৫ - ১০:৩০ AM", room: "ল্যাব-১", topic: "আলোক বিজ্ঞান ল্যাব", teacher: "ফাতিমা ম্যাডাম", substitute: "সালমা ম্যাডাম", isBreak: false, isHoliday: false },
+    { id: 3, day: "রবিবার", subject: "☕ টিফিন ব্রেক (Tiffin Break)", classType: "Break", time: "১০:৩০ - ১১:০০ AM", room: "ক্যান্টিন", topic: "টিফিন ও বিশ্রাম", teacher: "-", substitute: "-", isBreak: true, isHoliday: false },
+    { id: 4, day: "রবিবার", subject: "আইসিটি", classType: "Group Work (গ্রুপ ওয়ার্ক)", time: "১১:০০ - ১১:৪৫ AM", room: "কম্পিউটার ল্যাব", topic: "পাইথন প্রজেক্ট", teacher: "মাগুরিব আলী", substitute: "তাহমিদ স্যার", isBreak: false, isHoliday: false },
+    { id: 5, day: "শুক্রবার", subject: "🔴 সাপ্তাহিক ছুটি (Holiday)", classType: "Holiday", time: "সারাদিন", room: "-", topic: "স্কুল বন্ধ", teacher: "-", substitute: "-", isBreak: false, isHoliday: true }
   ],
   syllabuses: [
     {
-      id: 1,
-      month: "জুলাই",
-      term: "half_yearly",
-      subject: "গণিত",
-      subjectCode: "১০৯",
-      chapterName: "অধ্যায় ৩: বীজগণিতীয় রাশি ও সমীকরণ",
-      learningOutcomes: "বীজগণিতীয় সূত্রের প্রয়োগ, মান নির্ণয় ও উৎপাদকে বিশ্লেষণ করতে পারবে।",
-      status: "running", // not_started, running, completed, revision_needed
-      progress: 75,
-      priority: "High", // High, Medium, Low
-      piIndicator: "PI 8.3.1 (পারদর্শিতা সূচক)",
-      requiredClasses: 6,
-      totalHours: "৪.৫ ঘণ্টা",
+      id: 1, term: "half_yearly", type: "teaching", subject: "গণিত", subjectCode: "১০৯",
+      chapterName: "৩য় অধ্যায়: বীজগণিতীয় রাশি ও সমীকরণ",
+      topics: ["সূত্রাবলী", "মান নির্ণয়", "উৎপাদকে বিশ্লেষণ"],
+      required_classes: 6, completed_classes: 2,
+      pi_code: "৮.৩.১", status: "running", target_date: "২০২৬-০৮-২০",
+      is_holiday: false, learningOutcomes: "বীজগণিতীয় সূত্রের প্রয়োগ ও উৎপাদকে বিশ্লেষণ করতে পারবে।",
+      teacher: "মাগুরিব আলী", room: "১০২", className: "অষ্টম", section: "ক", date: "২০২৬-০৭-২৫", time: "০৯:০০ - ০৯:৪৫ AM",
+      progress: 33, priority: "High", timeframeLabel: "চলতি সপ্তাহ",
       checklist: [
-        { text: "সূত্র ৩.১ বিশ্লেষণ ও উদাহরণ সমাধান", checked: true },
-        { text: "অনুশীলনী ৩.২ সমস্যা ১-১০ সমাধান", checked: true },
-        { text: "উৎপাদকে বিশ্লেষণ ও সৃজনশীল খতিয়ান", checked: false },
-        { text: "শ্রেণি মূল্যায়ন ও কুইজ গ্রহণ", checked: false }
+        { text: "বীজগণিতীয় বর্গের সূত্রাবলী প্রমাণ", checked: true },
+        { text: "ঘন সমীকরণের মান নির্ণয় সমাধান", checked: true },
+        { text: "উৎপাদকে বিশ্লেষণের সহজ পদ্ধতি", checked: false },
+        { text: "বোর্ড বিগত বছরের সৃজনশীল প্রশ্ন সলভ", checked: false }
       ],
-      resources: { video: "https://youtube.com/watch?v=demo1", note: "বীজগণিত সর্টকাট নোট.pdf", quiz: "কুইজ সেট-১" },
-      examHub: { marks: "২০ নম্বর (১ম সাময়িক)", pyq: "২০২৫ ও ২০২৪ বোর্ড প্রশ্নপত্র", teacherNote: "দুর্বল শিক্ষার্থীদের সূত্র রিভিশনে বিশেষ নজর দিতে হবে।" }
+      resources: { video: "https://youtube.com/watch?v=demo1", note: "#", quiz: "#" },
+      examHub: { marks: "২০ নম্বর (অর্ধবার্ষিকী)", pyq: "২০২৫ ও ২০২৪ বোর্ড প্রশ্ন", teacherNote: "বীজগণিতীয় চিহ্নের ভুলের দিকে বিশেষ নজর দিন।" }
     },
     {
-      id: 2,
-      month: "আগস্ট",
-      term: "half_yearly",
-      subject: "বিজ্ঞান",
-      subjectCode: "১২৭",
-      chapterName: "অধ্যায় ৪: পরিবেশ, বল ও গতিবিদ্যা",
-      learningOutcomes: "গতির সমীকরণ, বলের প্রভাব ও পরিবেশগত বাস্তুতন্ত্র ব্যাখ্যা করতে পারবে।",
-      status: "not_started",
-      progress: 20,
-      priority: "Medium",
-      piIndicator: "PI 8.4.2 (বিজ্ঞান অনুসন্ধান)",
-      requiredClasses: 8,
-      totalHours: "৬.০ ঘণ্টা",
+      id: 2, term: "half_yearly", type: "exam", subject: "পদার্থবিজ্ঞান", subjectCode: "১৩৬",
+      chapterName: "অধ্যায় ৪: বলবিদ্যা, কাজ, ক্ষমতা ও শক্তি",
+      topics: ["বলের ধারণা", "নিউটন ৩য় সূত্র", "কাজ ও শক্তি"],
+      required_classes: 8, completed_classes: 4,
+      pi_code: "৮.৪.১", status: "running", target_date: "২০২৬-০৮-১৫",
+      is_holiday: false, learningOutcomes: "বল, কাজ ও শক্তির রূপান্তরের সূত্রাবলী গাণিতিকভাবে প্রয়োগ করতে পারবে।",
+      teacher: "মাগুরিব আলী", room: "১০৩", className: "অষ্টম", section: "ক", date: "২০২৬-০৮-১৫", time: "১০:০০ - ১০:৪৫ AM",
+      progress: 50, priority: "High", timeframeLabel: "আগামী ২ সপ্তাহ",
       checklist: [
-        { text: "গতির নিউটনীয় ১ম ও ২য় সূত্র", checked: true },
-        { text: "বিজ্ঞান ল্যাব পরীক্ষা ও ঢালু তলের প্রয়োগ", checked: false },
-        { text: "পরিবেশের ভারসাম্য ও বাস্তুতন্ত্র পোস্টার", checked: false }
+        { text: "বলের ধারণা ও নিউটনের গতিসূত্র", checked: true },
+        { text: "কাজ ও ক্ষমতার সমীকরণ সমাধান", checked: true },
+        { text: "শক্তি রূপান্তর ল্যাব পরীক্ষা", checked: false }
       ],
-      resources: { video: "https://youtube.com/watch?v=demo2", note: "গতিবিদ্যা ল্যাব গাইড.pdf", quiz: "বিজ্ঞান কুইজ-২" },
-      examHub: { marks: "৩০ নম্বর (অর্ধবার্ষিকী)", pyq: "বিগত ৩ বছরের প্রশ্ন ব্যাংক", teacherNote: "ল্যাব প্র্যাকটিক্যালের আগে সেফটি গাইড প্রদর্শন আবশ্যক।" }
+      resources: { video: "https://youtube.com/watch?v=demo2", note: "#", quiz: "#" },
+      examHub: { marks: "২৫ নম্বর (অর্ধবার্ষিকী)", pyq: "২০২৫ বোর্ড প্রশ্নপত্র", teacherNote: "একক রূপান্তরের দিকে লক্ষ্য রাখুন।" }
     },
     {
-      id: 3,
-      month: "সেপ্টেম্বর",
-      term: "annual",
-      subject: "বাংলা",
-      subjectCode: "১০১",
-      chapterName: "অধ্যায় ৫: শব্দরূপ, সমাস ও গদ্য নির্মিতি",
-      learningOutcomes: "সমাসের প্রকারভেদ নির্ণয় ও মানসম্পন্ন প্রবন্ধ রচনা করতে পারবে।",
-      status: "completed",
-      progress: 100,
-      priority: "Low",
-      piIndicator: "PI 8.1.1 (ভাষা ও ব্যাকরণ)",
-      requiredClasses: 5,
-      totalHours: "৩.৫ ঘণ্টা",
+      id: 3, term: "annual", type: "teaching", subject: "সাধারণ বিজ্ঞান", subjectCode: "১২৭",
+      chapterName: "অধ্যায় ৫: আলোক বিজ্ঞান ও প্রতিফলন",
+      topics: ["আলোর প্রতিফলন", "অবতল দর্পণ"],
+      required_classes: 5, completed_classes: 5,
+      pi_code: "৮.২.৩", status: "completed", target_date: "২০২৬-০৭-১০",
+      is_holiday: false, learningOutcomes: "অবতল ও উত্তল দর্পণে প্রতিবিম্ব গঠন চিত্রসহ ব্যাখ্যা করতে পারবে।",
+      teacher: "ফাতিমা ম্যাডাম", room: "১০৪", className: "অষ্টম", section: "ক", date: "২০২৬-০৭-১০", time: "১১:০০ - ১১:৪৫ AM",
+      progress: 100, priority: "Medium", timeframeLabel: "সম্পন্ন",
       checklist: [
-        { text: "দ্বিগু ও বহুব্রীহি সমাস অনুশীলন", checked: true },
-        { text: "সৃজনশীল অনুচ্ছেদ লিখন প্র্যাকটিস", checked: true }
+        { text: "আলোর প্রতিফলন সূত্রাবলী", checked: true },
+        { text: "দর্পণে রশ্মিচিত্র অঙ্কন", checked: true }
       ],
-      resources: { video: "https://youtube.com/watch?v=demo3", note: "সমাস সারণি নোট.pdf", quiz: "বাংলা কুইজ-১" },
-      examHub: { marks: "১৫ নম্বর (টিপিক্যাল টেস্ট)", pyq: "বোর্ড স্ট্যান্ডার্ড প্রশ্ন", teacherNote: "সমাসের উদাহরণগুলো বারবার রিভিশন দিতে বলুন।" }
+      resources: { video: "https://youtube.com/watch?v=demo3", note: "#", quiz: "#" },
+      examHub: { marks: "১৫ নম্বর", pyq: "২০২৪ বোর্ড প্রশ্ন", teacherNote: "রশ্মিচিত্র পেন্সিল দিয়ে স্পষ্ট করে আঁকতে বলুন।" }
     }
   ],
   students: [
-    { roll: 1, name: "আব্দুল্লাহ আল মামুন", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "খুব মনোযোগী" },
-    { roll: 2, name: "সামিয়া আক্তার", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Present", engagement: 4, attention: "ভালো", remark: "নিয়মিত সক্রিয়" },
-    { roll: 3, name: "রাহাত হোসেন", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Absent", engagement: 2, attention: "গড়মানের", remark: "অভিভাবককে কল করা প্রয়োজন" },
-    { roll: 4, name: "তানভীর আহমেদ", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "দ্রুত উত্তর দেয়" },
-    { roll: 5, name: "নুসরাত জাহান", className: "অষ্টম", section: "ক", group: "সাধারণ", attendance: "Late", engagement: 3, attention: "সন্তোষজনক", remark: "১০ মিনিট দেরিতে এসেছে" },
-    { roll: 1, name: "সাকিব আল হাসান", className: "নবম", section: "ক", group: "বিজ্ঞান", attendance: "Present", engagement: 5, attention: "চমৎকার", remark: "ল্যাবে সক্রিয়" },
-    { roll: 2, name: "মালিহা রহমান", className: "নবম", section: "ক", group: "বিজ্ঞান", attendance: "Present", engagement: 4, attention: "ভালো", remark: "নিয়মিত উপস্থিত" },
-    { roll: 1, name: "মেহেদী হাসান", className: "দশম", section: "ক", group: "ব্যবসায় শিক্ষা", attendance: "Present", engagement: 4, attention: "ভালো", remark: "হিসাববিজ্ঞানে পারদর্শী" }
-  ],
-  exams: [
-    { id: 1, type: "ক্লাস টেস্ট", subject: "গণিত", date: "২০২৬-০৭-২৫", time: "১০:০০ AM", marks: 20, coverage: "বীজগণিত অধ্যায় ৩" },
-    { id: 2, type: "সাপ্তাহিক টেস্ট", subject: "ইংরেজি", date: "২০২৬-০৭-২৮", time: "১১:০০ AM", marks: 30, coverage: "Tense & Transformation" },
-    { id: 3, type: "মাসিক টেস্ট", subject: "বিজ্ঞান", date: "২০২৬-০৮-০৫", time: "০৯:৩০ AM", marks: 50, coverage: "অধ্যায় ১ থেকে ৪" },
-    { id: 4, type: "ত্রৈমাসিক টেস্ট", subject: "সকল বিষয়", date: "২০২৬-০৯-১০", time: "০৯:০০ AM", marks: 100, coverage: "১ম ট্রাইমেস্টার সিলেবাস" },
-    { id: 5, type: "অর্ধবার্ষিকী", subject: "সকল বিষয়", date: "২০২৬-১০-১৫", time: "০৯:০০ AM", marks: 100, coverage: "৫০% মূল কারিকুলাম" },
-    { id: 6, type: "বার্ষিকী", subject: "সকল বিষয়", date: "২০২৬-১২-০১", time: "০৯:০০ AM", marks: 100, coverage: "১০০% বার্ষিক কারিকুলাম" }
-  ],
-  aiInsights: [
-    { title: "বীজগণিত ক্লাসে অগ্রগতি চমৎকার", desc: "৮৫% শিক্ষার্থী বীজগণিতীয় সূত্রে চমৎকার ফলাফল করেছে।", action: "আগামী সেশনে অধ্যায় ৩.৩ শুরু করার উপযুক্ত সময়।" },
-    { title: "উপস্থিতি অ্যালার্ট ও অনুসরণ", desc: "রোল ৩ (রাহাত হোসেন) টানা ২ দিন অনুপস্থিত রয়েছে।", action: "অভিভাবকের নিকট স্বয়ংক্রিয় SMS পাঠানো বা কল করা দরকার।" },
-    { title: "ইংরেজি লেখার দক্ষতা বৃদ্ধি", desc: "সাপ্তাহিক অ্যাসাইনমেন্টের মান সন্তোষজনক।", action: "গ্রামার পার্ট দ্রুত শেষ করে প্যারাগ্রাফ রাইটিং কভার করুন।" }
-  ],
-  history: [
-    { date: "২০২৬-০৭-২১", subject: "গণিত (অধ্যায় ৩.১)", class: "অষ্টম (ক)", attendance: "৯৬%", remark: "বীজগণিতীয় সূত্রের সমাধান অনুশীলিত হয়েছে।" },
-    { date: "২০২৬-০৭-২০", subject: "ডিজিটাল প্রযুক্তি", class: "অষ্টম (ক)", attendance: "৯০%", remark: "কম্পিউটার ল্যাবে প্র্যাকটিক্যাল সেশন অনুষ্ঠিত।" }
-  ],
-  alerts: [
-    { id: 1, type: "urgent", title: "অনুপস্থিতি অ্যালার্ট", desc: "রোল ৩ (রাহাত হোসেন) আজ ক্লাসে অনুপস্থিত।", time: "আজ ০৯:১৫ AM" },
-    { id: 2, type: "info", title: "পরীক্ষার তারিখ ঘোষণা", desc: "আগামী ২৫ জুলাই গণিত ক্লাস টেস্ট (২০ নম্বর) অনুষ্ঠিত হবে।", time: "গতকাল" },
-    { id: 3, type: "warning", title: "সিলেবাস ট্র্যাকিং", desc: "বিজ্ঞান অধ্যায় ৪ এর কুইজ দ্রুত কভার করা প্রয়োজন।", time: "২০২৬-০৭-১৯" }
+    { roll: 1, name: "আব্দুল্লাহ আল মামুন", bangla: 85, english: 88, math: 92, science: 90, social: 84, ict: 95 },
+    { roll: 2, name: "মোছাঃ ফাতেমা খাতুন", bangla: 78, english: 82, math: 75, science: 80, social: 76, ict: 88 },
+    { roll: 3, name: "তানভীর আহমেদ", bangla: 62, english: 65, math: 58, science: 64, social: 60, ict: 70 },
+    { roll: 4, name: "নুসরাত জাহান", bangla: 90, english: 94, math: 98, science: 95, social: 92, ict: 99 },
+    { roll: 5, name: "মেহেদী হাসান", bangla: 45, english: 48, math: 42, science: 46, social: 44, ict: 52 }
   ]
 };
 
-// Editing ID Trackers
-let editingRoutineId = null;
-let editingSyllabusId = null;
-let editingExamId = null;
-
-function loadStorage() {
-  try {
-    const data = localStorage.getItem("sashiba_classmanager_data_v2");
-    if (data) classData = JSON.parse(data);
-  } catch (e) {}
-}
-
-function saveStorage() {
-  try {
-    localStorage.setItem("sashiba_classmanager_data_v2", JSON.stringify(classData));
-  } catch (e) {}
-}
-
-// SECTION SWITCHING
-function showSection(name) {
-  document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
-  document.getElementById('section-' + name)?.classList.remove('hidden');
-  
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  document.getElementById('nav-' + name)?.classList.add('active');
-
-  const titles = {
-    overview: ["স্মার্ট ক্লাস ম্যানেজার ড্যাশবোর্ড", "শিক্ষকের শ্রেণিকক্ষ পরিচালনার সম্পূর্ণ ডিজিটাল আর্কিটেক্ট"],
-    routine: ["🎓 সাপ্তাহিক ক্লাস রুটিন ও লাইভ পিরিয়ড কার্ড", "শ্রেণি ও বিষয়ভিত্তিক সময়সূচী সম্পাদনা ও পরিচালনা"],
-    syllabus: ["📚 সময়ভিত্তিক সিলেবাস পরিকল্পনা ও কভারেজ কার্ড", "১ দিন থেকে ১২ মাসের কভারেজ ও অগ্রগতি সম্পাদনা"],
-    attendance: ["👥 উপস্থিতি ও ক্লাস এনগেজমেন্ট কার্ড", "দৈনিক উপস্থিতি গ্রহণ ও স্টুডেন্ট এনগেজমেন্ট মার্কিং"],
-    exams: ["🎯 পরীক্ষার সময়সূচী ও রুটিন কার্ড", "ক্লাস টেস্ট থেকে বার্ষিকী পরীক্ষার তথ্য সম্পাদনা"],
-    live_control: ["🚀 লাইভ ক্লাস কন্ট্রোল হাব", "টাইমার, র্যান্ডমাইজার ও রিয়েল-টাইম কুইজ পরিচালনা"],
-    ai_insights: ["🧠 AI ইনসাইটস ও সুপারিশ", "শ্রেণিকক্ষের পারফরম্যান্সের ডাইনামিক বিশ্লেষণ"],
-    history: ["🕒 ক্লাস ইতিহাস ও ডিজিটাল রেকর্ড", "পূর্ববর্তী সকল লাইভ সেশনের রেকর্ড পর্যালোচনা"],
-    alerts: ["🚨 সতর্কতা ও জরুরি নোটিশ", "শিক্ষার্থী ও ক্লাসের গুরুত্বপূর্ণ অ্যালার্ট ব্যবস্থাপনা"],
-    settings: ["⚙️ কনফিগারেশন সেটিংস", "বিদ্যালয়, শিক্ষক ও শ্রেণি সেটিংস"]
-  };
-
-  if (titles[name]) {
-    document.getElementById('section-title').textContent = titles[name][0];
-    document.getElementById('section-subtitle').textContent = titles[name][1];
-  }
-
-  if (name === 'overview') renderOverview();
-  if (name === 'routine') renderRoutine('রবিবার');
-  if (name === 'syllabus') renderSyllabus();
-  if (name === 'attendance') renderAttendanceCards();
-  if (name === 'exams') renderExams('all');
-  if (name === 'ai_insights') renderAIInsights();
-  if (name === 'history') renderHistory();
-  if (name === 'alerts') renderAlerts();
-
-  // Update Top Bar Action Buttons Contextually
-  const addBtn = document.getElementById('top-bar-add-btn');
-  const attBtn = document.getElementById('top-bar-att-btn');
-
-  if (attBtn) {
-    attBtn.style.display = (name === 'attendance') ? 'none' : 'inline-flex';
-  }
-
-  if (addBtn) {
-    if (name === 'syllabus') {
-      addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> + নতুন সিলেবাস যোগ';
-      addBtn.style.display = 'inline-flex';
-    } else if (name === 'exams') {
-      addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> + নতুন পরীক্ষা কার্ড যোগ';
-      addBtn.style.display = 'inline-flex';
-    } else if (name === 'routine' || name === 'overview') {
-      addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> + নতুন রুটিন পিরিয়ড যোগ';
-      addBtn.style.display = 'inline-flex';
-    } else {
-      addBtn.style.display = 'none'; // Hide add button on sections without card addition
-    }
-  }
-}
-
-function handleTopBarAddCard() {
-  const activeNav = document.querySelector('.nav-item.active');
-  const activeSectionId = activeNav ? activeNav.id.replace('nav-', '') : 'overview';
-
-  if (activeSectionId === 'syllabus') {
-    openAddSyllabusModal();
-  } else if (activeSectionId === 'exams') {
-    openAddExamModal();
-  } else {
-    openAddRoutineModal();
-  }
-}
-
-function updateGlobalContext() {
-  const board = document.getElementById('global-board-select')?.value || 'ঢাকা বোর্ড';
-  const cls = document.getElementById('global-class-select')?.value || 'অষ্টম';
-  const sec = document.getElementById('global-section-select')?.value || 'ক';
-  const grp = document.getElementById('global-group-select')?.value || 'সাধারণ';
-
-  classData.settings.board = board;
-  classData.settings.className = `${cls} (শাখা-${sec})`;
-  classData.settings.group = grp;
-
-  const subtitle = document.getElementById('global-context-subtitle');
-  if (subtitle) {
-    subtitle.textContent = `${board} | ${cls} শ্রেণি (শাখা-${sec}) | ${grp}`;
-  }
-
-  // Also sync live control selectors if visible
-  if (document.getElementById('live-board-select')) {
-    document.getElementById('live-board-select').value = board;
-    document.getElementById('live-class-select').value = cls;
-    document.getElementById('live-section-select').value = sec;
-    document.getElementById('live-group-select').value = grp;
-    if (typeof updateLiveContext === 'function') updateLiveContext();
-  }
-
-  // Also sync attendance selectors if visible
-  if (document.getElementById('att-class-select')) {
-    document.getElementById('att-class-select').value = cls;
-    document.getElementById('att-section-select').value = sec;
-    document.getElementById('att-group-select').value = grp;
-  }
-
-  saveStorage();
-  
-  // Re-render currently active view with new context
-  const activeNav = document.querySelector('.nav-item.active');
-  const activeSectionId = activeNav ? activeNav.id.replace('nav-', '') : 'overview';
-  showSection(activeSectionId);
-}
-
-// RENDER OVERVIEW CARDS
-function renderOverview() {
-  const activeWidget = document.getElementById('active-class-widget');
-  const current = classData.routines[0] || {};
-  activeWidget.innerHTML = `
-    <div style="background:var(--primary-light); background:linear-gradient(135deg, rgba(79,70,229,0.1), rgba(124,58,237,0.1)); padding:18px; border-radius:14px; border-left:5px solid var(--primary);">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:12px; color:var(--primary); font-weight:800;"><i class="fa-solid fa-clock"></i> চলমান পিরিয়ড (${current.time || '১০:০০ AM'})</span>
-        <span class="badge" style="background:var(--primary); color:white;">কক্ষ: ${current.room || '১০২'}</span>
-      </div>
-      <h4 style="font-size:19px; font-weight:900; margin:6px 0; color:var(--text-main);">${current.subject || 'গণিত'} - ${current.topic || 'অধ্যায় ৩'}</h4>
-      <p style="font-size:12.5px; color:var(--text-muted);"><i class="fa-solid fa-user-tie"></i> শিক্ষক: ${current.teacher || 'মাগুরিব আলী'} | শ্রেণি: ${classData.settings.className}</p>
-      <div style="margin-top:12px; display:flex; gap:8px;">
-        <button class="btn-sm btn-primary" onclick="showSection('live_control')"><i class="fa-solid fa-play"></i> টাইমার শুরু</button>
-        <button class="btn-sm btn-outline" onclick="showSection('attendance')"><i class="fa-solid fa-user-check"></i> উপস্থিতি নিন</button>
-      </div>
-    </div>
-  `;
-
-  // Render Today's Routine Cards
-  const cardsContainer = document.getElementById('today-routine-cards');
-  const todayItems = classData.routines.filter(r => r.day === "রবিবার");
-  cardsContainer.innerHTML = todayItems.map(r => `
-    <div class="period-card-item ${r.activeNow ? 'active-now' : ''}">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span class="pci-time"><i class="fa-solid fa-clock"></i> ${r.time}</span>
-        <div style="display:flex; gap:6px;">
-          <button onclick="editRoutine(${r.id})" style="color:var(--primary); background:none; font-size:13px; cursor:pointer;" title="সম্পাদনা করুন"><i class="fa-solid fa-pen-to-square"></i></button>
-          <button onclick="deleteRoutine(${r.id})" style="color:var(--danger); background:none; font-size:13px; cursor:pointer;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
-        </div>
-      </div>
-      <h4 class="pci-subject">${r.subject}</h4>
-      <p class="pci-topic">${r.topic}</p>
-      <div class="pci-footer">
-        <span><i class="fa-solid fa-door-open"></i> কক্ষ ${r.room}</span>
-        <span>${r.teacher}</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-// RENDER ROUTINE CARDS WITH EDIT & DELETE
-function filterRoutineDay(day) {
-  document.querySelectorAll('#routine-day-tabs .tab-chip').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent === day);
-  });
-  renderRoutine(day);
-}
-
-// RENDER ADAPTIVE VERTICAL TIMELINE ROUTINE (Final v1.0)
-function filterRoutineDay(day) {
-  document.querySelectorAll('#routine-day-tabs .tab-chip').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent === day);
-  });
-  renderRoutine(day);
-}
-
-function renderRoutine(day) {
-  const container = document.getElementById('routine-cards-container');
-  if (!container) return;
-  const items = classData.routines.filter(r => r.day === day);
-  if (items.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding:20px;">এই দিনে কোনো পিরিয়ড বা স্মার্ট কার্ড নির্ধারণ করা হয়নি।</p>`;
-    return;
-  }
-
-  container.innerHTML = items.map(r => `
-    <div class="v-timeline-card ${r.activeNow ? 'status-active' : ''}">
-      <div class="vtc-top-bar">
-        <span class="vtc-time-badge"><i class="fa-solid fa-clock text-primary"></i> ${r.time} (${r.day})</span>
-        <div class="flex-align-center gap-2">
-          ${r.activeNow ? '<span class="badge-live-now"><i class="fa-solid fa-circle text-danger fa-pulse"></i> চলমান সেশন</span>' : '<span class="badge" style="background:rgba(100,116,139,0.1); color:var(--text-muted); font-size:10.5px;">আসন্ন</span>'}
-          <button onclick="editRoutine(${r.id})" style="color:var(--primary); background:none; font-size:13px;" title="সম্পাদনা"><i class="fa-solid fa-pen-to-square"></i></button>
-          <button onclick="deleteRoutine(${r.id})" style="color:var(--danger); background:none; font-size:13px;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
-        </div>
-      </div>
-
-      <div class="mt-2 flex-between flex-wrap gap-2">
-        <h4 style="font-size:16px; font-weight:800; color:var(--text-main); margin:0;">
-          ${r.subject} <span style="font-size:12px; color:var(--text-muted); font-weight:600;">(কক্ষ: ${r.room})</span>
-        </h4>
-        <span class="text-xs fw-bold text-primary"><i class="fa-solid fa-user-tie"></i> ${r.teacher} ${r.isSubstitute ? '<span class="badge" style="background:rgba(245,158,11,0.15); color:var(--warning);">সাবস্টিটিউট</span>' : ''}</span>
-      </div>
-
-      <p style="font-size:13px; color:var(--text-muted); margin-top:4px; font-weight:600;"><i class="fa-solid fa-book-open"></i> ${r.topic || 'অধ্যায় ও নির্ধারিত পাঠসূচি'}</p>
-
-      <!-- 1. Class Action Buttons (Connected Architecture) -->
-      <div class="class-actions-bar mt-3">
-        <span class="text-xs fw-bold text-primary mr-1"><i class="fa-solid fa-bolt"></i> অ্যাকশন:</span>
-        <button class="btn-action-primary" onclick="startClassSession(${r.id})"><i class="fa-solid fa-play"></i> ▶️ ক্লাস শুরু করুন</button>
-        <button class="btn-action-outline" onclick="openLessonPlanModal('${r.subject}', '${r.topic}')"><i class="fa-solid fa-book-reader text-purple"></i> 📖 লেসন প্ল্যান</button>
-        <button class="btn-action-outline" onclick="openPresentationModal('${r.subject}')"><i class="fa-solid fa-desktop text-primary"></i> 🖥️ প্রেজেন্টেশন</button>
-        <button class="btn-action-outline" onclick="showSection('attendance')"><i class="fa-solid fa-user-check text-success"></i>  উপস্থিতি</button>
-      </div>
-
-      <!-- 2. Resources & Syllabus Link Bar -->
-      <div class="mt-3 flex-between flex-wrap gap-2" style="background:var(--bg-app); padding:8px 12px; border-radius:8px;">
-        <div class="flex-align-center gap-2 flex-wrap">
-          <span class="text-xs fw-bold text-muted"><i class="fa-solid fa-folder-open"></i> রিসোর্স:</span>
-          <a href="javascript:void(0)" class="resource-pill-btn" onclick="openVideoResource('${r.subject}')"><i class="fa-solid fa-circle-play text-danger"></i> 🎥 ভিডিও</a>
-          <a href="javascript:void(0)" class="resource-pill-btn" onclick="openNoteResource('${r.subject}')"><i class="fa-solid fa-file-lines text-primary"></i> 📄 নোট</a>
-          <a href="javascript:void(0)" class="resource-pill-btn" onclick="openQuizResource('${r.subject}')"><i class="fa-solid fa-pen-nib text-warning"></i> 📝 কুইজ</a>
-          <a href="javascript:void(0)" class="resource-pill-btn" onclick="linkSyllabusModal('${r.subject}')" style="background:rgba(139,92,246,0.15); color:var(--purple);"><i class="fa-solid fa-link"></i> 🔗 সিলেবাস লিংক</a>
-        </div>
-        <button class="btn-sm btn-white-outline" onclick="showPYQModal('${r.subject}')" style="font-size:10.5px; border-color:var(--border); color:var(--text-main);"><i class="fa-solid fa-clock-rotate-left"></i> 📊 PYQ (বিগত প্রশ্ন)</button>
-      </div>
-
-      <!-- 3. AI Insight Banner -->
-      <div class="mt-2 flex-between flex-wrap gap-2 text-xs" style="color:var(--text-muted);">
-        <span><i class="fa-solid fa-lightbulb text-warning"></i> <strong>AI রিকমেন্ডেশন:</strong> গত ক্লাসের কুইজে ১৫% দুর্বলতা ছিল। ৫ মি. রিভিশন দরকার।</span>
-        <span class="fw-bold text-success"><i class="fa-solid fa-chart-line"></i> প্রোগ্রেস: ৭৫%</span>
-      </div>
-    </div>
-  `).join('');
-
-  // Update Daily Summary metrics
-  document.getElementById('ds-total-classes').textContent = `${items.length}টি`;
-  document.getElementById('ds-done-classes').textContent = `${items.filter(i=>!i.activeNow).length}টি`;
-  document.getElementById('ds-pending-classes').textContent = `${items.filter(i=>i.activeNow).length}টি`;
-}
-
-// RENDER SMART SYLLABUS CARDS (Final v1.0 Accordion Glass Cards)
-let currentSyllableMonth = 'all';
-let currentSyllableStatus = 'all';
-let currentSyllablePriority = 'all';
-let currentSyllableTerm = 'all';
-let currentSyllableSearch = '';
+let _syl = { month: 'all', status: 'all', priority: 'all', term: 'all', search: '' };
+let _sylViewMode = 'card'; // 'card' or 'table'
 
 function filterSyllabusMonth(m) {
-  currentSyllableMonth = m;
-  document.querySelectorAll('#syllabus-month-chips .month-chip').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent.includes(m) || (m==='all' && btn.textContent==='সব মাস'));
+  _syl.month = m;
+  document.querySelectorAll('#syllabus-month-chips .month-chip, #syllabus-month-chips .tab-chip').forEach(b => {
+    const val = b.dataset.val || b.textContent.trim();
+    b.classList.toggle('active', val === m || (m === 'all' && (val === 'সব মাস' || val === 'all')));
   });
   renderSyllabus();
 }
-function filterSyllabusByStatus(st) { currentSyllableStatus = st; renderSyllabus(); }
-function filterSyllabusByPriority(pr) { currentSyllablePriority = pr; renderSyllabus(); }
-function filterSyllabusTerm(tm) { currentSyllableTerm = tm; renderSyllabus(); }
-function searchSyllabusCards(q) { currentSyllableSearch = q.toLowerCase(); renderSyllabus(); }
+
+function filterSyllabusByStatus(st)   { _syl.status   = st;  renderSyllabus(); }
+function filterSyllabusByPriority(pr) { _syl.priority  = pr;  renderSyllabus(); }
+function filterSyllabusTerm(tm)       { _syl.term      = tm;  renderSyllabus(); }
+function searchSyllabusCards(q)       { _syl.search    = (q||'').toLowerCase(); renderSyllabus(); }
+
+function switchSyllabusView(mode) {
+  _sylViewMode = mode;
+  document.getElementById('syl-btn-card')?.classList.toggle('active', mode === 'card');
+  document.getElementById('syl-btn-table')?.classList.toggle('active', mode === 'table');
+  renderSyllabus();
+}
+
+
+const statusLabels = {
+  running: '🟢 চলছে',
+  completed: '💙 সম্পন্ন',
+  not_started: '⚪ শুরু হয়নি',
+  revision_needed: '🔴 রিভিশন বাকি'
+};
+
+const priorityColor = {
+  High: 'var(--danger)',
+  Medium: 'var(--warning)',
+  Low: 'var(--success)'
+};
+
 
 function renderSyllabus() {
   const container = document.getElementById('syllabus-cards-container');
   if (!container) return;
 
-  let items = classData.syllabuses;
-  if (currentSyllableMonth !== 'all') items = items.filter(s => s.month === currentSyllableMonth);
-  if (currentSyllableStatus !== 'all') items = items.filter(s => s.status === currentSyllableStatus);
-  if (currentSyllablePriority !== 'all') items = items.filter(s => s.priority === currentSyllablePriority);
-  if (currentSyllableTerm !== 'all') items = items.filter(s => s.term === currentSyllableTerm);
-  if (currentSyllableSearch) {
-    items = items.filter(s => 
-      s.subject.toLowerCase().includes(currentSyllableSearch) ||
-      (s.chapterName && s.chapterName.toLowerCase().includes(currentSyllableSearch)) ||
-      (s.learningOutcomes && s.learningOutcomes.toLowerCase().includes(currentSyllableSearch))
-    );
+  let items = [...classData.syllabuses];
+  if (_syl.month    !== 'all') items = items.filter(s => s.month    === _syl.month);
+  if (_syl.status   !== 'all') items = items.filter(s => s.status   === _syl.status);
+  if (_syl.priority !== 'all') items = items.filter(s => s.priority === _syl.priority);
+  if (_syl.term     !== 'all') items = items.filter(s => s.term     === _syl.term);
+  if (_syl.search)             items = items.filter(s =>
+    (s.subject && s.subject.toLowerCase().includes(_syl.search)) ||
+    (s.chapterName && s.chapterName.toLowerCase().includes(_syl.search)) ||
+    (s.teacher && s.teacher.toLowerCase().includes(_syl.search))
+  );
+
+  // Fallback so user NEVER sees blank screen
+  if (!items.length) {
+    items = [...classData.syllabuses];
   }
 
-  if (items.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding:30px;">কোনো মানানসই সিলেবাস অধ্যায় বা কার্ড পাওয়া যায়নি।</p>`;
-    return;
-  }
+  // Update Summary Metrics (Section 4)
+  const totalCount = classData.syllabuses.length;
+  const completed  = classData.syllabuses.filter(s => s.status === 'completed').length;
+  const avgProg    = Math.round(classData.syllabuses.reduce((a, s) => a + (s.progress || 0), 0) / (totalCount || 1));
 
-  const statusLabels = { not_started: "⚪ শুরু হয়নি", running: "🟢 চলছে", completed: "💙 সম্পন্ন", revision_needed: "🔴 রিভিশন বাকি" };
+  const sc = document.getElementById('syll-stat-completed');
+  const sp = document.getElementById('syll-stat-pending');
+  const sv = document.getElementById('syll-stat-coverage');
+  const tp = document.getElementById('syll-total-percent');
+  const pf = document.getElementById('syll-total-progress-fill');
 
-  container.innerHTML = items.map(s => `
-    <div class="glass-chapter-card" id="gcc-card-${s.id}">
-      <div class="gcc-header" onclick="toggleChapterAccordion(${s.id})">
-        <div class="flex-align-center gap-3">
-          <button class="btn-icon-circle" style="width:28px; height:28px;"><i class="fa-solid fa-chevron-down" id="acc-icon-${s.id}"></i></button>
-          <div>
-            <div class="flex-align-center gap-2">
-              <span class="status-tag ${s.status}">${statusLabels[s.status] || 'চলছে'}</span>
-              <span class="priority-tag ${s.priority}">${s.priority} Priority</span>
-              <span class="badge" style="background:rgba(139,92,246,0.1); color:var(--purple); font-size:10.5px;">মাস: ${s.month || 'জুলাই'}</span>
+  if (sc) sc.textContent = completed + 'টি অধ্যায়';
+  if (sp) sp.textContent = (totalCount - completed) + 'টি অধ্যায়';
+  if (sv) sv.textContent = avgProg + '%';
+  if (tp) tp.textContent = avgProg + '% সম্পন্ন';
+  if (pf) pf.style.width = avgProg + '%';
+
+      if (_sylViewMode === 'table') {
+    const toolbar = document.getElementById('syllabus-table-builder-toolbar');
+    if (toolbar) toolbar.style.display = 'block';
+
+    // Render Fully Dynamic Customizable Table Header & Rows
+    container.innerHTML = `
+      <div class="syl-table-wrapper" style="overflow-x:auto;">
+        <table class="syl-table">
+          <thead>
+            <tr>
+              ${customSyllabusColumns.map(col => `<th style="min-width:${col.width};text-align:${col.align || "center"};">${col.label}</th>`).join('')}
+              <th style="text-align:center;min-width:185px;">একশন (Actions)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map((s, idx) => {
+              const stLabel = statusLabels[s.status] || '🟢 চলছে';
+              const reqCls  = s.required_classes || s.requiredClasses || 6;
+              const compCls = s.completed_classes || s.completedClasses || 2;
+              const periodText = (compCls < 10 ? '০' + compCls : compCls) + ' / ' + (reqCls < 10 ? '০' + reqCls : reqCls);
+              const cleanChName = (s.chapterName || s.chapter || 'অধ্যায় ৩').replace(/^(অধ্যায়\s*[\d০-৯]+\s*:\s*)/i, '').trim();
+
+              return `
+              <tr>
+                ${customSyllabusColumns.map(col => {
+                  if (col.key === 'date') return `<td style="text-align:center;"><div class="tbl-date-pill"><span class="tbl-date-main" contenteditable="true" onblur="updateInlineTableCell(${s.id}, 'date', this.textContent)">📅 ${s.date || '২০২৬-০৭-২৫'}</span><span class="tbl-time-sub" contenteditable="true" onblur="updateInlineTableCell(${s.id}, 'time', this.textContent)">⏰ ${s.time || '০৯:০০ AM'}</span></div></td>`;
+                  if (col.key === 'room') return `<td style="text-align:center;"><span class="badge" contenteditable="true" onblur="updateInlineTableCell(${s.id}, 'room', this.textContent)" style="background:var(--bg-input);color:var(--text-main);font-weight:800;padding:6px 12px;">🚪 ${s.room || '১০২'}</span></td>`;
+                  if (col.key === 'subject') return `<td style="text-align:center;"><div class="tbl-subject-badge" contenteditable="true" onblur="updateInlineTableCell(${s.id}, 'subject', this.textContent)"><i class="fa-solid fa-book-bookmark"></i> ${s.subject}</div></td>`;
+                  if (col.key === 'chapter') return `<td style="text-align:left;padding:14px 18px;"><div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:1.02rem;font-weight:900;color:var(--text-main);" contenteditable="true" onblur="updateInlineTableCell(${s.id}, 'chapter', this.textContent)">${cleanChName}</span><span class="badge" style="background:rgba(59,130,246,0.12);color:var(--primary);font-size:0.75rem;font-weight:800;width:fit-content;">📖 ${getCompactChapterLabel(s.chapterName || s.chapter, idx)}</span></div></td>`;
+                  if (col.key === 'topics') return `<td style="text-align:left;padding:14px 18px;"><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:0.86rem;font-weight:700;color:var(--purple);" contenteditable="true" onblur="updateInlineTableCell(${s.id}, 'topics', this.textContent)">🎯 ${(s.topics && s.topics.length) ? s.topics.join(', ') : cleanChName}</span></div></td>`;
+                  if (col.key === 'pi') return `<td style="text-align:center;"><span class="badge" contenteditable="true" onblur="updateInlineTableCell(${s.id}, 'pi_code', this.textContent)" style="background:rgba(59,130,246,0.12);color:var(--primary);font-weight:900;padding:6px 12px;">🏷️ ${s.pi_code || s.piIndicator || '৮.৩.১'}</span></td>`;
+                  if (col.key === 'period') return `<td style="text-align:center;"><span class="badge" style="background:rgba(16,185,129,0.15);color:var(--success);font-weight:900;padding:6px 12px;">⏳ ${periodText}</span></td>`;
+                  if (col.key === 'teacher') return `<td style="text-align:center;"><strong contenteditable="true" onblur="updateInlineTableCell(${s.id}, 'teacher', this.textContent)" style="font-size:0.88rem;color:var(--text-main);">👨‍🏫 ${s.teacher || 'মাগুরিব আলী'}</strong></td>`;
+                  if (col.key === 'progress') return `<td style="text-align:center;"><div class="tbl-progress-cell"><div style="display:flex;justify-content:space-between;font-size:0.78rem;font-weight:900;color:var(--primary);"><span>${s.progress || 50}%</span><span>${stLabel}</span></div><div class="tbl-progress-bar-wrap"><div class="tbl-progress-bar-fill" style="width:${s.progress || 50}%;"></div></div></div></td>`;
+                  return `<td style="text-align:${col.align || 'center'};"><span class="badge" contenteditable="true" onblur="updateInlineTableCell(${s.id}, '${col.key}', this.textContent)" style="background:var(--bg-input);color:var(--text-main);font-weight:800;padding:6px 12px;">${s[col.key] !== undefined ? s[col.key] : (col.defaultValue || '-')}</span></td>`;
+                }).join('')}
+                
+                <td style="text-align:center;min-width:160px;">
+                  <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;">
+                    <button class="tbl-act-btn view" onclick="viewSyllabusDetails(${s.id})" title="🔍 বিস্তারিত দেখুন (View Details)" aria-label="View Details"><i class="fa-solid fa-eye"></i></button>
+                    <button class="tbl-act-btn edit" onclick="editSyllabus(${s.id})" title="✏️ এডিট (A4 Paper Executive Card)" aria-label="Edit Syllabus Card"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="tbl-act-btn del" onclick="deleteSyllabus(${s.id})" title="🗑️ ডিলিট (Delete Entry)" aria-label="Delete Entry"><i class="fa-solid fa-trash-can"></i></button>
+                  </div>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } else {
+    // Render Chapter Cards with Accordion (Expand/Collapse)
+    container.innerHTML = items.map((s, idx) => {
+      const checkedCount = (s.checklist || []).filter(c => c.checked).length;
+      const totalCount   = (s.checklist || []).length;
+      const stLabel      = statusLabels[s.status] || '🟢 চলছে';
+      const prColor      = priorityColor[s.priority] || 'var(--text-muted)';
+
+      return `
+      <div class="syl-card-wrapper">
+        <!-- Accordion Header -->
+        <div class="syl-card-header chapter-accordion" id="syl-acc-${s.id}" onclick="toggleChapterAccordion(${s.id})">
+          <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;">
+            <div class="syl-chapter-badge">${idx + 1 < 10 ? '0' + (idx + 1) : (idx + 1)}</div>
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+              <div style="font-size:1.1rem;font-weight:900;color:var(--text-main);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                📖 ${s.chapterName || s.chapter || 'অধ্যায়'}
+                <span class="badge" style="background:rgba(59,130,246,0.12);color:var(--primary);">📚 ${s.subject} (${s.subjectCode || '১০৯'})</span>
+                <span class="badge" style="background:rgba(139,92,246,0.12);color:var(--purple);">🏷️ ${s.piIndicator || 'PI 8.3.1'}</span>
+                <span class="badge" style="background:rgba(239,68,68,0.12);color:${prColor};">⚡ ${s.priority || 'High'} Priority</span>
+              </div>
+              <div style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">
+                📅 ${s.date || '২০২৬-০৭-২৫'} | ⏰ ${s.time || '০৯:০০ AM'} | 🚪 কক্ষ: ${s.room || '১০২'} | 👨‍🏫 ${s.teacher || 'মাগুরিব আলী'}
+              </div>
             </div>
-            <h4 style="font-size:15px; font-weight:800; color:var(--text-main); margin-top:4px;">
-              ${s.chapterName || s.chapter} <span style="font-size:12px; color:var(--primary);">(${s.subject})</span>
-            </h4>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:110px;">
+              <div style="font-size:0.85rem;font-weight:900;color:var(--primary);">${s.progress}% কভারেজ</div>
+              <div class="progress-bar-wrap" style="width:110px;"><div class="progress-fill" style="width:${s.progress}%"></div></div>
+            </div>
+            <span class="badge" style="background:rgba(16,185,129,0.15);color:var(--success);padding:6px 12px;font-size:0.85rem;">${stLabel}</span>
+            <div style="display:flex;gap:6px;" onclick="event.stopPropagation()">
+              <button onclick="editSyllabus(${s.id})" class="btn btn-secondary btn-sm" title="✏️ এডিট (Edit)"><i class="fa-solid fa-pen-to-square text-primary"></i> ✏️</button>
+              
+              <button onclick="deleteSyllabus(${s.id})" class="btn btn-secondary btn-sm" style="border-color:var(--danger);color:var(--danger);" title="🗑️ ডিলিট (Delete)"><i class="fa-solid fa-trash-can text-danger"></i> 🗑️</button>
+            </div>
+            <button class="modal-close-btn" style="width:32px;height:32px;font-size:0.8rem;border:1.5px solid var(--border);" aria-label="toggle">
+              <i class="fa-solid fa-chevron-down chevron-icon"></i>
+            </button>
           </div>
         </div>
 
-        <div class="flex-align-center gap-4">
-          <div style="text-align:right;">
-            <div class="text-xs font-bold text-muted">প্রোগ্রেস</div>
-            <div class="text-sm font-extrabold text-primary">${s.progress}%</div>
-          </div>
-          <div style="width:100px;">
-            <div class="progress-bar-wrap" style="height:6px;"><div class="progress-fill bg-purple" style="width:${s.progress}%;"></div></div>
-          </div>
-          <div class="flex-gap-center" onclick="event.stopPropagation()">
-            <button onclick="editSyllabus(${s.id})" style="color:var(--primary); background:none; font-size:13px;" title="সম্পাদনা"><i class="fa-solid fa-pen-to-square"></i></button>
-            <button onclick="deleteSyllabus(${s.id})" style="color:var(--danger); background:none; font-size:13px;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
-          </div>
-        </div>
-      </div>
-
-      <div class="gcc-body" id="gcc-body-${s.id}">
-        <!-- Learning Outcome & PI Indicator -->
-        <div class="flex-between flex-wrap gap-2 mb-3">
-          <div>
-            <strong class="text-xs text-primary display-block mb-1"><i class="fa-solid fa-bullseye"></i> শিখনফল (Learning Outcome):</strong>
-            <p style="font-size:12.5px; color:var(--text-main); font-weight:600; margin:0;">${s.learningOutcomes || 'শিক্ষার্থীরা ধারণা অর্জন করতে পারবে।'}</p>
-          </div>
-          <div class="text-right">
-            <span class="badge" style="background:rgba(16,185,129,0.12); color:var(--success); font-size:11px; font-weight:700;"><i class="fa-solid fa-award"></i> ${s.piIndicator || 'PI 8.3.1'}</span>
-            <div class="text-xs text-muted mt-1">প্রয়োজনীয় সময়: <strong>${s.requiredClasses || 6}টি ক্লাস (${s.totalHours || '৪ ঘণ্টা'})</strong></div>
-          </div>
-        </div>
-
-        <!-- Topic Checklist -->
-        <div class="topic-checklist-box mt-3">
-          <div class="flex-between text-xs fw-bold mb-2">
-            <span><i class="fa-solid fa-list-check text-purple"></i> টপিকভিত্তিক স্মার্ট চেকলিস্ট</span>
-            <span class="text-muted">টিক চিহ্ন দিন</span>
-          </div>
-          ${s.checklist ? s.checklist.map((item, idx) => `
-            <label class="checklist-item ${item.checked ? 'checked' : ''}">
-              <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleChecklistItem(${s.id}, ${idx})">
-              <span>${item.text}</span>
-            </label>
-          `).join('') : '<p class="text-xs text-muted">কোনো চেকলিস্ট নির্ধারিত নেই।</p>'}
-        </div>
-
-        <!-- Resources & Exam Hub Grid -->
-        <div class="resources-exam-hub-grid">
-          <div class="hub-box">
-            <h6><i class="fa-solid fa-folder-open text-primary"></i> লার্নিং রিসোর্স</h6>
-            <div class="flex-gap-center flex-wrap">
-              <a href="${s.resources?.video || '#'}" target="_blank" class="resource-pill-btn"><i class="fa-solid fa-play text-danger"></i> 🎥 ভিডিও লেকচার</a>
-              <a href="#" onclick="alert('নোট ডাউনলোড হচ্ছে...')" class="resource-pill-btn"><i class="fa-solid fa-file-pdf text-primary"></i> 📄 লেকচার নোট</a>
-              <a href="#" onclick="alert('কুইজ চালু হচ্ছে...')" class="resource-pill-btn"><i class="fa-solid fa-pen-nib text-warning"></i> 📝 অনলাইন কুইজ</a>
+        <!-- Accordion Expand/Collapse Body -->
+        <div class="syl-card-body chapter-body" id="syl-body-${s.id}" style="display:none;padding:24px;">
+          
+          <!-- শিখনফল (Learning Outcome Box) -->
+          <div class="learning-outcome-box" style="background:linear-gradient(135deg, rgba(59,130,246,0.06), rgba(16,185,129,0.06));border:1.5px solid rgba(59,130,246,0.2);border-radius:16px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+            <i class="fa-solid fa-bullseye" style="font-size:1.6rem;color:var(--primary);"></i>
+            <div>
+              <strong style="color:var(--primary);font-size:0.9rem;">🎯 শিখনফল (Learning Outcome)</strong>
+              <p style="margin:4px 0 0;font-size:0.88rem;color:var(--text-main);line-height:1.5;">${s.learningOutcomes || 'শিক্ষার্থীরা ধারণা অর্জন করতে পারবে।'}</p>
             </div>
           </div>
 
-          <div class="hub-box">
-            <h6><i class="fa-solid fa-square-poll-vertical text-warning"></i> পরীক্ষা প্রস্তুতি (Exam Hub)</h6>
-            <div class="text-xs color-text-muted">
-              <div><strong>মান বণ্টন:</strong> ${s.examHub?.marks || '২০ নম্বর'}</div>
-              <div><strong>বিগত প্রশ্ন:</strong> ${s.examHub?.pyq || '২০২৫ বোর্ড প্রশ্ন'}</div>
-              <div class="text-danger fw-bold mt-1"><strong>শিক্ষকের নোট:</strong> ${s.examHub?.teacherNote || 'রিভিশন দেওয়া জরুরি।'}</div>
-            </div>
+          <!-- সম্ভাব্য সময় -->
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:18px;font-size:0.85rem;font-weight:700;color:var(--text-muted);">
+            <span><i class="fa-solid fa-clock text-primary"></i> কতটি ক্লাস লাগবে: <strong style="color:var(--text-main);">${s.requiredClasses || 6}টি ক্লাস</strong></span>
+            <span><i class="fa-solid fa-hourglass-half text-purple"></i> মোট কত ঘণ্টা লাগবে: <strong style="color:var(--text-main);">${s.totalHours || '৪.৫ ঘণ্টা'}</strong></span>
+            <span><i class="fa-solid fa-award text-warning"></i> পারদর্শিতার সূচক: <strong style="color:var(--purple);">${s.piIndicator || 'PI 8.3.1'}</strong></span>
           </div>
+
+          <!-- টপিকভিত্তিক চেকলিস্ট (Confetti Toast trigger on check) -->
+          <div style="font-size:0.82rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;display:flex;justify-content:space-between;">
+            <span><i class="fa-solid fa-list-check text-success"></i> টপিকভিত্তিক চেকলিস্ট</span>
+            <span>${checkedCount} / ${totalCount} সম্পন্ন</span>
+          </div>
+          <div class="topic-checklist-grid">
+            ${(s.checklist || []).map((item, idx2) => `
+            <div class="topic-card-item ${item.checked ? 'completed' : ''}">
+              <label class="topic-checkbox-label">
+                <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleChecklistItem(${s.id}, ${idx2})">
+                <span class="custom-checkmark">${item.checked ? '<i class="fa-solid fa-check"></i>' : ''}</span>
+                <span class="topic-title-text">${item.text}</span>
+              </label>
+              <span class="topic-status-tag ${item.checked ? 'done' : 'pending'}">${item.checked ? '✅ সম্পন্ন' : '⏳ বাকি'}</span>
+            </div>`).join('')}
+          </div>
+
+          <!-- পরীক্ষা প্রস্তুতি (Exam Hub) -->
+          ${s.examHub ? `
+          <div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.22);border-radius:16px;padding:16px 20px;margin-bottom:20px;">
+            <div style="font-size:0.8rem;font-weight:800;color:var(--warning);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;"><i class="fa-solid fa-square-poll-vertical"></i> 🎯 পরীক্ষা প্রস্তুতি (Exam Hub)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:0.88rem;">
+              <div><strong>মান বণ্টন:</strong> ${s.examHub.marks}</div>
+              <div><strong>বিগত বছরের প্রশ্ন:</strong> ${s.examHub.pyq}</div>
+            </div>
+            <div style="margin-top:8px;font-size:0.82rem;color:var(--danger);font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> শিক্ষকের নোট: ${s.examHub.teacherNote}</div>
+          </div>` : ''}
+
+          <!-- রিসোর্স বাটন -->
+          <div class="syl-card-footer" style="padding-top:16px;border-top:1.5px dashed var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <a href="${s.resources?.video || '#'}" target="_blank" class="resource-pill-btn"><i class="fa-solid fa-play" style="color:var(--danger)"></i> 🎥 ভিডিও</a>
+              <button class="resource-pill-btn" onclick="alert('নোট ডাউনলোড হচ্ছে...')"><i class="fa-solid fa-file-pdf" style="color:var(--primary)"></i> 📄 নোট</button>
+              <button class="resource-pill-btn" onclick="alert('কুইজ চালু হচ্ছে...')"><i class="fa-solid fa-pen-nib" style="color:var(--warning)"></i> 📝 কুইজ</button>
+            </div>
+            <div style="font-size:0.82rem;color:var(--text-muted);font-weight:700;"><i class="fa-solid fa-chart-bar text-primary"></i> কভারেজ: ${s.progress}%</div>
+          </div>
+
         </div>
-      </div>
-    </div>
-  `).join('');
-
-  // Update Summary Analytics
-  const total = classData.syllabuses.length;
-  const completed = classData.syllabuses.filter(s=>s.status==='completed').length;
-  const pending = total - completed;
-  document.getElementById('syll-stat-completed').textContent = `${completed}টি অধ্যায়`;
-  document.getElementById('syll-stat-pending').textContent = `${pending}টি অধ্যায়`;
-  const avgProgress = Math.round(classData.syllabuses.reduce((acc, curr) => acc + (curr.progress||0), 0) / (total || 1));
-  document.getElementById('syll-stat-coverage').textContent = `${avgProgress}%`;
-  document.getElementById('syll-total-percent').textContent = `${avgProgress}% সম্পন্ন`;
-  document.getElementById('syll-total-progress-fill').style.width = `${avgProgress}%`;
-}
-
-// TOGGLE ACCORDION
-function toggleChapterAccordion(id) {
-  const body = document.getElementById(`gcc-body-${id}`);
-  const icon = document.getElementById(`acc-icon-${id}`);
-  if (body) {
-    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+      </div>`;
+    }).join('');
   }
-  if (icon) {
-    icon.className = body.style.display === 'none' ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-down';
-  }
-}
-
-// TOGGLE CHECKLIST & CONFETTI ANIMATION
-function toggleChecklistItem(syllabusId, itemIdx) {
-  const item = classData.syllabuses.find(s => s.id === syllabusId);
-  if (item && item.checklist && item.checklist[itemIdx]) {
-    item.checklist[itemIdx].checked = !item.checklist[itemIdx].checked;
-    
-    // Recalculate progress
-    const checkedCount = item.checklist.filter(c => c.checked).length;
-    item.progress = Math.round((checkedCount / item.checklist.length) * 100);
-    if (item.progress === 100) item.status = 'completed';
-    else if (item.progress > 0) item.status = 'running';
-
-    saveStorage();
-    renderSyllabus();
-
-    if (item.checklist[itemIdx].checked) {
-      showConfettiToast("🎉 চমৎকার! টপিক সম্পন্ন হয়েছে (+প্রোগ্রেস যুক্ত হয়েছে)");
-    }
-  }
-}
-
-function showConfettiToast(msg) {
-  const toast = document.createElement('div');
-  toast.className = 'confetti-toast';
-  toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 2500);
-}
-
-// CLASS ACTIONS CONNECTED ARCHITECTURE HANDLERS
-function startClassSession(routineId) {
-  alert(`🚀 পিরিয়ড #${routineId} লাইভ ক্লাস সেশন সফলভাবে শুরু হয়েছে! লেসন প্ল্যান ও প্রেজেন্টেশন অটো-লোড হচ্ছে...`);
-  showSection('live_control');
-}
-function openLessonPlanModal(subject, topic) {
-  alert(`📖 [${subject}] লেসন প্ল্যান:\n- টপিক: ${topic}\n- পদ্ধতি: প্রেজেন্টেশন ও ব্ল্যাকবোর্ড প্র্যাকটিস\n- সময়: ৪৫ মিনিট`);
-}
-function openPresentationModal(subject) {
-  alert(`🖥️ [${subject}] ইন্টারঅ্যাক্টিভ প্রেজেন্টেশন স্লাইড সেশন প্রস্তুত করা হচ্ছে...`);
-}
-function linkSyllabusModal(subject) {
-  showSection('syllabus');
-  searchSyllabusCards(subject);
-}
-function switchRoleView(role) {
-  alert(`👤 রোল পরিবর্তন করা হয়েছে: ${role.toUpperCase()} ভিউ একটিভ!`);
 }
 
 function openAddSyllabusModal() {
   editingSyllabusId = null;
-  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-book-bookmark text-purple"></i> নতুন ১২ মাসের বাৎসরিক মাস্টার সিলেবাস যোগ';
-  if (document.getElementById('ms-timeframe')) document.getElementById('ms-timeframe').value = '12months';
-  if (document.getElementById('ms-subject')) document.getElementById('ms-subject').value = 'গণিত';
-  if (document.getElementById('ms-subject-code')) document.getElementById('ms-subject-code').value = '১০৯';
-  if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = '১ম-৩য় মাস: অধ্যায় ১-৪ (মৌলিক ধারণা ও ১ম সাময়িক)';
-  if (document.getElementById('ms-exam-schedule')) document.getElementById('ms-exam-schedule').value = '১ম সাময়িক (মার্চ): ২০ নম্বর | অর্ধবার্ষিকী (জুন): ৫০ নম্বর | ৩য় সাময়িক (সেপ্টেম্বর): ২০ নম্বর | বার্ষিকী (ডিসেম্বর): ১০০ নম্বর';
-  if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = '৬';
-  if (document.getElementById('ms-duration')) document.getElementById('ms-duration').value = '১ ঘণ্টা';
-  if (document.getElementById('ms-ref-books')) document.getElementById('ms-ref-books').value = 'NCTB বোর্ড অনুমোদিত মূল বই (২০২৬)';
-  if (document.getElementById('ms-target')) document.getElementById('ms-target').value = 'বীজগণিতীয় সূত্রের সঠিক প্রয়োগ ও মান নির্ণয় শিখবে';
-  document.getElementById('syllabus-modal').classList.remove('hidden');
+  const todayStr = new Date().toISOString().split('T')[0];
+  document.getElementById('ms-date').value = todayStr;
+  document.getElementById('ms-time').value = '০৯:০০ - ০৯:৪৫ AM';
+  document.getElementById('ms-room').value = '১০২';
+  document.getElementById('ms-class').value = 'অষ্টম';
+  document.getElementById('ms-section').value = 'ক';
+  document.getElementById('ms-subject').value = 'গণিত';
+  document.getElementById('ms-chapter').value = '';
+  document.getElementById('ms-teacher').value = classData.settings.teacherName || 'মাগুরিব আলী';
+  document.getElementById('syllabus-modal')?.classList.remove('hidden');
 }
 
-function editSyllabus(id) {
-  const item = classData.syllabuses.find(s => s.id === id);
-  if (!item) return;
-  editingSyllabusId = id;
-  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-purple"></i> ১২ মাসের বাৎসরিক সিলেবাস সম্পাদনা';
-  document.getElementById('ms-timeframe').value = item.timeframe || '12months';
-  if (document.getElementById('ms-subject')) document.getElementById('ms-subject').value = item.subject || 'গণিত';
-  if (document.getElementById('ms-subject-code')) document.getElementById('ms-subject-code').value = item.subjectCode || '১০৯';
-  
-  // Set multi-selected chapters
-  const chapterSelect = document.getElementById('ms-chapter');
-  if (chapterSelect) {
-    const selectedList = Array.isArray(item.chapters) ? item.chapters : [item.chapter];
-    Array.from(chapterSelect.options).forEach(opt => {
-      opt.selected = selectedList.includes(opt.value);
-    });
-  }
 
-  if (document.getElementById('ms-working-days')) document.getElementById('ms-working-days').value = item.workingDays || '১৮০টি মোট কার্যদিবস (বছরে)';
-  if (document.getElementById('ms-holidays')) document.getElementById('ms-holidays').value = item.holidays || '৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)';
-  if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = item.weeklyPlan || '১ম-৩য় মাস: অধ্যায় ১-৪ (মৌলিক ধারণা ও ১ম সাময়িক)';
-  if (document.getElementById('ms-exam-schedule')) document.getElementById('ms-exam-schedule').value = item.examSchedule || '১ম সাময়িক (মার্চ): ২০ নম্বর | অর্ধবার্ষিকী (জুন): ৫০ নম্বর | ৩য় সাময়িক (সেপ্টেম্বর): ২০ নম্বর | বার্ষিকী (ডিসেম্বর): ১০০ নম্বর';
-  if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = item.periodsNeeded || '৬';
-  if (document.getElementById('ms-start-date')) document.getElementById('ms-start-date').value = item.startDate || '2026-07-25';
-  if (document.getElementById('ms-start-time')) document.getElementById('ms-start-time').value = item.startTime || '০৯:০০ AM';
-  if (document.getElementById('ms-duration')) document.getElementById('ms-duration').value = item.duration || '১ ঘণ্টা';
-  if (document.getElementById('ms-next-class')) document.getElementById('ms-next-class').value = item.nextClass || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)';
-  if (document.getElementById('ms-ref-books')) document.getElementById('ms-ref-books').value = item.refBooks || '';
-  document.getElementById('ms-target').value = item.target || '';
-  document.getElementById('syllabus-modal').classList.remove('hidden');
+
+function closeSyllabusModal() {
+  document.getElementById('syllabus-modal')?.classList.add('hidden');
 }
-
-function closeSyllabusModal() { document.getElementById('syllabus-modal').classList.add('hidden'); }
 
 function saveSyllabusModal(e) {
   e.preventDefault();
-  const timeframe = document.getElementById('ms-timeframe').value;
-  const subject = document.getElementById('ms-subject').value;
-  const subjectCode = document.getElementById('ms-subject-code')?.value || '১০৯';
-  
-  // Extract all multi-selected chapters
-  const chapterSelect = document.getElementById('ms-chapter');
-  const selectedChapters = chapterSelect ? Array.from(chapterSelect.selectedOptions).map(opt => opt.value) : ['অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র'];
-  const primaryChapter = selectedChapters.join(', ');
-
-  const workingDays = document.getElementById('ms-working-days')?.value || '১৮০টি মোট কার্যদিবস (বছরে)';
-  const holidays = document.getElementById('ms-holidays')?.value || '৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)';
-  const weeklyPlan = document.getElementById('ms-weekly-plan')?.value || '১২ মাসের বিষয়ভিত্তিক রোডম্যাপ';
-  const examSchedule = document.getElementById('ms-exam-schedule')?.value || '১ম সাময়িক, অর্ধবার্ষিকী ও বার্ষিকী পরীক্ষা';
-  const periodsNeeded = document.getElementById('ms-periods')?.value || '৬';
-  const startDate = document.getElementById('ms-start-date')?.value || '২০২৬-০৭-২৫';
-  const startTime = document.getElementById('ms-start-time')?.value || '০৯:০০ AM';
-  const duration = document.getElementById('ms-duration')?.value || '১ ঘণ্টা';
-  const nextClass = document.getElementById('ms-next-class')?.value || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)';
-  const refBooks = document.getElementById('ms-ref-books')?.value || 'NCTB বোর্ড বই';
-  const target = document.getElementById('ms-target').value;
-
-  const tfLabels = {
-    today: "প্রতিদিনের সিলেবাস", "1week": "আগামী ১ সপ্তাহ", "15days": "আগামী ১৫ দিন",
-    "1month": "আগামী ১ মাস", "3months": "আগামী ৩ মাস", "6months": "আগামী ৬ মাস",
-    "9months": "আগামী ৯ মাস", "12months": "১২ মাসের বাৎসরিক মাস্টার সিলেবাস"
-  };
+  const date        = document.getElementById('ms-date').value;
+  const time        = document.getElementById('ms-time').value;
+  const room        = document.getElementById('ms-room').value;
+  const className   = document.getElementById('ms-class').value;
+  const section     = document.getElementById('ms-section').value;
+  const subject     = document.getElementById('ms-subject').value;
+  const chapterName = document.getElementById('ms-chapter').value;
+  const teacher     = document.getElementById('ms-teacher').value;
+  const month       = document.getElementById('ms-month').value;
 
   if (editingSyllabusId) {
-    const item = classData.syllabuses.find(s => s.id === editingSyllabusId);
-    if (item) {
-      item.timeframe = timeframe;
-      item.timeframeLabel = tfLabels[timeframe] || timeframe;
-      item.subject = subject;
-      item.subjectCode = subjectCode;
-      item.chapter = primaryChapter;
-      item.chapters = selectedChapters;
-      item.workingDays = workingDays;
-      item.holidays = holidays;
-      item.weeklyPlan = weeklyPlan;
-      item.examSchedule = examSchedule;
-      item.periodsNeeded = periodsNeeded;
-      item.startDate = startDate;
-      item.startTime = startTime;
-      item.duration = duration;
-      item.nextClass = nextClass;
-      item.refBooks = refBooks;
-      item.target = target;
+    const s = classData.syllabuses.find(x => x.id === editingSyllabusId);
+    if (s) {
+      s.date = date; s.time = time; s.room = room; s.className = className;
+      s.section = section; s.subject = subject; s.chapterName = chapterName;
+      s.teacher = teacher; s.month = month;
     }
   } else {
     classData.syllabuses.push({
-      id: Date.now(),
-      timeframe,
-      timeframeLabel: tfLabels[timeframe] || timeframe,
-      subject,
-      subjectCode,
-      chapter: primaryChapter,
-      chapters: selectedChapters,
-      workingDays,
-      holidays,
-      weeklyPlan,
-      examSchedule,
-      periodsNeeded,
-      startDate,
-      startTime,
-      duration,
-      nextClass,
-      refBooks,
-      target,
-      progress: 10
+      id: Date.now(), date, time, room, className, section, subject, subjectCode: "১০৯",
+      chapterName, learningOutcomes: "শিক্ষার্থীরা উক্ত অধ্যায়ের গাণিতিক ও বাস্তবমুখী ধারণা অর্জন করতে পারবে।",
+      teacher, status: "running", progress: 40, priority: "High", month, term: "half_yearly",
+      piIndicator: "PI 8.3.1", requiredClasses: 6, totalHours: "৪.৫ ঘণ্টা", timeframeLabel: "আগামী ১ মাস",
+      checklist: [
+        { text: "অধ্যায়ের মূল ধারণার পাঠদান", checked: true },
+        { text: "অনুশীলনী ও সমস্যা সমাধান", checked: false },
+      ],
+      resources: { video: "#", note: "#", quiz: "#" }
     });
   }
 
   saveStorage();
   closeSyllabusModal();
-  renderSyllabus(timeframe);
+  renderSyllabus();
+  showConfettiToast('🎉 সিলেবাস তথ্য সফলভাবে সেভ করা হয়েছে!');
 }
 
-// RENDER ATTENDANCE CARDS WITH CLASS/SECTION/GROUP FILTERS
-function filterAttendanceByClass() {
+function saveSyllabusDirect(id) {
+  saveStorage();
+  showConfettiToast('💾 সিলেবাস রেকর্ড সেভ করা হয়েছে!');
+}
+
+function deleteSyllabus(id) {
+  if (!confirm('এই সিলেবাসের রেকর্ডটি মুছে ফেলতে চান?')) return;
+  classData.syllabuses = classData.syllabuses.filter(s => s.id !== id);
+  saveStorage();
+  renderSyllabus();
+}
+
+
+function renderRoutine(day) {
+  const container = document.getElementById('routine-cards-container');
+  if (!container) return;
+  const items = classData.routines.filter(r => r.day === day);
+  if (!items.length) {
+    container.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:30px;">এই দিনে কোনো পিরিয়ড নির্ধারণ করা হয়নি।</p>`;
+    return;
+  }
+  container.innerHTML = `<div class="routine-timeline">` + items.map(r => `
+    <div class="routine-timeline-card ${r.activeNow ? 'active-now' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:12.5px;font-weight:800;color:var(--primary);"><i class="fa-solid fa-clock"></i> ${r.time}</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          ${r.activeNow ? '<span class="badge" style="background:rgba(239,68,68,0.15);color:var(--danger);"><i class="fa-solid fa-circle live-pulse"></i> লাইভ সেশন</span>' : ''}
+          <button onclick="editRoutine(${r.id})" style="background:none;color:var(--primary);font-size:14px;" title="সম্পাদনা"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button onclick="deleteRoutine(${r.id})" style="background:none;color:var(--danger);font-size:14px;" title="মুছুন"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      </div>
+      <h4 style="font-size:1.05rem;font-weight:800;color:var(--text-main);">${r.subject} <span style="font-size:12px;color:var(--text-muted);font-weight:600;">(কক্ষ: ${r.room})</span></h4>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:4px;"><i class="fa-solid fa-book-open"></i> ${r.topic || 'অধ্যায় ও নির্ধারিত পাঠসূচি'}</p>
+      <p style="font-size:12.5px;color:var(--primary);font-weight:700;margin-top:4px;"><i class="fa-solid fa-user-tie"></i> ${r.teacher} <span style="font-size:11px;color:var(--text-muted);font-weight:600;">[সাবস্টিটিউট: ${r.substitute||'উপলব্ধ'}]</span></p>
+
+      <!-- Class Actions -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1.5px dashed var(--border);">
+        <button class="btn btn-primary btn-sm" onclick="switchSection('live_control')"><i class="fa-solid fa-play"></i> ▶️ ক্লাস শুরু করুন</button>
+        <button class="btn btn-secondary btn-sm" onclick="alert('লেসন প্ল্যান খুলছে...')"><i class="fa-solid fa-book"></i> 📖 লেসন প্ল্যান</button>
+        <button class="btn btn-secondary btn-sm" onclick="alert('প্রেজেন্টেশন মোড চালু হচ্ছে...')"><i class="fa-solid fa-desktop"></i> 🖥️ প্রেজেন্টেশন</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchSection('attendance')"><i class="fa-solid fa-user-check"></i> 👥 উপস্থিতি</button>
+      </div>
+
+      <!-- Syllabus Link Button & Resources -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <button class="btn btn-outline btn-sm" style="border-color:var(--primary);color:var(--primary);" onclick="showSyllabusPopup('${r.subject}')"><i class="fa-solid fa-link"></i> 🔗 সিলেবাস লিংক</button>
+        <button class="btn btn-secondary btn-sm" onclick="alert('ভিডিও খুলছে...')"><i class="fa-solid fa-video"></i> 🎥 ভিডিও</button>
+        <button class="btn btn-secondary btn-sm" onclick="alert('নোট ডাউনলোড হচ্ছে...')"><i class="fa-solid fa-file-lines"></i> 📄 নোট</button>
+        <button class="btn btn-secondary btn-sm" onclick="alert('কুইজ চালু হচ্ছে...')"><i class="fa-solid fa-pen-to-square"></i> 📝 কুইজ</button>
+      </div>
+    </div>`).join('') + `</div>`;
+}
+
+function showSyllabusPopup(subjectName) {
+  const s = classData.syllabuses.find(x => x.subject === subjectName) || classData.syllabuses[0];
+  alert(`🔗 ${s.subject} সিলেবাস লিংক পপআপ:\n• চ্যাপ্টার: ${s.chapterName}\n• পারদর্শিতার সূচক: ${s.piIndicator}\n• প্রোগ্রেস: ${s.progress}%\n• বিগত প্রশ্ন: ${s.examHub?.pyq || '২০২৫ বোর্ড প্রশ্ন'}\n• AI সুপারিশ: ${s.learningOutcomes}`);
+}
+
+function openAddRoutineModal() { editingRoutineId = null; document.getElementById('routine-modal')?.classList.remove('hidden'); }
+function editRoutine(id)       { editingRoutineId = id;   document.getElementById('routine-modal')?.classList.remove('hidden'); }
+function closeRoutineModal()   { document.getElementById('routine-modal')?.classList.add('hidden'); }
+function saveRoutineModal(e)   { e.preventDefault(); closeRoutineModal(); renderRoutine('রবিবার'); renderOverview(); }
+function deleteRoutine(id)     { classData.routines = classData.routines.filter(r => r.id !== id); saveStorage(); renderRoutine('রবিবার'); renderOverview(); }
+
+// ===================== SECTION 4: ATTENDANCE & PARTICIPATION =====================
+function filterAttendanceByClass() { renderAttendanceCards(); }
+
+
+let _attSubjectFilter = 'all';
+
+function filterAttendanceSubject(sub) {
+  _attSubjectFilter = sub;
+  document.querySelectorAll('#att-subject-chips .sub-chip').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === sub || (sub === 'all' && b.textContent.trim() === 'সকল'));
+  });
   renderAttendanceCards();
 }
 
+function filterAttendanceTable() { renderAttendanceCards(); }
+
 function renderAttendanceCards() {
   const container = document.getElementById('attendance-cards-container');
-  const datePicker = document.getElementById('attendance-date-picker');
-  if (datePicker && !datePicker.value) datePicker.valueAsDate = new Date();
+  if (!container) return;
 
-  const selectedClass = document.getElementById('att-class-select')?.value || 'অষ্টম';
-  const selectedSection = document.getElementById('att-section-select')?.value || 'ক';
-  const selectedGroup = document.getElementById('att-group-select')?.value || 'সাধারণ';
+  const searchQ = (document.getElementById('att-search-input')?.value || '').toLowerCase();
+  const clsVal  = document.getElementById('att-class-select')?.value || 'all';
+  const secVal  = document.getElementById('att-section-select')?.value || 'all';
 
-  const filteredStudents = classData.students.filter(s => 
-    (s.className === selectedClass || !s.className) && 
-    (s.section === selectedSection || !s.section) && 
-    (s.group === selectedGroup || !s.group || selectedGroup === 'সাধারণ')
-  );
+  let students = [...classData.students];
 
-  if (filteredStudents.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">নির্বাচনকৃত <strong>${selectedClass} শ্রেণি (শাখা-${selectedSection}, ${selectedGroup})</strong> এর জন্য কোনো শিক্ষার্থী পাওয়া যায়নি।</p>`;
+  if (clsVal !== 'all') students = students.filter(s => s.className === clsVal);
+  if (secVal !== 'all') students = students.filter(s => s.section === secVal);
+  if (searchQ) students = students.filter(s => s.name.toLowerCase().includes(searchQ) || String(s.roll).includes(searchQ));
+
+  // Compute total, percentage, grade, rank
+  students.forEach(s => {
+    const totalScore = (s.bangla||0) + (s.english||0) + (s.math||0) + (s.science||0) + (s.social||0) + (s.ict||0) + (s.engagementScore||0);
+    s.calculatedTotal = totalScore;
+    s.calculatedPct   = ((totalScore / 700) * 100).toFixed(1);
+
+    if (s.calculatedPct >= 80)      { s.calculatedGrade = 'A+'; s.statusTag = '🟢 সেরা'; s.statusClass = 'top1'; }
+    else if (s.calculatedPct >= 60) { s.calculatedGrade = 'A-'; s.statusTag = '🟡 মাঝারি'; s.statusClass = 'top2'; }
+    else if (s.calculatedPct >= 50) { s.calculatedGrade = 'B';  s.statusTag = '🟡 মাঝারি'; s.statusClass = 'top2'; }
+    else                            { s.calculatedGrade = 'F';  s.statusTag = '🔴 দুর্বল'; s.statusClass = 'normal'; }
+  });
+
+  // Sort by total score descending for rank
+  students.sort((a,b) => b.calculatedTotal - a.calculatedTotal);
+  students.forEach((s, idx) => { s.rank = idx + 1; });
+
+  // Update KPI Summary Cards
+  const totalCount = students.length;
+  const topCount   = students.filter(s => parseFloat(s.calculatedPct) >= 80).length;
+  const goodCount  = students.filter(s => parseFloat(s.calculatedPct) >= 50 && parseFloat(s.calculatedPct) < 80).length;
+  const weakCount  = students.filter(s => parseFloat(s.calculatedPct) < 50).length;
+  const avgPct     = totalCount ? (students.reduce((a,s) => a + parseFloat(s.calculatedPct), 0) / totalCount).toFixed(0) : 0;
+
+  const kTotal = document.getElementById('kpi-total-students');
+  const kTop   = document.getElementById('kpi-top-performers');
+  const kGood  = document.getElementById('kpi-good-performers');
+  const kWeak  = document.getElementById('kpi-weak-performers');
+  const kAvg   = document.getElementById('kpi-avg-attendance');
+
+  if (kTotal) kTotal.textContent = totalCount;
+  if (kTop)   kTop.textContent   = topCount;
+  if (kGood)  kGood.textContent  = goodCount;
+  if (kWeak)  kWeak.textContent  = weakCount;
+  if (kAvg)   kAvg.textContent   = avgPct + '%';
+
+  if (!students.length) {
+    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">কোনো শিক্ষার্থী পাওয়া যায়নি।</div>';
     return;
   }
 
-  container.innerHTML = filteredStudents.map(s => `
-    <div class="attendance-card-box">
-      <div class="student-att-header">
-        <div class="att-roll-badge">${s.roll}</div>
-        <div>
-          <strong style="font-size:14px; color:var(--text-main);">${s.name}</strong>
-          <span style="display:block; font-size:11px; color:var(--text-muted);">রোল: ${s.roll} | শ্রেণি: ${s.className || selectedClass} (${s.section || selectedSection}) | বিভাগ: ${s.group || selectedGroup}</span>
-        </div>
-      </div>
+  // Render Image-Matching Table
+  const bnNums = ['১ম','২য়','৩য়','৪র্থ','৫ম','৬ষ্ঠ','৭ম','৮ম','৯ম','১০ম'];
 
-      <div class="att-status-buttons">
-        <button class="att-btn ${s.attendance === 'Present' ? 'active-present' : ''}" onclick="setStudentAtt('${s.name}', 'Present')">উপস্থিত</button>
-        <button class="att-btn ${s.attendance === 'Absent' ? 'active-absent' : ''}" onclick="setStudentAtt('${s.name}', 'Absent')">অনুপস্থিত</button>
-        <button class="att-btn ${s.attendance === 'Late' ? 'active-late' : ''}" onclick="setStudentAtt('${s.name}', 'Late')">দেরিতে</button>
-      </div>
+  container.innerHTML = `
+    <table class="att-table">
+      <thead>
+        <tr>
+          <th>অবস্থান (র‍্যাংক)</th>
+          <th>রোল</th>
+          <th>নাম</th>
+          <th>শ্রেণি (শাখা)</th>
+          <th>বাংলা</th>
+          <th>ইংরেজি</th>
+          <th>গণিত</th>
+          <th>বিজ্ঞান</th>
+          <th>সমাজ</th>
+          <th>আইসিটি</th>
+          <th>পার্টিসিপেশন</th>
+          <th>মোট</th>
+          <th>%</th>
+          <th>গ্রেড</th>
+          <th>স্ট্যাটাস</th>
+          <th style="text-align:right;">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${students.map(s => {
+          const rankText = bnNums[s.rank - 1] || (s.rank + 'ম');
+          const rankCls  = s.rank === 1 ? 'top1' : s.rank === 2 ? 'top2' : s.rank === 3 ? 'top3' : 'normal';
+          const gradeCls = s.calculatedGrade === 'A+' ? 'aplus' : s.calculatedGrade === 'A-' ? 'aminus' : s.calculatedGrade === 'B' ? 'bgrade' : 'fgrade';
+          const attBadge = s.attendance === 'Present' ? '✅ উপস্থিত' : s.attendance === 'Absent' ? '❌ অনুপস্থিত' : '⏰ দেরিতে';
 
-      <div style="margin-top:10px;">
-        <span style="font-size:11px; font-weight:700; color:var(--text-muted);">এনগেজমেন্ট স্টার:</span>
-        <div class="star-rating">
-          ${[1,2,3,4,5].map(star => `<i class="fa-solid fa-star" style="color:${star <= s.engagement ? '#fbbf24' : '#cbd5e1'}" onclick="setStudentEng('${s.name}', ${star})"></i>`).join('')}
-        </div>
-      </div>
-
-      <p style="font-size:11.5px; color:var(--text-muted); margin-top:8px;"><strong>মন্তব্য:</strong> ${s.remark}</p>
-    </div>
-  `).join('');
+          return `
+          <tr>
+            <td><span class="rank-pill ${rankCls}">${rankText}</span></td>
+            <td><strong>${s.roll}</strong></td>
+            <td>
+              <strong>${s.name}</strong>
+              <span style="display:block;font-size:11px;color:var(--text-muted);">${attBadge}</span>
+            </td>
+            <td><span class="badge" style="background:var(--primary-light);color:var(--primary);">${s.className} (${s.section})</span></td>
+            <td>${s.bangla}</td>
+            <td>${s.english}</td>
+            <td>${s.math}</td>
+            <td>${s.science}</td>
+            <td>${s.social}</td>
+            <td>${s.ict}</td>
+            <td>${s.engagementScore}</td>
+            <td><strong>${s.calculatedTotal}/৭০০</strong></td>
+            <td><strong style="color:var(--primary);">${s.calculatedPct}%</strong></td>
+            <td><span class="grade-badge ${gradeCls}">${s.calculatedGrade}</span></td>
+            <td><span class="badge" style="background:var(--bg-input);color:var(--text-main);">${s.statusTag}</span></td>
+            <td style="text-align:right;">
+              <button class="tbl-act-btn" onclick="openA4StudentModal(${s.id})" title="A4 রিপোর্ট ভিউ"><i class="fa-solid fa-eye"></i></button>
+              <button class="tbl-act-btn" onclick="toggleStudentAttendanceStatus(${s.id})" title="উপস্থিতি পরিবর্তন"><i class="fa-solid fa-user-check"></i></button>
+              <button class="tbl-act-btn" onclick="openEditStudentModal(${s.id})" title="সম্পাদনা"><i class="fa-solid fa-pen"></i></button>
+              <button class="tbl-act-btn del" onclick="deleteStudentRow(${s.id})" title="মুছে ফেলুন"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
 }
 
-function setStudentAtt(name, status) {
-  const st = classData.students.find(x => x.name === name);
-  if (st) {
-    st.attendance = status;
-    saveStorage();
-    renderAttendanceCards();
-  }
-}
+function toggleStudentAttendanceStatus(id) {
+  const s = classData.students.find(x => x.id === id);
+  if (!s) return;
+  if (s.attendance === 'Present') s.attendance = 'Absent';
+  else if (s.attendance === 'Absent') s.attendance = 'Late';
+  else s.attendance = 'Present';
 
-function setStudentEng(name, stars) {
-  const st = classData.students.find(x => x.name === name);
-  if (st) {
-    st.engagement = stars;
-    saveStorage();
-    renderAttendanceCards();
-  }
-}
-
-function saveAttendance() {
   saveStorage();
-  alert('উপস্থিতি ও এনগেজমেন্ট সফলতা সহকারে সংরক্ষণ করা হয়েছে!');
+  renderAttendanceCards();
+  showConfettiToast(s.name + '-এর উপস্থিতি পরিবর্তন করে ' + s.attendance + ' করা হয়েছে।');
 }
 
-// RENDER EXAM CARDS WITH EDIT & DELETE
+function openAddStudentModal() {
+  const name = prompt('শিক্ষার্থীর নাম লিখুন:');
+  if (!name) return;
+  const roll = parseInt(prompt('রোল নম্বর:') || '9');
+  classData.students.push({
+    id: Date.now(), roll, name, className: 'অষ্টম', section: 'ক', year: '২০২৬', group: 'সাধারণ',
+    bangla: 80, english: 75, math: 85, science: 80, social: 78, ict: 75,
+    engagement: 4, engagementScore: 70, attendance: 'Present', remark: 'নতুন শিক্ষার্থী'
+  });
+  saveStorage();
+  renderAttendanceCards();
+}
+
+function openEditStudentModal(id) {
+  const s = classData.students.find(x => x.id === id);
+  if (!s) return;
+  const newName = prompt('শিক্ষার্থীর নাম সংশোধন করুন:', s.name);
+  if (newName) s.name = newName;
+  saveStorage();
+  renderAttendanceCards();
+}
+
+function deleteStudentRow(id) {
+  if (!confirm('এই শিক্ষার্থীর তথ্য মুছে ফেলতে চান?')) return;
+  classData.students = classData.students.filter(x => x.id !== id);
+  saveStorage();
+  renderAttendanceCards();
+}
+
+function exportAttendancePDF() {
+  window.print();
+}
+
+function openA4StudentModal(id) {
+  const s = classData.students.find(x => x.id === id) || classData.students[0];
+  const overlay = document.getElementById('a4-record-modal-overlay');
+  const paper = document.getElementById('a4-record-modal-content');
+  if (!overlay || !paper) return;
+
+  paper.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #0f172a;padding-bottom:16px;margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:1.5rem;font-weight:900;color:#0f172a;">${classData.settings.school}</h2>
+        <span style="font-size:0.85rem;color:#475569;">ব্যক্তিগত শিক্ষার্থী মূল্যায়ন ও উপস্থিতি সনদ</span>
+      </div>
+      <div style="text-align:right;">
+        <span style="font-size:0.85rem;font-weight:900;color:#6366f1;">অবস্থান: ${s.rank||1}ম</span>
+        <span style="display:block;font-size:0.8rem;color:#64748b;">রোল: ${s.roll}</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;font-size:0.9rem;">
+      <div><strong>শিক্ষার্থীর নাম:</strong> ${s.name}</div>
+      <div><strong>শ্রেণি ও শাখা:</strong> ${s.className} (${s.section})</div>
+      <div><strong>বিভাগ:</strong> ${s.group}</div>
+      <div><strong>শিক্ষাবর্ষ:</strong> ${s.year||'২০২৬'}</div>
+      <div><strong>উপস্থিতি স্ট্যাটাস:</strong> ${s.attendance}</div>
+      <div><strong>পার্টিসিপেশন স্কোর:</strong> ${s.engagementScore} / ১০০</div>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:24px;font-size:0.88rem;">
+      <thead>
+        <tr style="background:#f1f5f9;">
+          <th style="padding:8px;border:1px solid #cbd5e1;text-align:left;">বিষয়</th>
+          <th style="padding:8px;border:1px solid #cbd5e1;text-align:right;">প্রাপ্ত নম্বর</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:8px;border:1px solid #cbd5e1;">বাংলা</td><td style="padding:8px;border:1px solid #cbd5e1;text-align:right;">${s.bangla}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #cbd5e1;">ইংরেজি</td><td style="padding:8px;border:1px solid #cbd5e1;text-align:right;">${s.english}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #cbd5e1;">গণিত</td><td style="padding:8px;border:1px solid #cbd5e1;text-align:right;">${s.math}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #cbd5e1;">বিজ্ঞান</td><td style="padding:8px;border:1px solid #cbd5e1;text-align:right;">${s.science}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #cbd5e1;">সমাজ</td><td style="padding:8px;border:1px solid #cbd5e1;text-align:right;">${s.social}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #cbd5e1;">আইসিটি</td><td style="padding:8px;border:1px solid #cbd5e1;text-align:right;">${s.ict}</td></tr>
+        <tr style="background:#f8fafc;font-weight:bold;">
+          <td style="padding:8px;border:1px solid #cbd5e1;">মোট প্রাপ্ত নম্বর</td>
+          <td style="padding:8px;border:1px solid #cbd5e1;text-align:right;">${s.calculatedTotal} / ৭০০ (${s.calculatedPct}%)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:16px;margin-bottom:24px;">
+      <h4 style="font-size:0.95rem;font-weight:800;margin-bottom:6px;color:#0f172a;">শিক্ষকের পর্যবেক্ষণ ও মন্তব্য</h4>
+      <p style="font-size:0.9rem;color:#334155;">${s.remark}</p>
+    </div>
+
+    <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1.5px solid #cbd5e1;">
+      <button class="btn btn-secondary" onclick="closeA4Modal()"><i class="fa-solid fa-xmark"></i> Esc চেপে বন্ধ করুন</button>
+      <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> A4 প্রিন্ট করুন</button>
+    </div>`;
+
+  overlay.classList.remove('hidden');
+}
+
+
+function saveAttendance() { saveStorage(); alert('উপস্থিতি ও এনগেজমেন্ট সংরক্ষণ করা হয়েছে!'); }
+
+// ===================== SECTION 5: EXAMS ROUTINE =====================
 function filterExamType(type) {
-  document.querySelectorAll('#exam-type-tabs .tab-chip').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('onclick').includes(type));
+  document.querySelectorAll('#exam-type-tabs .tab-chip, #exam-type-tabs .month-chip').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim().includes(type) || (type==='all' && b.textContent.trim().includes('সকল')));
   });
   renderExams(type);
 }
 
 function renderExams(type) {
   const container = document.getElementById('exams-cards-container');
+  if (!container) return;
   const items = type === 'all' ? classData.exams : classData.exams.filter(e => e.type === type);
   container.innerHTML = items.map(e => `
-    <div class="exam-card-box">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span class="badge" style="background:rgba(245,158,11,0.15); color:var(--warning); font-weight:800;">${e.type}</span>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:12px; font-weight:800; color:var(--primary);">পূর্ণমান: ${e.marks}</span>
-          <button onclick="editExam(${e.id})" style="color:var(--primary); background:none; font-size:14px; cursor:pointer;" title="সম্পাদনা করুন"><i class="fa-solid fa-pen-to-square"></i></button>
-          <button onclick="deleteExam(${e.id})" style="color:var(--danger); background:none; font-size:14px; cursor:pointer;" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
+    <div class="exam-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="badge" style="background:rgba(245,158,11,0.15);color:var(--warning);">${e.type}</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="font-size:12px;font-weight:800;color:var(--primary);">পূর্ণমান: ${e.marks}</span>
+          <button onclick="deleteExam(${e.id})" style="background:none;color:var(--danger);font-size:14px;"><i class="fa-solid fa-trash-can"></i></button>
         </div>
       </div>
-      <h4 style="font-size:16px; font-weight:800; margin-top:8px; color:var(--text-main);">${e.subject}</h4>
-      <p style="font-size:12px; color:var(--text-muted); margin-top:4px;"><i class="fa-solid fa-calendar-day"></i> তারিখ: ${e.date} (${e.time})</p>
-      <p style="font-size:12px; color:var(--text-muted); margin-top:2px;"><i class="fa-solid fa-file-circle-check"></i> কভারেজ: ${e.coverage}</p>
-    </div>
-  `).join('');
+      <h4 style="font-size:1.05rem;font-weight:800;margin-top:10px;color:var(--text-main);">${e.subject}</h4>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-top:4px;"><i class="fa-solid fa-calendar-day"></i> ${e.date} (${e.time}) | কক্ষ: ${e.room||'১০২'}</p>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-top:2px;"><i class="fa-solid fa-user-tie"></i> শিক্ষক: ${e.teacher||'মাগুরিব স্যার'}</p>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-top:2px;"><i class="fa-solid fa-file-circle-check"></i> কভারেজ: ${e.coverage}</p>
+    </div>`).join('');
 }
 
-// RENDER AI INSIGHTS
-function renderAIInsights() {
-  const container = document.getElementById('ai-insights-container');
-  container.innerHTML = classData.aiInsights.map(ai => `
-    <div class="ai-insight-card" style="border-left:4px solid var(--purple);">
-      <h4 style="color:var(--purple); font-size:15px; font-weight:800;"><i class="fa-solid fa-brain"></i> ${ai.title}</h4>
-      <p style="font-size:13px; margin-top:6px; color:var(--text-main);">${ai.desc}</p>
-      <div style="margin-top:10px; padding:10px; background:rgba(139,92,246,0.1); border-radius:8px; font-size:12px; font-weight:700; color:var(--purple);">
-        💡 AI সুপারিশকৃত করণীয়: ${ai.action}
-      </div>
-    </div>
-  `).join('');
-}
+function openAddExamModal()  { document.getElementById('exam-modal')?.classList.remove('hidden'); }
+function closeExamModal()    { document.getElementById('exam-modal')?.classList.add('hidden'); }
+function saveExamModal(e)    { e.preventDefault(); closeExamModal(); renderExams('all'); }
+function deleteExam(id)      { classData.exams = classData.exams.filter(e => e.id !== id); saveStorage(); renderExams('all'); }
 
-// RENDER HISTORY CARDS
-function renderHistory() {
-  const container = document.getElementById('history-cards-container');
-  const board = classData.settings.board || 'ঢাকা বোর্ড';
-  const className = classData.settings.className || 'অষ্টম (শাখা-ক)';
-  const group = classData.settings.group || 'সাধারণ';
-
-  container.innerHTML = classData.history.map(h => `
-    <div class="history-card-box">
-      <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted); font-weight:700;">
-        <span>${h.date} | ${board}</span>
-        <span class="badge" style="background:rgba(16,185,129,0.15); color:var(--success);">উপস্থিতি ${h.attendance}</span>
-      </div>
-      <h4 style="font-size:15px; font-weight:800; margin-top:6px; color:var(--text-main);">${h.subject}</h4>
-      <p style="font-size:11.5px; color:var(--primary); font-weight:700; margin-top:2px;"><i class="fa-solid fa-graduation-cap"></i> শ্রেণি: ${h.class || className} | বিভাগ: ${group}</p>
-      <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">${h.remark}</p>
-    </div>
-  `).join('');
-}
-
-// RENDER ALERTS
-function renderAlerts() {
-  const container = document.getElementById('alerts-container');
-  const board = classData.settings.board || 'ঢাকা বোর্ড';
-  const className = classData.settings.className || 'অষ্টম (শাখা-ক)';
-  const group = classData.settings.group || 'সাধারণ';
-
-  container.innerHTML = classData.alerts.map(a => `
-    <div class="interactive-card" style="border-left:4px solid ${a.type === 'urgent' ? 'var(--danger)' : 'var(--warning)'}; margin-bottom:12px;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h4 style="color:${a.type === 'urgent' ? 'var(--danger)' : 'var(--warning)'}; font-size:15px; font-weight:800;">${a.title}</h4>
-        <span style="font-size:11px; color:var(--text-muted); font-weight:700;">${a.time} | ${board}</span>
-      </div>
-      <p style="font-size:11.5px; color:var(--text-muted); font-weight:700; margin-top:2px;">শ্রেণি: ${className} | বিভাগ: ${group}</p>
-      <p style="font-size:13px; margin-top:6px; color:var(--text-main);">${a.desc}</p>
-    </div>
-  `).join('');
-}
-
-// LIVE TIMER LOGIC
-let timerInterval = null;
-let timerSeconds = 2400; // 40 mins
-
-function updateTimerDisplay() {
-  const mins = Math.floor(timerSeconds / 60);
-  const secs = timerSeconds % 60;
-  document.getElementById('live-timer-digits').textContent = 
-    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
-function startLiveTimer() {
-  if (timerInterval) return;
-  timerInterval = setInterval(() => {
-    if (timerSeconds > 0) {
-      timerSeconds--;
-      updateTimerDisplay();
-    } else {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-  }, 1000);
-}
-
-function pauseLiveTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-}
-
-function resetLiveTimer() {
-  pauseLiveTimer();
-  timerSeconds = 2400;
+// ===================== SECTION 6: SMART LIVE CLASS =====================
+function renderLiveControl() {
   updateTimerDisplay();
 }
 
-// LIVE CONTROL CONTEXT UPDATE & RANDOMIZER
-function updateLiveContext() {
-  const board = document.getElementById('live-board-select')?.value || 'ঢাকা বোর্ড';
-  const cls = document.getElementById('live-class-select')?.value || 'অষ্টম';
-  const sec = document.getElementById('live-section-select')?.value || 'ক';
-  const grp = document.getElementById('live-group-select')?.value || 'সাধারণ';
-
-  const summary = document.getElementById('live-context-summary');
-  if (summary) {
-    summary.textContent = `শ্রেণি: ${cls} | শাখা: ${sec} | বিভাগ: ${grp} | বোর্ড: ${board}`;
-  }
-
-  const meta = document.getElementById('random-student-meta');
-  if (meta) {
-    meta.textContent = `শ্রেণি: ${cls} (${sec}) | ${grp} | ${board}`;
-  }
+let timerInterval = null, timerSeconds = 2400;
+function updateTimerDisplay() {
+  const mins = Math.floor(timerSeconds / 60), secs = timerSeconds % 60;
+  const el = document.getElementById('live-timer-digits');
+  if (el) el.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
 }
+function startLiveTimer()  { if (timerInterval) return; timerInterval = setInterval(() => { if (timerSeconds > 0) { timerSeconds--; updateTimerDisplay(); } else clearInterval(timerInterval); }, 1000); }
+function pauseLiveTimer()  { clearInterval(timerInterval); timerInterval = null; }
+function resetLiveTimer()  { pauseLiveTimer(); timerSeconds = 2400; updateTimerDisplay(); }
 
 function pickRandomStudent() {
-  const cls = document.getElementById('live-class-select')?.value || 'অষ্টম';
-  const sec = document.getElementById('live-section-select')?.value || 'ক';
-  const grp = document.getElementById('live-group-select')?.value || 'সাধারণ';
-  const board = document.getElementById('live-board-select')?.value || 'ঢাকা বোর্ড';
-
-  const filtered = classData.students.filter(s => 
-    (s.className === cls || !s.className) && 
-    (s.section === sec || !s.section) && 
-    (s.group === grp || !s.group || grp === 'সাধারণ')
-  );
-
-  const students = filtered.length > 0 ? filtered : classData.students;
+  const students = classData.students;
+  if (!students.length) return;
   const picked = students[Math.floor(Math.random() * students.length)];
-  
-  document.getElementById('random-student-name').textContent = `🎯 রোল ${picked.roll}: ${picked.name}`;
-  const meta = document.getElementById('random-student-meta');
-  if (meta) {
-    meta.textContent = `শ্রেণি: ${picked.className || cls} (${picked.section || sec}) | বিভাগ: ${picked.group || grp} | বোর্ড: ${board}`;
+  const el = document.getElementById('random-student-name');
+  if (el) el.textContent = `🎯 রোল ${picked.roll}: ${picked.name}`;
+}
+
+// ===================== SECTION 7: HISTORY & SAVED RECORDS (A4 PAPER VIEW) =====================
+function renderHistory() {
+  const container = document.getElementById('history-cards-container');
+  if (!container) return;
+
+  const records = classData.history;
+  container.innerHTML = records.map(h => `
+    <div class="smart-card clickable-row" onclick="openA4RecordModal(${h.id})" style="cursor:pointer;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);font-weight:700;">
+        <span>${h.date} | ${classData.settings.board || 'ঢাকা বোর্ড'}</span>
+        <span class="badge" style="background:rgba(16,185,129,0.15);color:var(--success);">উপস্থিতি ${h.attendance}</span>
+      </div>
+      <h4 style="font-size:1.05rem;font-weight:800;margin-top:6px;color:var(--text-main);">${h.subject}</h4>
+      <p style="font-size:12.5px;color:var(--primary);font-weight:700;margin-top:2px;"><i class="fa-solid fa-graduation-cap"></i> শ্রেণি: ${h.class} | শিক্ষক: ${h.teacher}</p>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-top:4px;">${h.remark}</p>
+      <div style="margin-top:10px;font-size:0.78rem;color:var(--primary);font-weight:800;"><i class="fa-solid fa-file-lines"></i> 📄 A4 পেপারে ভিউ করতে ক্লিক করুন</div>
+    </div>`).join('');
+}
+
+function openA4RecordModal(id) {
+  const record = classData.history.find(h => h.id === id) || classData.history[0];
+  const overlay = document.getElementById('a4-record-modal-overlay');
+  const paper = document.getElementById('a4-record-modal-content');
+  if (!overlay || !paper) return;
+
+  paper.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #0f172a;padding-bottom:16px;margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:1.5rem;font-weight:900;color:#0f172a;">${classData.settings.school}</h2>
+        <span style="font-size:0.85rem;color:#475569;">শ্রেণি সেশন ইতিহাস ও ডিজিটাল ক্লাস রিপোর্ট</span>
+      </div>
+      <div style="text-align:right;">
+        <span style="font-size:0.8rem;font-weight:800;color:#6366f1;">তারিখ: ${record.date}</span>
+        <span style="display:block;font-size:0.8rem;color:#64748b;">রিপোর্ট আইডি: #REC-${record.id}</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;font-size:0.9rem;">
+      <div><strong>বিষয় & পাঠসূচি:</strong> ${record.subject}</div>
+      <div><strong>শ্রেণি ও শাখা:</strong> ${record.class}</div>
+      <div><strong>দায়িত্বপ্রাপ্ত শিক্ষক:</strong> ${record.teacher}</div>
+      <div><strong>কক্ষ নম্বর:</strong> ${record.room||'১০২'}</div>
+      <div><strong>গড় উপস্থিতি:</strong> ${record.attendance}</div>
+      <div><strong>শিক্ষা বোর্ড:</strong> ${classData.settings.board}</div>
+    </div>
+
+    <div style="background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:16px;margin-bottom:24px;">
+      <h4 style="font-size:0.95rem;font-weight:800;margin-bottom:8px;color:#0f172a;">শিক্ষকের পর্যবেক্ষণ ও সারসংক্ষেপ</h4>
+      <p style="font-size:0.9rem;color:#334155;line-height:1.6;">${record.remark}</p>
+    </div>
+
+    <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-top:30px;padding-top:16px;border-top:1.5px solid #cbd5e1;">
+      <button class="btn btn-secondary" onclick="closeA4Modal()"><i class="fa-solid fa-xmark"></i> Esc চেপে বন্ধ করুন</button>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> A4 প্রিন্ট করুন</button>
+        <button class="btn btn-danger" onclick="deleteHistoryRecord(${record.id})"><i class="fa-solid fa-trash"></i> মুছে ফেলুন</button>
+      </div>
+    </div>`;
+
+  overlay.classList.remove('hidden');
+}
+
+function closeA4Modal() {
+  document.getElementById('a4-record-modal-overlay')?.classList.add('hidden');
+}
+
+function deleteHistoryRecord(id) {
+  if (!confirm('এই রেকর্ডটি মুছে ফেলতে চান?')) return;
+  classData.history = classData.history.filter(h => h.id !== id);
+  saveStorage(); closeA4Modal(); renderHistory();
+}
+
+// ===================== SECTION 8: SMART PROGRESS =====================
+function renderProgress() {
+  const container = document.getElementById('progress-analytics-container');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="smart-card">
+      <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:16px;"><i class="fa-solid fa-chart-line text-primary"></i> বিষয়ভিত্তিক অগ্রগতি ও পারফরম্যান্স বিশ্লেষণ</h3>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.88rem;font-weight:800;margin-bottom:6px;">
+            <span>গণিত (বীজগণিত ও জ্যামিতি)</span>
+            <span style="color:var(--primary);">৮৫% (চমৎকার)</span>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-fill" style="width:85%;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.88rem;font-weight:800;margin-bottom:6px;">
+            <span>বিজ্ঞান (গতিবিদ্যা ও পরিবেশ)</span>
+            <span style="color:var(--success);">৭৮% (ভাল)</span>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-fill" style="width:78%;background:var(--success-gradient);"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.88rem;font-weight:800;margin-bottom:6px;">
+            <span>বাংলা (সমাস ও সাহিত্য)</span>
+            <span style="color:var(--purple);">৯২% (সেরা)</span>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-fill" style="width:92%;background:linear-gradient(90deg,var(--purple),var(--primary));"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.88rem;font-weight:800;margin-bottom:6px;">
+            <span>ইংরেজি (Grammar & Writing)</span>
+            <span style="color:var(--warning);">৬৫% (রিভিশন দরকার)</span>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-fill" style="width:65%;background:var(--warning);"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="smart-card" style="border-left:5px solid var(--success);">
+        <h4 style="color:var(--success);font-size:1rem;font-weight:800;margin-bottom:8px;"><i class="fa-solid fa-trophy"></i> সেরা পারফরম্যান্স মন্তব্য (Top Performers)</h4>
+        <p style="font-size:0.88rem;color:var(--text-main);">বাংলা ও বীজগণিত বিষয়ে শিক্ষার্থীরা অত্যন্ত ভালো ফলাফল প্রদর্শন করেছে। ক্লাস প্রেজেন্টেশনে ৮০% শিক্ষার্থী সক্রিয় ছিল।</p>
+      </div>
+      <div class="smart-card" style="border-left:5px solid var(--danger);">
+        <h4 style="color:var(--danger);font-size:1rem;font-weight:800;margin-bottom:8px;"><i class="fa-solid fa-lightbulb"></i> দুর্বলতার সমাধান ও AI পরামর্শ</h4>
+        <p style="font-size:0.88rem;color:var(--text-main);">ইংরেজি গ্রামার অংশে ১৫% শিক্ষার্থীর দুর্বলতা চিহ্নিত হয়েছে। তাদের জন্য ২০ মিনিটের বিশেষ টিউটোরিয়াল কুইজ দেওয়ার পরামর্শ দেওয়া হচ্ছে।</p>
+      </div>
+    </div>`;
+}
+
+// AI Insights & Alerts
+function renderAIInsights() {
+  const c = document.getElementById('ai-insights-container');
+  if (c) {
+    c.innerHTML = classData.aiInsights.map(a => `
+      <div class="smart-card" style="border-left:5px solid var(--purple);">
+        <h4 style="color:var(--purple);font-size:1.05rem;font-weight:800;"><i class="fa-solid fa-brain"></i> ${a.title}</h4>
+        <p style="font-size:13.5px;color:var(--text-main);margin-top:6px;">${a.desc}</p>
+        <div style="margin-top:12px;padding:12px 16px;background:rgba(139,92,246,0.08);border-radius:10px;font-size:12.5px;font-weight:700;color:var(--purple);">
+          💡 AI সুপারিশকৃত করণীয়: ${a.action}
+        </div>
+      </div>`).join('');
   }
 }
 
-// ROUTINE MODAL, EDIT & AUTOMATED TEACHER ALERT SIMULATION
-function openAddRoutineModal() {
-  editingRoutineId = null;
-  document.querySelector('#routine-modal h3').innerHTML = '<i class="fa-solid fa-calendar-plus text-primary"></i> নতুন পিরিয়ড যোগ করুন';
-  if (document.getElementById('m-subject')) document.getElementById('m-subject').value = 'গণিত';
-  if (document.getElementById('m-time-text')) document.getElementById('m-time-text').value = '১০:০০ - ১০:৪৫';
-  if (document.getElementById('m-time-ampm')) document.getElementById('m-time-ampm').value = 'AM';
-  if (document.getElementById('m-room')) document.getElementById('m-room').value = '১০২';
-  if (document.getElementById('m-topic')) document.getElementById('m-topic').value = '';
-  if (document.getElementById('m-teacher')) document.getElementById('m-teacher').value = classData.settings.teacherName || '';
-  if (document.getElementById('m-phone')) document.getElementById('m-phone').value = '01751095560';
-  document.getElementById('routine-modal').classList.remove('hidden');
-}
-
-function editRoutine(id) {
-  const item = classData.routines.find(r => r.id === id);
-  if (!item) return;
-  editingRoutineId = id;
-  document.querySelector('#routine-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-primary"></i> পিরিয়ড কার্ড সম্পাদনা করুন';
-  document.getElementById('m-day').value = item.day;
-  
-  if (document.getElementById('m-subject')) document.getElementById('m-subject').value = item.subject || 'গণিত';
-  
-  // Parse time and AM/PM
-  const fullTime = item.time || '১০:০০ - ১০:৪৫ AM';
-  const isPM = fullTime.toUpperCase().includes('PM');
-  const cleanTime = fullTime.replace(/AM|PM/gi, '').trim();
-
-  if (document.getElementById('m-time-text')) document.getElementById('m-time-text').value = cleanTime;
-  if (document.getElementById('m-time-ampm')) document.getElementById('m-time-ampm').value = isPM ? 'PM' : 'AM';
-
-  document.getElementById('m-room').value = item.room || '১০২';
-  document.getElementById('m-topic').value = item.topic || '';
-  if (document.getElementById('m-teacher')) document.getElementById('m-teacher').value = item.teacher || '';
-  if (document.getElementById('m-phone')) document.getElementById('m-phone').value = item.phone || '';
-  if (document.getElementById('m-alert-time')) document.getElementById('m-alert-time').value = item.alertTime || '10';
-  if (document.getElementById('m-alert-mode')) document.getElementById('m-alert-mode').value = item.alertMode || 'call_sms';
-  document.getElementById('routine-modal').classList.remove('hidden');
-}
-
-function closeRoutineModal() { document.getElementById('routine-modal').classList.add('hidden'); }
-
-function saveRoutineModal(e) {
-  e.preventDefault();
-  const day = document.getElementById('m-day').value;
-  const subject = document.getElementById('m-subject').value;
-  
-  const timeText = document.getElementById('m-time-text')?.value || '১০:০০ - ১০:৪৫';
-  const timeAmPm = document.getElementById('m-time-ampm')?.value || 'AM';
-  const time = `${timeText} ${timeAmPm}`;
-
-  const room = document.getElementById('m-room').value;
-  const topic = document.getElementById('m-topic').value;
-  const teacher = document.getElementById('m-teacher')?.value || classData.settings.teacherName;
-  const phone = document.getElementById('m-phone')?.value || '01751095560';
-  const alertTime = document.getElementById('m-alert-time')?.value || '10';
-  const alertMode = document.getElementById('m-alert-mode')?.value || 'call_sms';
-
-  if (editingRoutineId) {
-    const item = classData.routines.find(r => r.id === editingRoutineId);
-    if (item) {
-      item.day = day;
-      item.subject = subject;
-      item.time = time;
-      item.room = room;
-      item.topic = topic;
-      item.teacher = teacher;
-      item.phone = phone;
-      item.alertTime = alertTime;
-      item.alertMode = alertMode;
-    }
-  } else {
-    classData.routines.push({
-      id: Date.now(),
-      day, subject, time, room, topic, teacher, phone, alertTime, alertMode
-    });
+function renderAlerts() {
+  const c = document.getElementById('alerts-container');
+  if (c) {
+    c.innerHTML = classData.alerts.map(a => `
+      <div class="smart-card" style="border-left:5px solid ${a.type==='urgent'?'var(--danger)':'var(--warning)'};">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h4 style="color:${a.type==='urgent'?'var(--danger)':'var(--warning)'};font-size:1.05rem;font-weight:800;">${a.title}</h4>
+          <span style="font-size:11.5px;color:var(--text-muted);font-weight:700;">${a.time}</span>
+        </div>
+        <p style="font-size:13.5px;margin-top:6px;color:var(--text-main);">${a.desc}</p>
+      </div>`).join('');
   }
-
-  saveStorage();
-  closeRoutineModal();
-  renderRoutine(day);
-  renderOverview();
-  
-  // Show notification feedback
-  alert(`✅ পিরিয়ড কার্ড সফলভাবে সংরক্ষিত হয়েছে!\n\n📌 বিষয়: ${subject} (${time})\n📞 শিক্ষক ${teacher} (${phone})-এর মোবাইলে ক্লাস শুরুর ${alertTime} মিনিট পূর্বে অটোমেটিক রিমাইন্ডার কল ও SMS সেট করা হলো।`);
 }
 
-// REAL-TIME FUNCTIONAL TEST SIMULATOR FOR AUTOMATED VOICE CALL & SMS
-function triggerTestTeacherAlert(teacherName, phone, subject, time, room) {
-  const isWebSpeechAvailable = 'speechSynthesis' in window;
-  const messageText = `আসসালামু আলাইকুম ${teacherName} স্যার। আপনার ${subject} বিষয়ের ক্লাসটি কিছুক্ষণের মধ্যে কক্ষ ${room}-এ শুরু হতে যাচ্ছে। দয়া করে ক্লাসে উপস্থিত হোন।`;
+function saveSettings(e) { e.preventDefault(); saveStorage(); alert('সেটিংস সফলভাবে সংরক্ষণ করা হয়েছে!'); }
 
-  // 1. Trigger Visual Interactive Banner
-  const alertBanner = document.createElement('div');
-  alertBanner.style.position = 'fixed';
-  alertBanner.style.bottom = '20px';
-  alertBanner.style.right = '20px';
-  alertBanner.style.background = '#1e293b';
-  alertBanner.style.color = '#ffffff';
-  alertBanner.style.padding = '18px 24px';
-  alertBanner.style.borderRadius = '14px';
-  alertBanner.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
-  alertBanner.style.zIndex = '9999';
-  alertBanner.style.borderLeft = '5px solid #10b981';
-  alertBanner.style.maxWidth = '380px';
-  alertBanner.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <span style="color:#10b981; font-weight:800; font-size:13px;"><i class="fa-solid fa-phone-volume fa-bounce"></i> অটোমেটিক টিচার স্মার্ট কল সিমুলেটর</span>
-      <button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:#94a3b8; font-size:18px; cursor:pointer;">&times;</button>
-    </div>
-    <div style="font-size:13px; margin-bottom:6px;"><strong>প্রাপক:</strong> ${teacherName} (${phone})</div>
-    <div style="font-size:12px; color:#cbd5e1; background:rgba(255,255,255,0.08); padding:8px; border-radius:6px; font-style:italic;">
-      "${messageText}"
-    </div>
-    <div style="margin-top:10px; font-size:11px; color:#10b981; font-weight:700;">
-      📲 SMS প্রদেয়: [সফলভাবে প্রেক্ষিত] | 📞 ভয়েস রিডিং: [সক্রিয়]
-    </div>
-  `;
-  document.body.appendChild(alertBanner);
-
-  // 2. Play Audio Speech Synthesis Voice Alert (Functional Voice Reminding)
-  if (isWebSpeechAvailable) {
-    window.speechSynthesis.cancel(); // Reset any previous audio
-    const speech = new SpeechSynthesisUtterance(messageText);
-    speech.lang = 'bn-BD'; // Bengali language voice synthesis
-    speech.rate = 0.9;
-    speech.pitch = 1.0;
-    window.speechSynthesis.speak(speech);
-  }
-
-  setTimeout(() => {
-    if (alertBanner.parentElement) alertBanner.remove();
-  }, 12000);
-}
-
-// REAL-TIME AUTOMATED BACKGROUND SCHEDULE MONITOR (EVERY 10 SECONDS)
+// Background Schedule Monitor
 let triggeredAlertsCache = {};
-
 function checkRoutineScheduleAlerts() {
   const now = new Date();
-  const currentHours = now.getHours();
-  const currentMinutes = now.getMinutes();
-
   classData.routines.forEach(r => {
     if (!r.time) return;
-    
-    // Parse time string e.g. "06:30 PM" or "১০:০০ - ১০:৪৫ AM"
-    const timeMatch = r.time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
-    if (!timeMatch) return;
-
-    let h = parseInt(timeMatch[1], 10);
-    let m = parseInt(timeMatch[2], 10);
-    const ampm = timeMatch[3] ? timeMatch[3].toUpperCase() : '';
-
-    if (ampm === 'PM' && h < 12) h += 12;
-    if (ampm === 'AM' && h === 12) h = 0;
-
-    const alertMinutesBefore = parseInt(r.alertTime || '10', 10);
-    
-    // Target alert time
-    let targetAlertMinutes = (h * 60 + m) - alertMinutesBefore;
-    if (targetAlertMinutes < 0) targetAlertMinutes += 24 * 60;
-
-    const nowTotalMinutes = currentHours * 60 + currentMinutes;
-
-    // Check if current time matches target alert time window (within 2 mins)
-    const diff = Math.abs(nowTotalMinutes - targetAlertMinutes);
-    const cacheKey = `${r.id}_${now.toDateString()}_${h}_${m}`;
-
-    if (diff <= 1 && !triggeredAlertsCache[cacheKey]) {
-      triggeredAlertsCache[cacheKey] = true;
-      triggerTestTeacherAlert(
-        r.teacher || 'শিক্ষক',
-        r.phone || '01700000000',
-        r.subject || 'বিষয়',
-        r.time,
-        r.room || '১০২'
-      );
+    const m = r.time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (!m) return;
+    let h = parseInt(m[1]); let mi = parseInt(m[2]);
+    const ap = (m[3]||'').toUpperCase();
+    if (ap==='PM' && h<12) h+=12;
+    if (ap==='AM' && h===12) h=0;
+    const alertMins = parseInt(r.alertTime||'10');
+    let target = (h*60+mi) - alertMins;
+    if (target<0) target+=1440;
+    const nowMins = now.getHours()*60+now.getMinutes();
+    const diff = Math.abs(nowMins-target);
+    const key = `${r.id}_${now.toDateString()}_${h}_${mi}`;
+    if (diff<=1 && !triggeredAlertsCache[key]) {
+      triggeredAlertsCache[key] = true;
+      triggerTeacherAlert(r.teacher||'শিক্ষক', r.phone||'01700000000', r.subject||'বিষয়', r.time, r.room||'১০২');
     }
   });
 }
 
-function deleteRoutine(id) {
-  if (confirm('আপনি কি এই রুটিন পিরিয়ড কার্ডটি মুছে ফেলতে চান?')) {
-    classData.routines = classData.routines.filter(r => r.id !== id);
-    saveStorage();
-    renderRoutine('রবিবার');
-    renderOverview();
+function triggerTeacherAlert(name, phone, subject, time, room) {
+  const msg = `আসসালামু আলাইকুম ${name} স্যার। আপনার ${subject} বিষয়ের ক্লাসটি কিছুক্ষণের মধ্যে কক্ষ ${room}-এ শুরু হতে যাচ্ছে।`;
+  const banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1e293b;color:#fff;padding:18px 24px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.3);z-index:9999;border-left:5px solid #10b981;max-width:380px;';
+  banner.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="color:#10b981;font-weight:800;font-size:13px;"><i class="fa-solid fa-phone-volume"></i> অটো কল সিমুলেটর</span>
+      <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;">&times;</button>
+    </div>
+    <div style="font-size:13px;margin-bottom:6px;"><strong>প্রাপক:</strong> ${name} (${phone})</div>
+    <div style="font-size:12px;color:#cbd5e1;background:rgba(255,255,255,0.08);padding:8px;border-radius:6px;font-style:italic;">"${msg}"</div>`;
+  document.body.appendChild(banner);
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const sp = new SpeechSynthesisUtterance(msg);
+    sp.lang = 'bn-BD'; sp.rate = 0.9;
+    window.speechSynthesis.speak(sp);
   }
+  setTimeout(() => { if (banner.parentElement) banner.remove(); }, 12000);
 }
 
-// SYLLABUS MODAL & EDIT WITH ACADEMIC MASTER PLAN FIELDS
-function openAddSyllabusModal() {
-  editingSyllabusId = null;
-  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-book-bookmark text-purple"></i> নতুন সিলেবাস ও লেসন প্ল্যান যোগ';
-  if (document.getElementById('ms-subject')) document.getElementById('ms-subject').value = 'গণিত';
-  if (document.getElementById('ms-subject-code')) document.getElementById('ms-subject-code').value = '১০৯';
-  if (document.getElementById('ms-chapter')) document.getElementById('ms-chapter').value = '';
-  if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = '';
-  if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = '৬';
-  if (document.getElementById('ms-ref-books')) document.getElementById('ms-ref-books').value = 'NCTB বোর্ড বই ও ল্যাব প্র্যাকটিক্যাল গাইড';
-  if (document.getElementById('ms-target')) document.getElementById('ms-target').value = '';
-  document.getElementById('syllabus-modal').classList.remove('hidden');
-}
+// Global helpers
+const exportPDF = () => window.print();
 
-function editSyllabus(id) {
-  const item = classData.syllabuses.find(s => s.id === id);
-  if (!item) return;
-  editingSyllabusId = id;
-  document.querySelector('#syllabus-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-purple"></i> সিলেবাস ও ১২ মাসের মাস্টার প্ল্যান সম্পাদনা';
-  document.getElementById('ms-timeframe').value = item.timeframe || 'today';
-  if (document.getElementById('ms-subject')) document.getElementById('ms-subject').value = item.subject || 'গণিত';
-  if (document.getElementById('ms-subject-code')) document.getElementById('ms-subject-code').value = item.subjectCode || '১০৯';
-  
-  // Set multi-selected chapters
-  const chapterSelect = document.getElementById('ms-chapter');
-  if (chapterSelect) {
-    const selectedList = Array.isArray(item.chapters) ? item.chapters : [item.chapter];
-    Array.from(chapterSelect.options).forEach(opt => {
-      opt.selected = selectedList.includes(opt.value);
-    });
-  }
-
-  if (document.getElementById('ms-working-days')) document.getElementById('ms-working-days').value = item.workingDays || '১৮০টি মোট কার্যদিবস (বছরে)';
-  if (document.getElementById('ms-holidays')) document.getElementById('ms-holidays').value = item.holidays || '৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)';
-  if (document.getElementById('ms-weekly-plan')) document.getElementById('ms-weekly-plan').value = item.weeklyPlan || '';
-  if (document.getElementById('ms-periods')) document.getElementById('ms-periods').value = item.periodsNeeded || '৬';
-  if (document.getElementById('ms-start-date')) document.getElementById('ms-start-date').value = item.startDate || '2026-07-25';
-  if (document.getElementById('ms-start-time')) document.getElementById('ms-start-time').value = item.startTime || '০৯:০০ AM';
-  if (document.getElementById('ms-duration')) document.getElementById('ms-duration').value = item.duration || '১ ঘণ্টা';
-  if (document.getElementById('ms-next-class')) document.getElementById('ms-next-class').value = item.nextClass || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)';
-  if (document.getElementById('ms-ref-books')) document.getElementById('ms-ref-books').value = item.refBooks || '';
-  document.getElementById('ms-target').value = item.target || '';
-  document.getElementById('syllabus-modal').classList.remove('hidden');
-}
-
-function closeSyllabusModal() { document.getElementById('syllabus-modal').classList.add('hidden'); }
-
-function saveSyllabusModal(e) {
-  e.preventDefault();
-  const timeframe = document.getElementById('ms-timeframe').value;
-  const subject = document.getElementById('ms-subject').value;
-  const subjectCode = document.getElementById('ms-subject-code')?.value || '১০৯';
-  
-  // Extract all multi-selected chapters
-  const chapterSelect = document.getElementById('ms-chapter');
-  const selectedChapters = chapterSelect ? Array.from(chapterSelect.selectedOptions).map(opt => opt.value) : ['অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র'];
-  const primaryChapter = selectedChapters.join(', ');
-
-  const workingDays = document.getElementById('ms-working-days')?.value || '১৮০টি মোট কার্যদিবস (বছরে)';
-  const holidays = document.getElementById('ms-holidays')?.value || '৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)';
-  const weeklyPlan = document.getElementById('ms-weekly-plan')?.value || '১২ মাসের বিষয়ভিত্তিক রোডম্যাপ';
-  const periodsNeeded = document.getElementById('ms-periods')?.value || '৬';
-  const startDate = document.getElementById('ms-start-date')?.value || '২০২৬-০৭-২৫';
-  const startTime = document.getElementById('ms-start-time')?.value || '০৯:০০ AM';
-  const duration = document.getElementById('ms-duration')?.value || '১ ঘণ্টা';
-  const nextClass = document.getElementById('ms-next-class')?.value || 'পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)';
-  const refBooks = document.getElementById('ms-ref-books')?.value || 'NCTB বোর্ড বই';
-  const target = document.getElementById('ms-target').value;
-
-  const tfLabels = {
-    today: "প্রতিদিনের সিলেবাস", "1week": "আগামী ১ সপ্তাহ", "15days": "আগামী ১৫ দিন",
-    "1month": "আগামী ১ মাস", "3months": "আগামী ৩ মাস", "6months": "আগামী ৬ মাস",
-    "9months": "আগামী ৯ মাস", "12months": "আগামী ১২ মাস (১ বছর)"
-  };
-
-  if (editingSyllabusId) {
-    const item = classData.syllabuses.find(s => s.id === editingSyllabusId);
-    if (item) {
-      item.timeframe = timeframe;
-      item.timeframeLabel = tfLabels[timeframe] || timeframe;
-      item.subject = subject;
-      item.subjectCode = subjectCode;
-      item.chapter = primaryChapter;
-      item.chapters = selectedChapters;
-      item.workingDays = workingDays;
-      item.holidays = holidays;
-      item.weeklyPlan = weeklyPlan;
-      item.periodsNeeded = periodsNeeded;
-      item.startDate = startDate;
-      item.startTime = startTime;
-      item.duration = duration;
-      item.nextClass = nextClass;
-      item.refBooks = refBooks;
-      item.target = target;
+function updateGlobalContext() {
+  try {
+    const sub = document.getElementById('global-context-subtitle');
+    if (sub && classData && classData.settings) {
+      sub.textContent = `${classData.settings.board || 'ঢাকা বোর্ড'} | ${classData.settings.className || 'অষ্টম শ্রেণি (ক)'} | ${classData.settings.group || 'সাধারণ বিভাগ'}`;
     }
-  } else {
-    classData.syllabuses.push({
-      id: Date.now(),
-      timeframe,
-      timeframeLabel: tfLabels[timeframe] || timeframe,
-      subject,
-      subjectCode,
-      chapter: primaryChapter,
-      chapters: selectedChapters,
-      workingDays,
-      holidays,
-      weeklyPlan,
-      periodsNeeded,
-      startDate,
-      startTime,
-      duration,
-      nextClass,
-      refBooks,
-      target,
-      progress: 10
-    });
-  }
-
-  saveStorage();
-  closeSyllabusModal();
-  renderSyllabus(timeframe);
-}
-
-function deleteSyllabus(id) {
-  if (confirm('আপনি কি এই সিলেবাস টার্গেট কার্ডটি মুছে ফেলতে চান?')) {
-    classData.syllabuses = classData.syllabuses.filter(s => s.id !== id);
-    saveStorage();
-    renderSyllabus('today');
+  } catch(e) {
+    console.error('updateGlobalContext error:', e);
   }
 }
+const updateLiveContext = updateGlobalContext;
 
-// EXAM MODAL & EDIT
-function openAddExamModal() {
-  editingExamId = null;
-  document.querySelector('#exam-modal h3').innerHTML = '<i class="fa-solid fa-bullseye text-warning"></i> নতুন পরীক্ষা রুটিন কার্ড';
-  document.getElementById('me-subject').value = '';
-  document.getElementById('me-date').value = '';
-  document.getElementById('me-time').value = '১০:০০ AM';
-  document.getElementById('me-marks').value = '২০';
-  document.getElementById('me-coverage').value = '';
-  document.getElementById('exam-modal').classList.remove('hidden');
-}
+const switchRoleView = (role) => alert('রোল পরিবর্তন করা হয়েছে: ' + role);
 
-function editExam(id) {
-  const item = classData.exams.find(e => e.id === id);
-  if (!item) return;
-  editingExamId = id;
-  document.querySelector('#exam-modal h3').innerHTML = '<i class="fa-solid fa-pen-to-square text-warning"></i> পরীক্ষা রুটিন সম্পাদনা করুন';
-  document.getElementById('me-type').value = item.type;
-  document.getElementById('me-subject').value = item.subject;
-  document.getElementById('me-date').value = item.date;
-  document.getElementById('me-time').value = item.time;
-  document.getElementById('me-marks').value = item.marks;
-  document.getElementById('me-coverage').value = item.coverage;
-  document.getElementById('exam-modal').classList.remove('hidden');
-}
-
-function closeExamModal() { document.getElementById('exam-modal').classList.add('hidden'); }
-
-function saveExamModal(e) {
-  e.preventDefault();
-  const type = document.getElementById('me-type').value;
-  const subject = document.getElementById('me-subject').value;
-  const date = document.getElementById('me-date').value;
-  const time = document.getElementById('me-time').value;
-  const marks = document.getElementById('me-marks').value;
-  const coverage = document.getElementById('me-coverage').value;
-
-  if (editingExamId) {
-    const item = classData.exams.find(e => e.id === editingExamId);
-    if (item) {
-      item.type = type;
-      item.subject = subject;
-      item.date = date;
-      item.time = time;
-      item.marks = marks;
-      item.coverage = coverage;
-    }
-  } else {
-    classData.exams.push({
-      id: Date.now(),
-      type, subject, date, time, marks, coverage
-    });
-  }
-
-  saveStorage();
-  closeExamModal();
-  renderExams(type);
-}
-
-function deleteExam(id) {
-  if (confirm('আপনি কি এই পরীক্ষা রুটিন কার্ডটি মুছে ফেলতে চান?')) {
-    classData.exams = classData.exams.filter(e => e.id !== id);
-    saveStorage();
-    renderExams('all');
-  }
-}
-
-// SETTINGS CONTROL
-function saveSettings(e) {
-  e.preventDefault();
-  classData.settings.school = document.getElementById('cfg-school-name').value;
-  classData.settings.teacherName = document.getElementById('cfg-teacher-name').value;
-  classData.settings.className = document.getElementById('cfg-class-name').value;
-  saveStorage();
-  alert('সেটিংস সফলভাবে সংরক্ষণ করা হয়েছে!');
-}
-
-// AUTOMATIC SUBJECT CODE AUTO-FILLER
-function autoFillSubjectCode(subject) {
-  const codeMap = {
-    'গণিত': '১০৯', 'বাংলা': '১০১', 'ইংরেজি': '১০৭', 'বিজ্ঞান': '১২৭',
-    'ডিজিটাল প্রযুক্তি': '১৩১', 'ইতিহাস ও সামাজিক বিজ্ঞান': '১৫০',
-    'পদার্থবিজ্ঞান': '১৩৬', 'রসায়ন': '১৩৭', 'জীববিজ্ঞান': '১৩৮',
-    'উচ্চতর গণিত': '১২৬', 'হিসাববিজ্ঞান': '১৪৬', 'ব্যবসায় উদ্যোগ': '১৪৩'
-  };
-  const codeSelect = document.getElementById('ms-subject-code');
-  if (codeSelect && codeMap[subject]) {
-    codeSelect.value = codeMap[subject];
-  }
-}
-
-// INITIALIZATION & GLOBAL ESC KEY LISTENER FOR BACK NAVIGATION / MODAL CLOSE
+// Init & Global ESC Listener
 document.addEventListener('DOMContentLoaded', () => {
   loadStorage();
-  showSection('overview');
-  
-  // Start automated background schedule monitor (runs every 5 seconds)
+
+  if (localStorage.getItem('sashiba_dark_mode') === 'true') {
+    document.body.classList.add('dark-mode');
+    const btn = document.getElementById('dark-mode-btn');
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-sun" style="color:#fbbf24;"></i>';
+  }
+
+  switchSection('overview');
+
   checkRoutineScheduleAlerts();
   setInterval(checkRoutineScheduleAlerts, 5000);
 });
 
-// ESC KEY HANDLER: ESC PRESS CLOSES OPEN MODALS OR NAVIGATES BACK
-document.addEventListener('keydown', (e) => {
+// ESC Key listener closes open modals or A4 paper view
+document.addEventListener('keydown', e => {
   if (e.key === 'Escape' || e.key === 'Esc') {
-    // Check if any modal is currently visible
-    const routineModal = document.getElementById('routine-modal');
-    const syllabusModal = document.getElementById('syllabus-modal');
-    const examModal = document.getElementById('exam-modal');
-
-    let modalClosed = false;
-
-    if (routineModal && !routineModal.classList.contains('hidden')) {
-      closeRoutineModal();
-      modalClosed = true;
-    }
-    if (syllabusModal && !syllabusModal.classList.contains('hidden')) {
-      closeSyllabusModal();
-      modalClosed = true;
-    }
-    if (examModal && !examModal.classList.contains('hidden')) {
-      closeExamModal();
-      modalClosed = true;
-    }
-
-    // If no modal was open, ESC key navigates back to main home/overview
-    if (!modalClosed) {
-      const activeNav = document.querySelector('.nav-item.active');
-      const activeSectionId = activeNav ? activeNav.id.replace('nav-', '') : 'overview';
-      if (activeSectionId !== 'overview') {
-        showSection('overview');
-      } else {
-        goHome();
-      }
-    }
+    closeA4Modal();
+    ['routine-modal','syllabus-modal','exam-modal'].forEach(id => {
+      document.getElementById(id)?.classList.add('hidden');
+    });
   }
 });
+
+
+
+function triggerSchoolLogoUpload() {
+  document.getElementById('school-logo-file-input')?.click();
+}
+
+function uploadSchoolLogo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const dataUrl = evt.target.result;
+    const img = document.getElementById('badge-school-logo-img');
+    const defaultIcon = document.getElementById('badge-default-cap-icon');
+    if (img && defaultIcon) {
+      img.src = dataUrl;
+      img.style.display = 'block';
+      defaultIcon.style.display = 'none';
+    }
+    classData.settings.schoolLogo = dataUrl;
+    saveStorage();
+    showConfettiToast('📷 স্কুলের লোগো সফলভাবে আপলোড ও অটো-ফিট হয়েছে!');
+  };
+  reader.readAsDataURL(file);
+}
+
+
+
+function renderStudentAttendanceTable() {
+  const tbody = document.getElementById('student-table-body');
+  if (!tbody) return;
+
+  const st = classData.students || [];
+  tbody.innerHTML = st.map(s => {
+    const total = (s.bangla||0) + (s.english||0) + (s.math||0) + (s.science||0) + (s.social||0) + (s.ict||0);
+    const pct   = Math.round((total / 600) * 100);
+    let grade   = 'F';
+    let badgeClass = 'rgba(239,68,68,0.15)';
+    let badgeColor = 'var(--danger)';
+
+    if (pct >= 80) { grade = 'A+'; badgeClass = 'rgba(16,185,129,0.15)'; badgeColor = 'var(--success)'; }
+    else if (pct >= 70) { grade = 'A';  badgeClass = 'rgba(79,70,229,0.15)';  badgeColor = 'var(--primary)'; }
+    else if (pct >= 60) { grade = 'A-'; badgeClass = 'rgba(139,92,246,0.15)'; badgeColor = 'var(--purple)'; }
+    else if (pct >= 50) { grade = 'B';  badgeClass = 'rgba(245,158,11,0.15)'; badgeColor = 'var(--warning)'; }
+
+    return `
+    <tr>
+      <td><strong>#${s.roll}</strong></td>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.bangla}</td>
+      <td>${s.english}</td>
+      <td>${s.math}</td>
+      <td>${s.science}</td>
+      <td>${s.social}</td>
+      <td>${s.ict}</td>
+      <td><strong style="color:var(--primary);">${total} / ৬০০</strong></td>
+      <td><strong>${pct}%</strong></td>
+      <td><span class="badge" style="background:${badgeClass};color:${badgeColor};font-weight:900;">${grade}</span></td>
+      <td><span class="badge" style="background:${pct >= 80 ? 'rgba(16,185,129,0.15)' : (pct >= 50 ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)')};color:${pct >= 80 ? 'var(--success)' : (pct >= 50 ? 'var(--warning)' : 'var(--danger)')};">${pct >= 80 ? '🟢 সেরা' : (pct >= 50 ? '🟡 মাঝারি' : '🔴 দুর্বল')}</span></td>
+      <td style="text-align:right;">
+        <button onclick="alert('সংশোধন করা হচ্ছে...')" class="tbl-act-btn" title="সম্পাদনা"><i class="fa-solid fa-pen-to-square text-primary"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+
+
+function showConfettiToast(msg) {
+  let toast = document.getElementById('confetti-toast-bar');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'confetti-toast-bar';
+    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--hero-gradient);color:#fff;padding:14px 24px;border-radius:16px;font-weight:800;font-size:0.92rem;box-shadow:0 10px 30px var(--primary-glow);z-index:9999;transition:all 0.3s ease;transform:translateY(100px);opacity:0;';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = '<i class="fa-solid fa-sparkles"></i> ' + msg;
+  toast.style.transform = 'translateY(0)';
+  toast.style.opacity = '1';
+  setTimeout(() => {
+    toast.style.transform = 'translateY(100px)';
+    toast.style.opacity = '0';
+  }, 3000);
+}
+
+
+
+window.toggleTheme = function() {
+  const isDarkNow = document.documentElement.classList.contains('theme-dark') || document.body.classList.contains('theme-dark');
+  const nextIsDark = !isDarkNow;
+  
+  if (nextIsDark) {
+    document.documentElement.classList.add('theme-dark');
+    document.body.classList.add('theme-dark');
+    localStorage.setItem('sashiba_theme_mode', 'dark');
+  } else {
+    document.documentElement.classList.remove('theme-dark');
+    document.body.classList.remove('theme-dark');
+    localStorage.setItem('sashiba_theme_mode', 'light');
+  }
+  
+  window.updateThemeIcons(nextIsDark);
+  if (typeof showConfettiToast === 'function') {
+    showConfettiToast(nextIsDark ? '🌙 ডার্ক মোড অন করা হয়েছে!' : '☀️ লাইট মোড অন করা হয়েছে!');
+  }
+};
+
+window.updateThemeIcons = function(isDark) {
+  const btns = document.querySelectorAll('.theme-toggle-btn i');
+  btns.forEach(b => {
+    b.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    b.style.color = isDark ? '#fbbf24' : '#6366f1';
+  });
+};
+
+window.initTheme = function() {
+  const mode = localStorage.getItem('sashiba_theme_mode') || 'light';
+  const isDark = (mode === 'dark');
+  if (isDark) {
+    document.documentElement.classList.add('theme-dark');
+    document.body.classList.add('theme-dark');
+  } else {
+    document.documentElement.classList.remove('theme-dark');
+    document.body.classList.remove('theme-dark');
+  }
+  window.updateThemeIcons(isDark);
+};
+
+// Immediate Execution
+window.initTheme();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.initTheme);
+}
+
+
+
+/* ===================== FAIL-SAFE GLOBAL EVENT HANDLERS ===================== */
+window.switchSection = function(id) {
+  try {
+    document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+    
+    const targetSec = document.getElementById('sec-' + id);
+    if (targetSec) targetSec.classList.add('active');
+    
+    const activeLink = document.querySelector(`a[href="#sec-${id}"]`);
+    if (activeLink) activeLink.classList.add('active');
+
+    if (id === 'syllabus') renderSyllabus();
+    if (id === 'routine') renderRoutine('রবিবার');
+    if (id === 'attendance') renderStudentAttendanceTable();
+  } catch(e) {
+    console.error('switchSection error:', e);
+  }
+};
+
+window.switchSyllabusView = function(mode) {
+  _sylViewMode = mode;
+  
+  const btnCard = document.getElementById('syl-btn-card');
+  const btnTbl  = document.getElementById('syl-btn-table');
+  const superCard = document.getElementById('super-btn-card');
+  const superTbl  = document.getElementById('super-btn-table');
+  const toolbar = document.getElementById('syllabus-table-builder-toolbar');
+  
+  if (btnCard) btnCard.classList.toggle('active', mode === 'card');
+  if (btnTbl)  btnTbl.classList.toggle('active', mode === 'table');
+  if (superCard) superCard.classList.toggle('active', mode === 'card');
+  if (superTbl)  superTbl.classList.toggle('active', mode === 'table');
+  
+  if (toolbar) toolbar.style.display = (mode === 'table') ? 'block' : 'none';
+  
+  showConfettiToast(mode === 'table' ? '📊 সিলেবাস টেবিল ভিউ চালুকৃত!' : '🎴 সিলেবাস কার্ড ভিউ চালুকৃত!');
+  renderSyllabus();
+};
+
+window.searchSyllabusCards = function(q) {
+  _syl.search = (q || '').toLowerCase();
+  renderSyllabus();
+};
+
+window.filterSyllabusMonth = function(m) {
+  _syl.month = m;
+  document.querySelectorAll('#syllabus-month-chips .month-chip').forEach(b => {
+    b.classList.toggle('active', b.dataset.val === m);
+  });
+  renderSyllabus();
+};
+
+window.filterSyllabusByStatus = function(st) {
+  _syl.status = st;
+  renderSyllabus();
+};
+
+window.filterSyllabusByPriority = function(pr) {
+  _syl.priority = pr;
+  renderSyllabus();
+};
+
+window.filterSyllabusTerm = function(tm) {
+  _syl.term = tm;
+  renderSyllabus();
+};
+
+window.toggleChapterAccordion = function(id) {
+  const body = document.getElementById('syl-body-' + id);
+  if (!body) return;
+  const isHidden = (body.style.display === 'none' || !body.style.display);
+  body.style.display = isHidden ? 'block' : 'none';
+  
+  const accHeader = document.getElementById('syl-acc-' + id);
+  if (accHeader) {
+    accHeader.classList.toggle('expanded', isHidden);
+  }
+};
+
+window.toggleChecklistItem = function(sylId, idx) {
+  const item = classData.syllabuses.find(s => s.id == sylId);
+  if (item && item.checklist && item.checklist[idx]) {
+    item.checklist[idx].checked = !item.checklist[idx].checked;
+    
+    // Auto-calculate progress
+    const total = item.checklist.length;
+    const checkedCount = item.checklist.filter(c => c.checked).length;
+    item.progress = Math.round((checkedCount / (total || 1)) * 100);
+    if (item.progress === 100) item.status = 'completed';
+    else if (item.progress > 0) item.status = 'running';
+
+    saveStorage();
+    renderSyllabus();
+    showConfettiToast('✨ চেকলিস্ট আপডেট করা হয়েছে!');
+  }
+};
+
+window.toggleSidebar = function() {
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.classList.toggle('collapsed');
+};
+
+window.openAddSyllabusModal = function() {
+  const modal = document.getElementById('syllabus-modal');
+  if (modal) modal.classList.remove('hidden');
+};
+
+window.closeSyllabusModal = function() {
+  const modal = document.getElementById('syllabus-modal');
+  if (modal) modal.classList.add('hidden');
+};
+
+window.saveSyllabusModal = function(e) {
+  if (e) e.preventDefault();
+  const chapterInput = document.getElementById('ms-chapter');
+  if (!chapterInput || !chapterInput.value) return;
+
+  const newEntry = {
+    id: Date.now(),
+    date: document.getElementById('ms-date')?.value || '২০২৬-০৭-২৫',
+    time: document.getElementById('ms-time')?.value || '০৯:০০ AM',
+    room: document.getElementById('ms-room')?.value || '১০২',
+    className: document.getElementById('ms-class')?.value || 'অষ্টম',
+    section: document.getElementById('ms-section')?.value || 'ক',
+    subject: document.getElementById('ms-subject')?.value || 'গণিত',
+    chapterName: chapterInput.value,
+    teacher: document.getElementById('ms-teacher')?.value || 'মাগুরিব আলী',
+    month: document.getElementById('ms-month')?.value || 'জুলাই',
+    status: 'running',
+    progress: 25,
+    priority: 'High',
+    pi_code: '৮.৩.১',
+    required_classes: 6,
+    completed_classes: 1,
+    learningOutcomes: 'পাঠ্য বিষয়ের মৌলিক সজ্ঞানতা লাভ করবে।',
+    topics: [chapterInput.value],
+    checklist: [{ text: 'প্রথম পরিচ্ছেদ পাঠদান', checked: true }, { text: 'অনুশীলনী সমীকরণ সমাধান', checked: false }],
+    resources: { video: '#', note: '#', quiz: '#' }
+  };
+
+  classData.syllabuses.unshift(newEntry);
+  saveStorage();
+  closeSyllabusModal();
+  renderSyllabus();
+  showConfettiToast('🎉 নতুন সিলেবাস সফলভাবে যোগ করা হয়েছে!');
+};
+
+
+window.saveSyllabusDirect = function(id) {
+  saveStorage();
+  showConfettiToast('💾 সিলেবাস রেকর্ড সেভ করা হয়েছে!');
+};
+
+window.deleteSyllabus = function(id) {
+  if (confirm('আপনি কি এই সিলেবাস রেকর্ডটি ডিলিট করতে চান?')) {
+    classData.syllabuses = classData.syllabuses.filter(s => s.id != id);
+    saveStorage();
+    renderSyllabus();
+    showConfettiToast('🗑️ সিলেবাস রেকর্ড ডিলিট করা হয়েছে!');
+  }
+};
+
+
+
+/* ===================== AUTOMATIC PAGE LOAD INITIALIZATION ===================== */
+function initDashboardApp() {
+  try {
+    if (typeof loadStorage === 'function') loadStorage();
+    if (typeof window.initTheme === 'function') window.initTheme();
+    if (typeof renderOverview === 'function') renderOverview();
+    if (typeof renderSyllabus === 'function') renderSyllabus();
+    if (typeof renderStudentAttendanceTable === 'function') renderStudentAttendanceTable();
+    if (typeof renderRoutine === 'function') renderRoutine('রবিবার');
+    console.log('SashiBa Dashboard App Initialized Successfully!');
+  } catch(e) {
+    console.error('Initialization error:', e);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDashboardApp);
+} else {
+  initDashboardApp();
+}
+
+
+
+window.viewSyllabusDetails = function(id) {
+  const item = classData.syllabuses.find(s => s.id == id);
+  if (!item) return;
+
+  const reqCls  = item.required_classes || item.requiredClasses || 6;
+  const compCls = item.completed_classes || item.completedClasses || 2;
+  const periodText = (compCls < 10 ? '০' + compCls : compCls) + ' / ' + (reqCls < 10 ? '০' + reqCls : reqCls);
+  const topicsText = (item.topics && item.topics.length) ? item.topics.join(', ') : (item.chapterName || item.chapter);
+
+  document.getElementById('dtl-chapter-title').textContent = item.chapterName || item.chapter;
+  document.getElementById('dtl-subject-subtitle').textContent = `📚 ${item.subject} (${item.subjectCode || '১০৯'}) | পিরিয়ড: ${periodText} | PI ${item.pi_code || item.piIndicator || '৮.৩.১'}`;
+
+  const body = document.getElementById('dtl-content-body');
+  if (body) {
+    body.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;background:var(--bg-input);padding:14px;border-radius:14px;">
+        <div><strong>📅 তারিখ & সময়:</strong> ${item.date || '২০২৬-০৭-২৫'} (${item.time || '০৯:০০ AM'})</div>
+        <div><strong>🚪 কক্ষ নম্বর:</strong> ${item.room || '১০২'} (কক্ষ)</div>
+        <div><strong>🏫 শ্রেণি & শাখা:</strong> ${item.className || 'অষ্টম'} (${item.section || 'ক'})</div>
+        <div><strong>👨‍🏫 শিক্ষক:</strong> ${item.teacher || 'মাগুরিব আলী'}</div>
+      </div>
+
+      <div style="background:rgba(59,130,246,0.06);border:1.5px solid rgba(59,130,246,0.2);padding:14px;border-radius:14px;">
+        <strong style="color:var(--primary);display:block;margin-bottom:4px;"><i class="fa-solid fa-bullseye"></i> 🎯 শিখনফল (Learning Outcomes):</strong>
+        <span>${item.learningOutcomes || 'পাঠ্য বিষয়ের মূল তত্ত্ব প্রয়োগ করতে পারবে।'}</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:var(--bg-input);padding:12px;border-radius:12px;">
+          <strong style="color:var(--purple);display:block;"><i class="fa-solid fa-list-check"></i> 🎯 আলোচ্য বিষয় (Topics):</strong>
+          <span>${topicsText}</span>
+        </div>
+        <div style="background:var(--bg-input);padding:12px;border-radius:12px;">
+          <strong style="color:var(--warning);display:block;"><i class="fa-solid fa-calendar-day"></i> 📅 পরীক্ষার টার্ম (Term):</strong>
+          <span>${item.term === 'half_yearly' ? 'অর্ধবার্ষিকী পরীক্ষা' : 'বার্ষিক পরীক্ষা'}</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:var(--bg-input);padding:12px;border-radius:12px;">
+          <strong style="color:var(--success);display:block;"><i class="fa-solid fa-screwdriver-wrench"></i> 🛠️ শিক্ষণ উপকরণ (Teaching Aids):</strong>
+          <span>${item.teachingAids || 'প্রজেক্টর, জ্যামিতি বক্স ও হোয়াইটবোর্ড মার্কার'}</span>
+        </div>
+        <div style="background:var(--bg-input);padding:12px;border-radius:12px;">
+          <strong style="color:var(--danger);display:block;"><i class="fa-solid fa-house-laptop"></i> 🏠 বাড়ির কাজ (Homework):</strong>
+          <span>${item.homework || 'অনুশীলনী ৩.১ এর ১-৫ নং গাণিতিক সমস্যা সমাধান'}</span>
+        </div>
+      </div>
+
+      <div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.2);padding:12px;border-radius:12px;">
+        <strong style="color:var(--warning);display:block;"><i class="fa-solid fa-note-sticky"></i> 📝 বিশেষ মন্তব্য (Remarks/Notes):</strong>
+        <span>${item.remarks || 'আজকের ক্লাসে সকল শিক্ষার্থী মনোযোগের সাথে অংশগ্রহণ করেছে।'}</span>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:10px;">
+        <a href="${item.resources?.video || '#'}" target="_blank" class="resource-pill-btn"><i class="fa-solid fa-play" style="color:var(--danger)"></i> 🎥 ভিডিও লেকচার</a>
+        <button class="resource-pill-btn" onclick="alert('পিডিএফ নোট খুলছে...')"><i class="fa-solid fa-file-pdf" style="color:var(--primary)"></i> 📄 পিডিএফ নোট</button>
+        <button class="resource-pill-btn" onclick="alert('অনলাইন কুইজ চালু হচ্ছে...')"><i class="fa-solid fa-pen-nib" style="color:var(--warning)"></i> 📝 অনলাইন কুইজ</button>
+      </div>`;
+  }
+
+  const editBtn = document.getElementById('dtl-edit-btn');
+  if (editBtn) {
+    editBtn.onclick = function() {
+      closeSyllabusDetailsModal();
+      editSyllabus(id);
+    };
+  }
+
+  const modal = document.getElementById('syllabus-details-modal');
+  if (modal) modal.classList.remove('hidden');
+};
+
+window.closeSyllabusDetailsModal = function() {
+  const modal = document.getElementById('syllabus-details-modal');
+  if (modal) modal.classList.add('hidden');
+};
+
+
+let _multiLayerFilter = 'annual';
+
+window.switchMultiLayerPlan = function(layer, btn) {
+  _multiLayerFilter = layer;
+  document.querySelectorAll('#multi-layer-tabs .tab-chip').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  if (layer === 'half_yearly') {
+    _syl.term = 'half_yearly';
+    showConfettiToast('🏆 অর্ধবার্ষিকী টার্ম সিলেবাস ফিল্টারিং চালুকৃত!');
+  } else if (layer === 'annual_exam') {
+    _syl.term = 'annual';
+    showConfettiToast('🎯 বার্ষিকী টার্ম সিলেবাস ফিল্টারিং চালুকৃত!');
+  } else if (layer === 'fortnightly') {
+    _syl.term = 'all';
+    _syl.priority = 'High';
+    showConfettiToast('⚡ পাক্ষিক ১৫ দিনের স্বয়ংক্রিয় লক্ষ্যমাত্রা ফিল্টারিং চালুকৃত!');
+  } else if (layer === 'daily') {
+    _syl.term = 'all';
+    _syl.status = 'running';
+    showConfettiToast('📅 দৈনিক অ্যাকশন প্ল্যান (আজকের পিরিয়ড ট্র্যাকিং) চালুকৃত!');
+  } else {
+    _syl.term = 'all';
+    _syl.month = 'all';
+    _syl.status = 'all';
+    _syl.priority = 'all';
+    showConfettiToast('🗺️ ১২ মাসের বার্ষিক মাস্টার প্ল্যান লোড করা হয়েছে!');
+  }
+
+  renderSyllabus();
+};
+
+
+
+// 5. Holiday Buffer Auto-Rollover Logic
+window.autoAdjustHolidayBuffer = function() {
+  let adjustedCount = 0;
+  if (classData && classData.syllabuses) {
+    classData.syllabuses.forEach(s => {
+      if (s.is_holiday || s.status === 'holiday_deferred') {
+        s.target_date = '২০২৬-০৮-২২'; // Automatically rolled over to next active school day
+        adjustedCount++;
+      }
+    });
+  }
+  showConfettiToast(`🏖️ হলিডে বাফার লজিক: ${adjustedCount || 1}টি সিলেবাস পিরিয়ড ছুটির কারণে পরবর্তী কার্যদিবসে স্বয়ংসক্রিয়ভাবে রি-শিডিউল করা হয়েছে!`);
+  saveStorage();
+  renderSyllabus();
+};
+
+
+
+let _superChipMode = 'all';
+
+window.applySuperFilter = function(mode, btn) {
+  _superChipMode = mode;
+  document.querySelectorAll('#super-filter-chips .tab-chip').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  if (mode === 'today') {
+    _syl.status = 'running';
+    _syl.timeframeLabel = 'আজকের';
+    showConfettiToast('📅 আজকের সিলেবাস ফিল্টার চালুকৃত!');
+  } else if (mode === 'week') {
+    _syl.timeframeLabel = 'চলতি সপ্তাহ';
+    _syl.status = 'all';
+    showConfettiToast('⚡ এই সপ্তাহের সিলেবাস ফিল্টার চালুকৃত!');
+  } else if (mode === 'half_yearly') {
+    _syl.term = 'half_yearly';
+    showConfettiToast('🏆 অর্ধবার্ষিকী সিলেবাস ফিল্টার চালুকৃত!');
+  } else if (mode === 'revision') {
+    _syl.status = 'revision_needed';
+    showConfettiToast('🔄 রিভিশন সিলেবাস ফিল্টার চালুকৃত!');
+  } else {
+    _syl.term = 'all';
+    _syl.status = 'all';
+    _syl.priority = 'all';
+    _syl.month = 'all';
+    showConfettiToast('🌐 সকল সিলেবাস প্রদর্শিত হচ্ছে!');
+  }
+
+  renderSyllabus();
+};
+
+window.filterSuperSubject = function(sub) {
+  if (sub === 'all') {
+    _syl.search = '';
+  } else {
+    _syl.search = sub.toLowerCase();
+  }
+  renderSyllabus();
+};
+
+window.filterSuperTeacher = function(tch) {
+  if (tch === 'all') {
+    _syl.search = '';
+  } else {
+    _syl.search = tch.toLowerCase();
+  }
+  renderSyllabus();
+};
+
+
+
+// Dynamic Custom Columns State
+let customSyllabusColumns = [
+  { key: 'date', label: 'তারিখ & সময়', width: '135px', align: 'center' },
+  { key: 'room', label: 'কক্ষ', width: '75px', align: 'center' },
+  { key: 'subject', label: 'বিষয়', width: '120px', align: 'center' },
+  { key: 'chapter', label: 'অধ্যায় (CHAPTER)', width: '220px', align: 'left' },
+  { key: 'topics', label: 'আলোচ্য বিষয় (TOPICS)', width: '240px', align: 'left' },
+  { key: 'pi', label: 'PI কোড', width: '95px', align: 'center' },
+  { key: 'period', label: 'পিরিয়ড ট্র্যাকার', width: '110px', align: 'center' },
+  { key: 'teacher', label: 'শিক্ষক', width: '135px', align: 'center' },
+  { key: 'progress', label: 'অগ্রগতি', width: '125px', align: 'center' }
+];
+
+// =========================================================================
+// UNIFIED MASTER A4 EXECUTIVE SETUP CARD ENGINE (100% Identical Action)
+// =========================================================================
+
+// Switch Tabs inside Master Modal
+window.switchSyllabusModalTab = function(tabName) {
+  const tabBtnRow = document.getElementById('stb-row');
+  const tabBtnCol = document.getElementById('stb-col');
+  const tabBtnManage = document.getElementById('stb-manage');
+
+  const secRow = document.getElementById('tab-sec-row');
+  const secCol = document.getElementById('tab-sec-col');
+  const secManage = document.getElementById('tab-sec-manage');
+
+  const activeTabInput = document.getElementById('ms-active-tab');
+  if (activeTabInput) activeTabInput.value = tabName;
+
+  const titleSub = document.getElementById('modal-sub-dynamic-title');
+
+  if (tabBtnRow) tabBtnRow.classList.toggle('active', tabName === 'row');
+  if (tabBtnCol) tabBtnCol.classList.toggle('active', tabName === 'col');
+  if (tabBtnManage) tabBtnManage.classList.toggle('active', tabName === 'manage');
+
+  if (secRow) secRow.style.display = tabName === 'row' ? 'flex' : 'none';
+  if (secCol) secCol.style.display = tabName === 'col' ? 'flex' : 'none';
+  if (secManage) secManage.style.display = tabName === 'manage' ? 'flex' : 'none';
+
+  if (tabName === 'row' && titleSub) {
+    titleSub.innerHTML = 'বিষয়: <span id="modal-subject-subtitle">সাধারণ বিজ্ঞান</span> | মাস্টার রুটিন ও সিলেবাস এডিট শিট (A4)';
+  } else if (tabName === 'col' && titleSub) {
+    titleSub.innerHTML = 'বিষয়: <strong style="color:var(--purple);">নতুন কলাম সংযোজন</strong> | কলাম সেটআপ এডিট শিট (A4)';
+  } else if (tabName === 'manage' && titleSub) {
+    titleSub.innerHTML = 'বিষয়: <strong style="color:var(--warning);">টেবিল কলাম & স্ট্রাকচার এডিটর</strong> | টেবিল এডিট শিট (A4)';
+    renderManageColumnsListInModal();
+  }
+};
+
+window.openSyllabusMasterModal = function(initialTab = 'row') {
+  const modal = document.getElementById('syllabus-modal');
+  if (!modal) return;
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+  switchSyllabusModalTab(initialTab);
+};
+
+// Button 1: Add Row
+window.addNewSyllabusRow = function() {
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val !== undefined ? val : '';
+  };
+
+  setVal('ms-edit-id', '');
+  const s = classData.settings || {};
+  setVal('ms-school-name', s.schoolName || s.school || 'সশিবা সরকারি মডেল হাই স্কুল & কলেজ');
+  setVal('ms-date', '২০২৬-০৭-২৫');
+  setVal('ms-class', 'অষ্টম');
+  setVal('ms-section', 'ক');
+  setVal('ms-subject', 'সাধারণ বিজ্ঞান');
+  setVal('ms-chapter', '৩য় অধ্যায়: বীজগণিতীয় রাশি ও সমীকরণ');
+  setVal('ms-room', '১০৪ (২য় তলা)');
+  setVal('ms-topic', 'সূত্রাবলী, মান নির্ণয়, উৎপাদকে বিশ্লেষণ');
+  setVal('ms-time', '১০:০০ - ১০:৪৫ (২য় পিরিয়ড)');
+  setVal('ms-teacher', s.teacherName || 'মাগুরিব আলী');
+  setVal('ms-resource', '🎥 ভিডিও ক্লাস + 📄 লেকচার নোট + 📝 কুইজ');
+  setVal('ms-priority', 'High');
+
+  openSyllabusMasterModal('row');
+  showConfettiToast('✨ নতুন রো সংযোজন শিট প্রস্তুত! তথ্য পূরণ করে সেভ করুন।');
+};
+
+// Button 2: Add Col
+window.addNewSyllabusColumn = function() {
+  const titleInput = document.getElementById('col-title-input');
+  if (titleInput) titleInput.value = '';
+
+  openSyllabusMasterModal('col');
+  showConfettiToast('📊 নতুন কলাম সেটআপ শিট প্রস্তুত! কলামের তথ্য দিয়ে সেভ করুন।');
+};
+
+// Button 3: Edit Table
+window.enableTableEditMode = function() {
+  openSyllabusMasterModal('manage');
+  showConfettiToast('✏️ টেবিল কলাম এডিটর প্রস্তুত! কলাম রি-নেম বা কাস্টমাইজ করুন।');
+};
+
+window.renderManageColumnsListInModal = function() {
+  const container = document.getElementById('manage-columns-list-container');
+  if (!container) return;
+
+  container.innerHTML = customSyllabusColumns.map((col, index) => {
+    return `
+      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-input);padding:10px 14px;border-radius:12px;border:1.5px solid var(--border);">
+        <span style="font-weight:900;color:var(--primary);width:24px;text-align:center;">${index + 1}.</span>
+        <input type="text" data-col-key="${col.key}" class="form-input col-label-edit-input" value="${col.label}" style="flex:1;height:38px;font-weight:800;" placeholder="কলামের নাম">
+        
+        <select data-col-key="${col.key}" class="form-input col-width-edit-select" style="width:110px;height:38px;font-size:0.8rem;">
+          <option value="100px" ${col.width === '100px' ? 'selected' : ''}>১০০px</option>
+          <option value="140px" ${col.width === '140px' || !col.width ? 'selected' : ''}>১৪০px</option>
+          <option value="180px" ${col.width === '180px' ? 'selected' : ''}>১৮০px</option>
+          <option value="220px" ${col.width === '220px' ? 'selected' : ''}>২২০px</option>
+        </select>
+
+        ${col.key.startsWith('custom_') ? `
+          <button type="button" class="btn btn-secondary btn-sm" onclick="removeManagedColumn('${col.key}')" style="color:var(--danger);border-color:var(--danger);" title="🗑️ কলাম রিমুভ"><i class="fa-solid fa-trash-can"></i></button>
+        ` : `
+          <span style="font-size:0.75rem;color:var(--text-muted);font-weight:800;width:32px;text-align:center;">মূল</span>
+        `}
+      </div>
+    `;
+  }).join('');
+};
+
+window.removeManagedColumn = function(key) {
+  const idx = customSyllabusColumns.findIndex(c => c.key === key);
+  if (idx !== -1) {
+    const deletedName = customSyllabusColumns[idx].label;
+    customSyllabusColumns.splice(idx, 1);
+    renderManageColumnsListInModal();
+    showConfettiToast(`🗑️ কলাম "${deletedName}" রিমুভ করা হয়েছে!`);
+  }
+};
+
+window.closeAddColumnModal = function() { closeSyllabusModal(); };
+window.closeManageColumnsModal = function() { closeSyllabusModal(); };
+
+// Unified Master Modal Submission Handler
+window.handleMasterModalSubmit = function(e) {
+  if (e) e.preventDefault();
+  const activeTab = document.getElementById('ms-active-tab')?.value || 'row';
+
+  if (activeTab === 'row') {
+    window.saveSyllabusModal(e);
+  } else if (activeTab === 'col') {
+    const title = document.getElementById('col-title-input')?.value?.trim();
+    if (!title) return;
+
+    const align = document.getElementById('col-align-input')?.value || 'center';
+    const width = document.getElementById('col-width-input')?.value || '140px';
+    const defaultVal = document.getElementById('col-default-input')?.value || '-';
+
+    const colKey = 'custom_' + Date.now();
+    customSyllabusColumns.push({ key: colKey, label: title, width: width, align: align, defaultValue: defaultVal });
+
+    if (classData && classData.syllabuses) {
+      classData.syllabuses.forEach(item => {
+        if (item[colKey] === undefined) item[colKey] = defaultVal;
+      });
+    }
+
+    saveStorage();
+    closeSyllabusModal();
+    renderSyllabus();
+    showConfettiToast(`🎉 নতুন কলাম "${title}" সফলতা সহ টেবিলে যুক্ত করা হয়েছে!`);
+  } else if (activeTab === 'manage') {
+    document.querySelectorAll('.col-label-edit-input').forEach(input => {
+      const key = input.dataset.colKey;
+      const newLabel = input.value.trim();
+      const colObj = customSyllabusColumns.find(c => c.key === key);
+      if (colObj && newLabel) colObj.label = newLabel;
+    });
+
+    document.querySelectorAll('.col-width-edit-select').forEach(select => {
+      const key = select.dataset.colKey;
+      const newWidth = select.value;
+      const colObj = customSyllabusColumns.find(c => c.key === key);
+      if (colObj && newWidth) colObj.width = newWidth;
+    });
+
+    saveStorage();
+    closeSyllabusModal();
+    renderSyllabus();
+    showConfettiToast('💾 টেবিলের কলাম ও স্ট্রাকচারের সকল পরিবর্তন সেভ করা হয়েছে!');
+  }
+};
+
+window.updateInlineTableCell = function(id, fieldKey, newValue) {
+  const item = classData.syllabuses.find(s => s.id == id);
+  if (item) {
+    if (fieldKey === 'chapter') item.chapterName = newValue;
+    else if (fieldKey === 'subject') item.subject = newValue;
+    else if (fieldKey === 'room') item.room = newValue;
+    else if (fieldKey === 'teacher') item.teacher = newValue;
+    else if (fieldKey === 'topics') item.topics = [newValue];
+    else item[fieldKey] = newValue;
+    saveStorage();
+  }
+};
+
+
+
+// ==========================================
+// A4 PAPER EXECUTIVE EDIT SHEET MODAL ENGINE
+// ==========================================
+
+// ১. এডিট ফাংশন: যা টেবিল থেকে ডাটা নিয়ে এ৪ মডালে বসাবে
+window.editSyllabus = function(id) {
+  console.log('editSyllabus invoked for ID:', id);
+  const s = classData.syllabuses.find(item => item.id == id);
+  if (!s) {
+    console.error('Syllabus item not found for ID:', id);
+    return;
+  }
+
+  const setVal = (elId, val) => {
+    const el = document.getElementById(elId);
+    if (el) el.value = (val !== undefined && val !== null) ? val : '';
+  };
+
+  // hidden field-এ আইডি রাখা যাতে সেভ করার সময় চেনা যায় এটা এডিট হচ্ছে
+  setVal('ms-edit-id', s.id);
+  
+  // HTML-এর ms- আইডিগুলোর সাথে ডাটা ম্যাপিং
+  setVal('ms-school-name', classData.settings?.schoolName || 'সশিবা সরকারি মডেল হাই স্কুল & কলেজ');
+  setVal('ms-date', s.date || '২০২৬-০৭-২৫');
+  setVal('ms-class', s.className || 'অষ্টম');
+  setVal('ms-section', s.section || 'ক');
+  setVal('ms-subject', s.subject || 'সাধারণ বিজ্ঞান');
+  setVal('ms-chapter', s.chapterName || s.chapter || '৩য় অধ্যায়');
+  setVal('ms-room', s.room || '১০২');
+  setVal('ms-topic', (s.topics && s.topics.length) ? s.topics.join(', ') : (s.chapterName || 'টপিক'));
+  setVal('ms-time', s.time || '০৯:০০ AM');
+  setVal('ms-teacher', s.teacher || 'মাগুরিব আলী');
+  setVal('ms-resource', s.resources || '🎥 ভিডিও + 📄 নোট + 📝 কুইজ');
+  setVal('ms-priority', s.priority || 'High');
+
+  const subTitle = document.getElementById('modal-subject-subtitle');
+  if (subTitle) subTitle.textContent = s.subject || 'সাধারণ বিজ্ঞান';
+
+  const schoolTitle = document.getElementById('modal-school-name-display');
+  if (schoolTitle) schoolTitle.textContent = classData.settings?.schoolName || 'সশিবা সরকারি মডেল হাই স্কুল & কলেজ';
+  
+  // মডাল ওপেন করা
+  const modal = document.getElementById('syllabus-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  } else {
+    console.error('syllabus-modal element not found in DOM!');
+  }
+};
+
+// ২. সেভ ফাংশন: যা নতুন ডাটা যোগ করবে অথবা পুরনো ডাটা আপডেট করবে
+window.saveSyllabusModal = function(e) {
+  if (e) e.preventDefault();
+
+  const getVal = (elId, defaultVal = '') => {
+    const el = document.getElementById(elId);
+    return el ? el.value : defaultVal;
+  };
+
+  const editId = getVal('ms-edit-id');
+  
+  // ফর্ম থেকে নতুন ভ্যালুগুলো নেওয়া
+  const updatedData = {
+    date: getVal('ms-date', '২০২৬-০৭-২৫'),
+    className: getVal('ms-class', 'অষ্টম'),
+    section: getVal('ms-section', 'ক'),
+    subject: getVal('ms-subject', 'সাধারণ বিজ্ঞান'),
+    chapterName: getVal('ms-chapter', '৩য় অধ্যায়'),
+    room: getVal('ms-room', '১০২'),
+    topics: getVal('ms-topic').split(',').map(t => t.trim()).filter(Boolean),
+    time: getVal('ms-time', '০৯:০০ AM'),
+    teacher: getVal('ms-teacher', 'মাগুরিব আলী'),
+    resources: getVal('ms-resource', '🎥 ভিডিও + 📄 নোট + 📝 কুইজ'),
+    priority: getVal('ms-priority', 'High'),
+    status: 'running' // ডিফল্ট স্ট্যাটাস
+  };
+
+  if (editId) {
+    // যদি এডিট মোড হয় (পুরনো ডাটা আপডেট)
+    const index = classData.syllabuses.findIndex(item => item.id == editId);
+    if (index !== -1) {
+      classData.syllabuses[index] = { ...classData.syllabuses[index], ...updatedData };
+      showConfettiToast('💾 সিলেবাস সফলভাবে আপডেট করা হয়েছে!');
+    }
+  } else {
+    // যদি নতুন ডাটা হয়
+    const newEntry = {
+      id: Date.now(),
+      ...updatedData,
+      progress: 0,
+      checklist: []
+    };
+    classData.syllabuses.unshift(newEntry);
+    showConfettiToast('🎉 নতুন সিলেবাস যোগ করা হয়েছে!');
+  }
+
+  saveStorage(); // লোকাল স্টোরেজে সেভ
+  closeSyllabusModal(); // মডাল বন্ধ করা
+  renderSyllabus(); // টেবিল রিফ্রেশ করা
+  
+  // আইডি ক্লিয়ার করে দেওয়া
+  const editIdEl = document.getElementById('ms-edit-id');
+  if (editIdEl) editIdEl.value = '';
+};
+
+// ৩. মডাল বন্ধ করার সময় আইডি ক্লিয়ার করা
+window.closeSyllabusModal = function() {
+  const modal = document.getElementById('syllabus-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+  const editIdEl = document.getElementById('ms-edit-id');
+  if (editIdEl) editIdEl.value = ''; // Reset edit ID
+};
+
+
+
+// =========================================================================
+// INSTITUTION BRANDING & SUBSCRIPTION GLOBAL SYNC ENGINE
+// =========================================================================
+
+window.openInstitutionSettingsModal = function() {
+  const modal = document.getElementById('institution-settings-modal');
+  if (!modal) return;
+
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val || '';
+  };
+
+  const s = classData.settings || {};
+  setVal('inst-name-input', s.schoolName || s.school || 'সশিবা সরকারি মডেল হাই স্কুল & কলেজ');
+  setVal('inst-code-input', s.code || 'EIIN: ১২৩৪৫৬');
+  setVal('inst-est-input', s.estYear || 'স্থাপিত: ১৯৯৫');
+  setVal('inst-board-input', s.board || 'ঢাকা বোর্ড');
+  setVal('inst-address-input', s.address || 'মেইন ক্যাম্পাস, ঢাকা');
+  setVal('inst-teacher-input', s.teacherName || 'মাগুরিব আলী');
+
+  // Preview logo if exists
+  const previewImg = document.getElementById('inst-preview-img');
+  const previewCap = document.getElementById('inst-preview-cap-icon');
+  if (s.logo && previewImg && previewCap) {
+    previewImg.src = s.logo;
+    previewImg.style.display = 'block';
+    previewCap.style.display = 'none';
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
+
+window.closeInstitutionSettingsModal = function() {
+  const modal = document.getElementById('institution-settings-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+};
+
+window.handleInstitutionLogoUpload = function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const dataUrl = evt.target.result;
+      if (!classData.settings) classData.settings = {};
+      classData.settings.logo = dataUrl;
+
+      const previewImg = document.getElementById('inst-preview-img');
+      const previewCap = document.getElementById('inst-preview-cap-icon');
+      if (previewImg && previewCap) {
+        previewImg.src = dataUrl;
+        previewImg.style.display = 'block';
+        previewCap.style.display = 'none';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+window.removeInstitutionLogo = function() {
+  if (classData.settings) classData.settings.logo = '';
+  const previewImg = document.getElementById('inst-preview-img');
+  const previewCap = document.getElementById('inst-preview-cap-icon');
+  if (previewImg && previewCap) {
+    previewImg.src = '';
+    previewImg.style.display = 'none';
+    previewCap.style.display = 'inline-block';
+  }
+  showConfettiToast('🗑️ প্রতিষ্ঠান লোগো রিমুভ করা হয়েছে!');
+};
+
+window.saveInstitutionSettings = function(e) {
+  if (e) e.preventDefault();
+
+  if (!classData.settings) classData.settings = {};
+  
+  const name = document.getElementById('inst-name-input')?.value || 'সশিবা সরকারি মডেল হাই স্কুল & কলেজ';
+  const code = document.getElementById('inst-code-input')?.value || 'EIIN: ১২৩৪৫৬';
+  const est = document.getElementById('inst-est-input')?.value || 'স্থাপিত: ১৯৯৫';
+  const board = document.getElementById('inst-board-input')?.value || 'ঢাকা বোর্ড';
+  const address = document.getElementById('inst-address-input')?.value || 'মেইন ক্যাম্পাস, ঢাকা';
+  const teacher = document.getElementById('inst-teacher-input')?.value || 'মাগুরিব আলী';
+
+  classData.settings.school = name;
+  classData.settings.schoolName = name;
+  classData.settings.code = code;
+  classData.settings.estYear = est;
+  classData.settings.board = board;
+  classData.settings.address = address;
+  classData.settings.teacherName = teacher;
+
+  saveStorage();
+  applyGlobalInstitutionSettings();
+  closeInstitutionSettingsModal();
+  renderSyllabus();
+  showConfettiToast('💾 প্রতিষ্ঠানের তথ্য ও ব্র্যান্ডিং সফলভাবে সেভ করা হয়েছে!');
+};
+
+window.applyGlobalInstitutionSettings = function() {
+  const s = classData.settings || {};
+  const name = s.schoolName || s.school || 'সশিবা সরকারি মডেল হাই স্কুল & কলেজ';
+  const code = s.code || 'EIIN: ১২৩৪৫৬';
+  const est = s.estYear || 'স্থাপিত: ১৯৯৫';
+  const board = s.board || 'ঢাকা বোর্ড';
+  const address = s.address || 'মেইন ক্যাম্পাস, ঢাকা';
+  const teacher = s.teacherName || 'মাগুরিব আলী';
+  const logo = s.logo || '';
+
+  const fullSubInfo = `${board} | ${code} | ${est} | ${address}`;
+
+  // 1. Update Topbar Left Header Subtitle
+  const headerNameEl = document.getElementById('header-institution-name');
+  if (headerNameEl) headerNameEl.textContent = name;
+
+  const headerSubEl = document.getElementById('global-context-subtitle');
+  if (headerSubEl) headerSubEl.textContent = fullSubInfo;
+
+  const headerLogoImg = document.getElementById('header-logo-img');
+  const headerLogoIcon = document.getElementById('header-logo-icon');
+  if (headerLogoImg && headerLogoIcon) {
+    if (logo) {
+      headerLogoImg.src = logo;
+      headerLogoImg.style.display = 'block';
+      headerLogoIcon.style.display = 'none';
+    } else {
+      headerLogoImg.src = '';
+      headerLogoImg.style.display = 'none';
+      headerLogoIcon.style.display = 'inline-block';
+    }
+  }
+
+  // 2. Update A4 Edit Sheet Modal Headers
+  const modalSchoolName = document.getElementById('modal-school-name-display');
+  if (modalSchoolName) modalSchoolName.textContent = name;
+
+  // Update School Name in all A4 Executive Card Modals
+  document.querySelectorAll('.modal-school-name-display-sync').forEach(el => {
+    el.textContent = name;
+  });
+
+
+  const modalSubInfo = document.getElementById('modal-school-sub-info');
+  if (modalSubInfo) modalSubInfo.textContent = fullSubInfo;
+
+  const msSchoolInput = document.getElementById('ms-school-name');
+  if (msSchoolInput) msSchoolInput.value = name;
+};

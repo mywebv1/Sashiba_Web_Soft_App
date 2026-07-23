@@ -3,70 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>স্মার্ট ক্লাস ম্যানেজার | সশিবা স্মার্ট শিক্ষা বাতায়ন</title>
-  <meta name="description" content="সশিবা স্মার্ট ক্লাস ম্যানেজার - শ্রেণিকক্ষ পরিচালনা, রুটিন ও পরীক্ষার ডিজিটাল আর্কিটেক্ট।">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>সশিবা স্মার্ট ক্লাস ম্যানেজার ড্যাশবোর্ড v5.0</title>
+  
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css?v=5.1.8">
 </head>
-<body>
-  <div class="app-container">
+<body class="theme-pearl">
 
-    <!-- ========== SIDEBAR ========== -->
+  <div class="app-container">
+    
+    <!-- ========== SIDEBAR NAVIGATION ========== -->
     <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
-        <div class="brand-text">
-          <strong>স্মার্ট শিক্ষা</strong><span>বাতায়ন</span>
+      <div class="sidebar-header">
+        <div class="brand-logo"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div class="brand-info">
+          <h1 class="brand-name">SaShiba</h1>
+          <span class="brand-tagline">স্মার্ট ক্লাস ম্যানেজার v5.0</span>
         </div>
+        <button class="sidebar-toggle-btn" onclick="toggleSidebar()"><i class="fa-solid fa-chevron-left"></i></button>
       </div>
 
-      <nav class="sidebar-nav">
-        <div class="nav-section-label">🎓 শ্রেণিকক্ষ পরিচালনা</div>
-        
-        <a href="javascript:void(0)" class="nav-item nav-home-btn" onclick="goHome()" id="nav-home">
-          <i class="fa-solid fa-house"></i><span>হোম (মূল পোর্টাল)</span>
+      <nav class="sidebar-menu">
+        <a href="#sec-overview" class="menu-item active" onclick="switchSection('overview')">
+          <i class="fa-solid fa-chart-pie"></i><span>১. ওভারভিউ ড্যাশবোর্ড</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item active" onclick="showSection('overview')" id="nav-overview">
-          <i class="fa-solid fa-chart-line"></i><span>ড্যাশবোর্ড ওভারভিউ</span>
+        <a href="#sec-syllabus" class="menu-item" onclick="switchSection('syllabus')">
+          <i class="fa-solid fa-book-bookmark"></i><span>২. স্মার্ট সিলেবাস</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showSection('routine')" id="nav-routine">
-          <i class="fa-solid fa-clock"></i><span>🕒 ক্লাস রুটিন ও লাইভ</span>
+        <a href="#sec-routine" class="menu-item" onclick="switchSection('routine')">
+          <i class="fa-solid fa-calendar-days"></i><span>৩. স্মার্ট রুটিন</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showSection('syllabus')" id="nav-syllabus">
-          <i class="fa-solid fa-book-bookmark"></i><span>🕒 ক্লাস সিলেবাস</span>
+        <a href="#sec-attendance" class="menu-item" onclick="switchSection('attendance')">
+          <i class="fa-solid fa-user-check"></i><span>৪. উপস্থিতি ও অংশগ্রহণ</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showSection('attendance')" id="nav-attendance">
-          <i class="fa-solid fa-user-check"></i><span>👥 উপস্থিতি ও সক্রিয়তা</span>
+        <a href="#sec-lesson" class="menu-item" onclick="switchSection('lesson')">
+          <i class="fa-solid fa-chalkboard-user"></i><span>৫. লেসন প্ল্যান ট্র্যাকার</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showSection('exams')" id="nav-exams">
-          <i class="fa-solid fa-bullseye"></i><span>🎯 পরীক্ষার রুটিন</span>
+        <a href="#sec-exams" class="menu-item" onclick="switchSection('exams')">
+          <i class="fa-solid fa-file-pen"></i><span>৬. পরীক্ষা ও মূল্যায়ন</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showSection('live_control')" id="nav-live_control">
-          <i class="fa-solid fa-tower-cell"></i><span>🚀 লাইভ কন্ট্রোল হাব</span>
-          <span class="nav-badge live-badge">LIVE</span>
+        <a href="#sec-notice" class="menu-item" onclick="switchSection('notice')">
+          <i class="fa-solid fa-bullhorn"></i><span>৭. নোটিশ ও যোগাযোগ</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showSection('ai_insights')" id="nav-ai_insights">
-          <i class="fa-solid fa-brain"></i><span>🧠 AI ইনসাইটস ও করণীয়</span>
-          <span class="nav-badge ai-badge">AI</span>
+        <a href="#sec-analytics" class="menu-item" onclick="switchSection('analytics')">
+          <i class="fa-solid fa-chart-line"></i><span>৮. পারফরম্যান্স অ্যানালিটিক্স</span>
         </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showSection('history')" id="nav-history">
-          <i class="fa-solid fa-clock-rotate-left"></i><span>🕒 ক্লাস ইতিহাস</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="showSection('alerts')" id="nav-alerts">
-          <i class="fa-solid fa-bell"></i><span>🚨 সতর্কতা ও নোটিশ</span>
-          <span class="nav-badge warn-badge" id="alert-count-badge">৩</span>
-        </a>
-
-        <div class="nav-section-label" style="margin-top:16px;">কনফিগারেশন</div>
-        <a href="javascript:void(0)" class="nav-item" onclick="showSection('settings')" id="nav-settings">
-          <i class="fa-solid fa-gear"></i><span>⚙️ সেটিংস</span>
+        <a href="#sec-settings" class="menu-item" onclick="switchSection('settings')">
+          <i class="fa-solid fa-gear"></i><span>৯. সিস্টেম সেটিংস</span>
         </a>
       </nav>
 
       <div class="sidebar-footer">
         <div class="user-avatar">মাআ</div>
-        <div class="user-info">
+        <div class="user-details">
           <div class="user-name">মাগুরিব আলী</div>
           <div class="user-role">শ্রেণি শিক্ষক ও সমন্বয়ক</div>
         </div>
@@ -76,623 +71,470 @@
     <!-- ========== MAIN CONTENT ========== -->
     <main class="main-content">
 
-      <!-- TOP BAR WITH GLOBAL CONTEXT SELECTORS -->
-      <header class="top-bar">
-        <div class="top-bar-left">
-          <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-          <div>
-            <h2 class="page-title" id="section-title">স্মার্ট ক্লাস ম্যানেজার</h2>
-            <span class="section-subtitle" id="global-context-subtitle">ঢাকা বোর্ড | অষ্টম শ্রেণি (ক) | সাধারণ বিভাগ</span>
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <div class="topbar-left" style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger-btn mobile-menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          
+          <div id="header-brand-box" style="display:flex;align-items:center;gap:12px;">
+            <div id="header-institution-logo" onclick="openInstitutionSettingsModal()" title="লোগো ও তথ্য পরিবর্তন করতে ক্লিক করুন" style="width:42px;height:42px;border-radius:12px;background:var(--hero-gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.25rem;box-shadow:0 4px 14px rgba(59,130,246,0.3);overflow:hidden;flex-shrink:0;cursor:pointer;border:2px solid var(--bg-card);">
+              <i class="fa-solid fa-graduation-cap" id="header-logo-icon"></i>
+              <img id="header-logo-img" src="" style="width:100%;height:100%;object-fit:cover;display:none;" alt="প্রতিষ্ঠান লোগো">
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <h2 class="section-title" id="header-institution-name" style="margin:0;font-size:1.15rem;font-weight:900;color:var(--text-main);">সশিবা সরকারি মডেল হাই স্কুল & কলেজ</h2>
+                <button class="btn-icon-edit" onclick="openInstitutionSettingsModal()" title="✏️ প্রতিষ্ঠান তথ্য, লোগো ও EIIN কোড এডিট করুন" style="background:rgba(59,130,246,0.12);color:var(--primary);border:1.5px solid rgba(59,130,246,0.3);border-radius:8px;padding:3px 10px;font-size:0.75rem;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s;">
+                  <i class="fa-solid fa-pen-to-square"></i> প্রতিষ্ঠান এডিট
+                </button>
+              </div>
+              <span class="section-subtitle" id="global-context-subtitle" style="font-size:0.78rem;color:var(--text-muted);font-weight:700;">ঢাকা বোর্ড | EIIN: ১২৩৪৫৬ | মেইন ক্যাম্পাস, ঢাকা</span>
+            </div>
           </div>
         </div>
 
-        <!-- Global Context Selector Bar across all tabs -->
-        <div class="global-context-bar flex-gap-center">
-          <select id="global-board-select" class="form-input-compact shadow-sm" onchange="updateGlobalContext()" title="শিক্ষা বোর্ড নির্বাচন">
-            <option value="ঢাকা বোর্ড" selected>ঢাকা বোর্ড</option>
-            <option value="রাজশাহী বোর্ড">রাজশাহী বোর্ড</option>
-            <option value="চট্টগ্রাম বোর্ড">চট্টগ্রাম বোর্ড</option>
-            <option value="কুমিল্লা বোর্ড">কুমিল্লা বোর্ড</option>
-            <option value="যশোর বোর্ড">যশোর বোর্ড</option>
-            <option value="সিলেট বোর্ড">সিলেট বোর্ড</option>
-            <option value="বরিশাল বোর্ড">বরিশাল বোর্ড</option>
-            <option value="দিনাজপুর বোর্ড">দিনাজপুর বোর্ড</option>
-            <option value="ময়মনসিংহ বোর্ড">ময়মনসিংহ বোর্ড</option>
-            <option value="মাদ্রাসা বোর্ড">মাদ্রাসা বোর্ড</option>
-            <option value="কারিগরি বোর্ড">কারিগরি বোর্ড</option>
-          </select>
-
-          <select id="global-class-select" class="form-input-compact shadow-sm" onchange="updateGlobalContext()" title="শ্রেণি নির্বাচন">
-            <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
-            <option value="সপ্তম">সপ্তম শ্রেণি</option>
-            <option value="অষ্টম" selected>অষ্টম শ্রেণি</option>
-            <option value="নবম">নবম শ্রেণি</option>
-            <option value="দশম">দশম শ্রেণি</option>
-          </select>
-
-          <select id="global-section-select" class="form-input-compact shadow-sm" onchange="updateGlobalContext()" title="শাখা নির্বাচন">
-            <option value="ক" selected>শাখা - ক</option>
-            <option value="খ">শাখা - খ</option>
-            <option value="গ">শাখা - গ</option>
-          </select>
-
-          <select id="global-group-select" class="form-input-compact shadow-sm" onchange="updateGlobalContext()" title="বিভাগ নির্বাচন">
-            <option value="সাধারণ" selected>সাধারণ বিভাগ</option>
-            <option value="বিজ্ঞান">বিজ্ঞান বিভাগ</option>
-            <option value="মানবিক">মানবিক বিভাগ</option>
-            <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা বিভাগ</option>
-          </select>
-        </div>
-
-        <div class="top-bar-right">
-          <button class="theme-toggle-btn" onclick="toggleDarkMode()" id="dark-mode-btn" title="ডার্ক মোড টগল"><i class="fa-solid fa-moon"></i></button>
-          <button class="btn btn-primary" id="top-bar-add-btn" onclick="handleTopBarAddCard()"><i class="fa-solid fa-plus"></i> + নতুন কার্ড যোগ</button>
-          <button class="btn btn-green" id="top-bar-att-btn" onclick="showSection('attendance')"><i class="fa-solid fa-user-check"></i> উপস্থিতি নিন</button>
+        <div class="topbar-right" style="display:flex;gap:10px;align-items:center;">
+          <button class="icon-btn theme-toggle-btn" onclick="toggleTheme()" title="ডার্ক/লাইট মোড টগল"><i class="fa-solid fa-moon"></i></button>
+          <button class="btn btn-primary btn-sm" onclick="openAddSyllabusModal()"><i class="fa-solid fa-plus"></i> + নতুন সিলেবাস</button>
+          <button class="btn btn-success btn-sm" onclick="switchSection('attendance')"><i class="fa-solid fa-user-check"></i> উপস্থিতি নিন</button>
         </div>
       </header>
 
-      <div class="content-body">
+      <!-- DASHBOARD SECTIONS -->
+      <div class="sections-wrapper">
 
-        <!-- SECTION 1: OVERVIEW -->
-        <section id="section-overview" class="content-section">
-          <!-- Top Interactive Stats Grid Cards -->
-          <div class="stats-overview-grid">
-            <div class="stat-glass-card blue">
-              <div class="sgc-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-              <div class="sgc-details">
-                <span class="sgc-label">আজকের মোট ক্লাস</span>
-                <h3 class="sgc-val" id="stat-total-classes">০৫ টি পিরিয়ড</h3>
-                <span class="sgc-sub"><i class="fa-solid fa-circle-play text-emerald"></i> চলমান: গণিত (১০:০০ AM)</span>
-              </div>
-            </div>
-            <div class="stat-glass-card green">
-              <div class="sgc-icon"><i class="fa-solid fa-users"></i></div>
-              <div class="sgc-details">
-                <span class="sgc-label">আজকের গড় উপস্থিতি</span>
-                <h3 class="sgc-val" id="stat-attendance-rate">৯৪.৫%</h3>
-                <span class="sgc-sub"><i class="fa-solid fa-user-check"></i> উপস্থিত: ৩৭/৪০ জন</span>
-              </div>
-            </div>
-            <div class="stat-glass-card purple">
-              <div class="sgc-icon"><i class="fa-solid fa-book-open-reader"></i></div>
-              <div class="sgc-details">
-                <span class="sgc-label">সিলেবাস সেশন কভারেজ</span>
-                <h3 class="sgc-val" id="stat-syllabus-progress">৭২.০%</h3>
-                <span class="sgc-sub"><i class="fa-solid fa-chart-line"></i> লক্ষ্যপূরণ অত্যন্ত সন্তোষজনক</span>
-              </div>
-            </div>
-            <div class="stat-glass-card orange">
-              <div class="sgc-icon"><i class="fa-solid fa-bullseye"></i></div>
-              <div class="sgc-details">
-                <span class="sgc-label">আসন্ন নিকটতম পরীক্ষা</span>
-                <h3 class="sgc-val" id="stat-upcoming-exams">গণিত ক্লাস টেস্ট</h3>
-                <span class="sgc-sub"><i class="fa-solid fa-calendar-day"></i> আগামী ২৫ জুলাই (২০ নম্বর)</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Main Interactive Dashboard Grid -->
-          <div class="interactive-grid-layout mt-6">
-            
-            <!-- Left Column: Active Class Widget & Quick Routine Cards -->
-            <div class="flex-col-gap">
-              
-              <!-- Ongoing Class Live Widget Card -->
-              <div class="interactive-card border-accent-blue">
-                <div class="ic-header">
-                  <h3><i class="fa-solid fa-tower-broadcast text-danger pulse-dot"></i> চলমান লাইভ ক্লাস ও সময় ট্র্যাকার</h3>
-                  <span class="live-pill"><i class="fa-solid fa-circle"></i> লাইভ সেশন</span>
-                </div>
-                <div class="ic-body" id="active-class-widget">
-                  <!-- JS Dynamic Content -->
-                </div>
-              </div>
-
-              <!-- Today's Routine Card Grid -->
-              <div class="interactive-card">
-                <div class="ic-header space-between">
-                  <h3><i class="fa-solid fa-calendar-day text-primary"></i> আজকের নির্ধারিত ক্লাস কার্ডসমূহ</h3>
-                  <button class="btn-outline btn-sm" onclick="showSection('routine')">পূর্ণাঙ্গ রুটিন ➔</button>
-                </div>
-                <div class="cards-interactive-grid" id="today-routine-cards">
-                  <!-- JS Dynamic Cards -->
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Right Column: Interactive Quick Actions & Class Announcements -->
-            <div class="flex-col-gap">
-              
-              <!-- Quick Action Manager Card -->
-              <div class="interactive-card">
-                <div class="ic-header">
-                  <h3><i class="fa-solid fa-bolt text-warning"></i> দ্রুত ক্লাস ম্যানেজার একশন</h3>
-                </div>
-                <div class="quick-action-cards-list">
-                  <div class="action-card-item" onclick="openAddRoutineModal()">
-                    <div class="aci-icon bg-indigo"><i class="fa-solid fa-plus"></i></div>
-                    <div class="aci-info">
-                      <strong>নতুন রুটিন বা পিরিয়ড যোগ<        <!-- SECTION 2: SMART CLASS ROUTINE & TIMELINE (Final v1.0) -->
-        <section id="section-routine" class="content-section hidden">
+        <!-- ==================== MENU 1: OVERVIEW ==================== -->
+        <section class="dashboard-section active" id="sec-overview">
           
-          <!-- 1. Smart Header (Context Layer) -->
-          <div class="smart-context-header-card mb-5">
-            <div class="sch-top flex-between flex-wrap gap-3">
-              <div class="sch-badge-group flex-align-center gap-2">
-                <span class="badge-live-now"><i class="fa-solid fa-circle text-danger fa-pulse"></i> চলমান (NOW): গণিত (০৯:০০ - ০৯:৪৫ AM)</span>
-                <span class="badge-next-up"><i class="fa-solid fa-forward text-primary"></i> পরবর্তী (NEXT): বাংলা (০৯:৪৫ AM)</span>
+          <!-- Hero Banner -->
+          <div class="smart-card" style="background:var(--hero-gradient);color:#fff;padding:28px;border-radius:24px;margin-bottom:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+              <div>
+                <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;margin-bottom:8px;"><i class="fa-solid fa-graduation-cap"></i> মাগুরিব হাই স্কুল অ্যান্ড কলেজ (EIIN-123456)</span>
+                <h2 style="font-size:1.8rem;font-weight:900;margin:6px 0 8px;">স্বাগতম, মাগুরিব আলী স্যার! 🎯</h2>
+                <p style="font-size:0.95rem;opacity:0.9;margin:0;">আজকের শ্রেণী পাঠদান, উপস্থিতি, সিলেবাস কভারেজ ও মূল্যায়ন ড্যাশবোর্ডে স্বাগতম</p>
               </div>
-              <div class="role-switcher-wrap flex-align-center gap-2">
-                <span class="text-xs text-muted fw-bold"><i class="fa-solid fa-user-gear"></i> রোল ভিউ:</span>
-                <select id="role-view-select" class="form-input-compact shadow-sm" onchange="switchRoleView(this.value)">
-                  <option value="teacher" selected>👨‍🏫 শিক্ষক ভিউ (Teacher)</option>
-                  <option value="student">👨‍🎓 শিক্ষার্থী ভিউ (Student)</option>
-                  <option value="admin">🏢 এডমিন ভিউ (Admin)</option>
-                  <option value="parent">👨‍👩‍👦 অভিভাবক ভিউ (Parent)</option>
-                </select>
-                <button class="btn-icon-circle shadow-sm" title="নোটিফিকেশন বেল" onclick="showSection('alerts')">
-                  <i class="fa-solid fa-bell text-warning"></i>
-                  <span class="dot-indicator"></span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Daily Goal Tracker & AI Message -->
-            <div class="sch-bottom-grid mt-4">
-              <div class="goal-tracker-box">
-                <div class="flex-between text-xs fw-bold mb-1">
-                  <span>🎯 আজকের ক্লাসের লক্ষ্য ট্র্যাকার</span>
-                  <span id="daily-goal-percent">৭৫% অর্জিত</span>
-                </div>
-                <div class="progress-bar-wrap"><div class="progress-fill bg-success" style="width:75%;"></div></div>
-              </div>
-              <div class="ai-context-banner">
-                <i class="fa-solid fa-robot text-purple"></i>
-                <span><strong>AI বার্তা:</strong> আজকে বীজগণিত সূত্রের ওপর উপস্থিতি ৯৬%। ২ জন শিক্ষার্থীর রিভিশন দরকার।</span>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-light" onclick="switchSection('syllabus')"><i class="fa-solid fa-book-bookmark text-primary"></i> সিলেবাস ট্র্যাকার</button>
+                <button class="btn btn-light" onclick="switchSection('attendance')"><i class="fa-solid fa-user-check text-success"></i> লাইভ উপস্থিতি</button>
               </div>
             </div>
           </div>
 
-          <!-- Day Tabs Selector -->
-          <div class="interactive-card mb-4">
-            <div class="ic-header space-between">
-              <div>
-                <h3><i class="fa-solid fa-calendar-week text-primary"></i> ইন্টারঅ্যাক্টিভ সাপ্তাহিক অ্যাডাপ্টিভ টাইমলাইন</h3>
-                <span class="section-subtitle">ভার্টিকাল টাইমলাইনে শ্রেণি ও বিষয়ভিত্তিক স্মার্ট কার্ড পরিচালনা</span>
-              </div>
-              <button class="btn btn-primary" onclick="openAddRoutineModal()"><i class="fa-solid fa-plus"></i> + নতুন পিরিয়ড যোগ করুন</button>
+          <!-- Overview KPI Cards -->
+          <div class="summary-metrics-grid" style="grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px;margin-bottom:24px;">
+            <div class="sm-item" style="padding:18px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:18px;">
+              <span class="sm-label"><i class="fa-solid fa-users text-primary"></i> মোট শিক্ষার্থী</span>
+              <span class="sm-val" style="color:var(--primary);font-size:1.4rem;">৪৮ জন</span>
             </div>
+            <div class="sm-item" style="padding:18px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:18px;">
+              <span class="sm-label"><i class="fa-solid fa-user-check text-success"></i> আজকের উপস্থিতি</span>
+              <span class="sm-val" style="color:var(--success);font-size:1.4rem;">৯৪%</span>
+            </div>
+            <div class="sm-item" style="padding:18px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:18px;">
+              <span class="sm-label"><i class="fa-solid fa-book-open text-purple"></i> সিলেবাস কভারেজ</span>
+              <span class="sm-val" style="color:var(--purple);font-size:1.4rem;">৬৮%</span>
+            </div>
+            <div class="sm-item" style="padding:18px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:18px;">
+              <span class="sm-label"><i class="fa-solid fa-award text-warning"></i> সেরা পারফরমার</span>
+              <span class="sm-val" style="color:var(--warning);font-size:1.4rem;">১৫ জন</span>
+            </div>
+          </div>
+
+          <!-- Recent Activity & Quick Schedule Grid -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="smart-card">
+              <h4 class="card-title"><i class="fa-solid fa-clock-rotate-left text-primary"></i> আজকের রুটিন সময়সূচি</h4>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
+                <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--bg-input);border-radius:12px;font-size:0.88rem;">
+                  <span><strong>০৯:০০ AM:</strong> গণিত (১০৯) - কক্ষ ১০২</span>
+                  <span class="badge" style="background:rgba(16,185,129,0.15);color:var(--success);">চলছে</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--bg-input);border-radius:12px;font-size:0.88rem;">
+                  <span><strong>১০:০০ AM:</strong> সাধারণ বিজ্ঞান (১২৭) - কক্ষ ১০৪</span>
+                  <span class="badge" style="background:rgba(79,70,229,0.15);color:var(--primary);">পরবর্তী</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="smart-card">
+              <h4 class="card-title"><i class="fa-solid fa-bell text-warning"></i> সর্বশেষ নোটিশ ও বার্তা</h4>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
+                <div style="padding:10px 14px;background:var(--bg-input);border-radius:12px;font-size:0.85rem;">
+                  <strong style="color:var(--primary);display:block;">📢 সাময়িক পরীক্ষা আগামী সপ্তাহে শুরু হবে</strong>
+                  <span style="color:var(--text-muted);font-size:0.78rem;">সকল শিক্ষককে অর্ধবার্ষিক সিলেবাস রিভিশন সম্পন্ন করার অনুরোধ।</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== MENU 2: SMART SYLLABUS ==================== -->
+        <section class="dashboard-section" id="sec-syllabus">
+          <div style="display:flex;flex-direction:column;gap:20px;">
             
-            <div class="day-tabs-bar" id="routine-day-tabs">
+            
+            
+            <!-- ১. হেডার (Header) -->
+            <div class="smart-card" style="background:linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #0284c7 100%);color:#fff;padding:26px;border-radius:24px;box-shadow:0 10px 28px rgba(37,99,235,0.22);border:1.5px solid rgba(255,255,255,0.25);">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+                    <span class="badge" style="background:rgba(255,255,255,0.25);color:#fff;"><i class="fa-solid fa-graduation-cap"></i> শিক্ষাবর্ষ: ২০২৬</span>
+                    <span class="badge" style="background:rgba(255,255,255,0.25);color:#fff;"><i class="fa-solid fa-book"></i> শ্রেণি: অষ্টম | বিষয়: বীজগণিত ও কারিকুলাম</span>
+                  </div>
+                  <h2 style="font-size:1.75rem;font-weight:900;margin:0 0 6px;">📖 স্মার্ট সিলেবাস মডিউল (Smart Syllabus Module)</h2>
+                  <p style="font-size:0.9rem;opacity:0.95;margin:0;">অধ্যায়ভিত্তিক পাঠ পরিকল্পনা, টপিক চেকলিস্ট, শিখনফল ও পরীক্ষা প্রস্তুতি ট্র্যাকার</p>
+                </div>
+                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                  <!-- টার্ম নির্বাচন (অর্ধবার্ষিক / বার্ষিক) -->
+                  <select id="term-selector" class="select-pill" onchange="filterSyllabusTerm(this.value)" style="background:rgba(255,255,255,0.9);color:#1e3a8a !important;font-weight:800;height:42px;">
+                    <option value="all" selected>🏆 সকল টার্ম সিলেবাস</option>
+                    <option value="half_yearly">অর্ধবার্ষিক পরীক্ষা (Half-Yearly)</option>
+                    <option value="annual">বার্ষিক পরীক্ষা (Annual Exam)</option>
+                  </select>
+                  
+                  <!-- ভিউ মোড টগল (কার্ড ভিউ বনাম টেবিল ভিউ) -->
+                  <div class="view-mode-toggle-group" style="display:flex;gap:4px;background:rgba(255,255,255,0.22);padding:4px;border-radius:14px;border:1.5px solid rgba(255,255,255,0.35);backdrop-filter:blur(8px);">
+                    <button id="syl-btn-card" class="btn btn-light btn-sm active" onclick="switchSyllabusView('card')" style="font-weight:900;border-radius:10px;height:36px;padding:6px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.1);"><i class="fa-solid fa-address-card text-primary"></i> 🎴 কার্ড ভিউ</button>
+                    <button id="syl-btn-table" class="btn btn-light btn-sm" onclick="switchSyllabusView('table')" style="font-weight:900;border-radius:10px;height:36px;padding:6px 14px;"><i class="fa-solid fa-table text-purple"></i> 📊 টেবিল ভিউ</button>
+                  </div>
+
+                  <button class="btn btn-light" onclick="openAddSyllabusModal()" style="font-weight:800;height:42px;"><i class="fa-solid fa-plus-circle text-primary"></i> ➕ নতুন সিলেবাস যোগ</button>
+                </div>
+              </div>
+
+              <!-- সিলেবাস অগ্রগতির বার & পরীক্ষা কাউন্টডাউন -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;padding-top:16px;border-top:1.5px solid rgba(255,255,255,0.2);">
+                <div style="background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:14px 18px;border-radius:16px;">
+                  <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:800;margin-bottom:6px;">
+                    <span>📊 সার্বিক সিলেবাস অগ্রগতি:</span>
+                    <span id="syll-total-percent">৬৮% সম্পন্ন</span>
+                  </div>
+                  <div class="progress-bar-wrap" style="height:10px;background:rgba(255,255,255,0.3);"><div class="progress-fill" id="syll-total-progress-fill" style="width:68%;background:#ffffff;"></div></div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:14px 18px;border-radius:16px;display:flex;align-items:center;gap:12px;">
+                  <i class="fa-solid fa-hourglass-half" style="font-size:1.6rem;color:#fef08a;"></i>
+                  <div>
+                    <span style="font-size:0.78rem;display:block;opacity:0.9;">বার্ষিক পরীক্ষা শুরু হতে বাকি:</span>
+                    <strong style="font-size:1.1rem;font-weight:900;color:#fef08a;" id="syll-countdown-digits">১২৪ দিন ০০ ঘণ্টা ১৫ মিনিট</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ৪টি মাস্টার একাডেমিক KPI কার্ড (Target vs Actual Coverage, Workdays & Countdown) -->
+            <div class="summary-metrics-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:16px;margin-bottom:22px;">
+              
+              <!-- Card 1: কার্যদিবস & বাকি দিন -->
+              <div class="sm-item" style="padding:18px 22px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:20px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="sm-label" style="font-weight:800;font-size:0.85rem;"><i class="fa-solid fa-calendar-check text-primary"></i> চলতি মাসের কার্যদিবস</span>
+                  <span class="badge" style="background:rgba(59,130,246,0.12);color:var(--primary);">২২ দিন মোট</span>
+                </div>
+                <div style="display:flex;align-items:baseline;justify-content:space-between;">
+                  <strong style="color:var(--primary);font-size:1.5rem;font-weight:900;">১৪ দিন অতিবাহিত</strong>
+                  <span style="font-size:0.85rem;font-weight:800;color:var(--warning);">বাকি: ৮ দিন</span>
+                </div>
+                <div class="tbl-progress-bar-wrap" style="height:8px;"><div class="tbl-progress-bar-fill" style="width:64%;background:linear-gradient(90deg, #3b82f6, #6366f1);"></div></div>
+              </div>
+
+              <!-- Card 2: সিলেবাস অবস্থা বনাম টার্গেট (Target vs Actual Coverage) -->
+              <div class="sm-item" style="padding:18px 22px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:20px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="sm-label" style="font-weight:800;font-size:0.85rem;"><i class="fa-solid fa-chart-pie text-purple"></i> সিলেবাস অবস্থা বনাম টার্গেট</span>
+                  <span class="badge" style="background:rgba(239,68,68,0.12);color:var(--danger);font-weight:900;">গ্যাপ: -৯%</span>
+                </div>
+                <div style="display:flex;align-items:baseline;justify-content:space-between;">
+                  <strong style="color:var(--purple);font-size:1.5rem;font-weight:900;">৬১% সম্পন্ন</strong>
+                  <span style="font-size:0.82rem;font-weight:800;color:var(--text-muted);">টার্গেট ছিল: ৭০%</span>
+                </div>
+                <div class="tbl-progress-bar-wrap" style="height:8px;background:rgba(239,68,68,0.15);"><div class="tbl-progress-bar-fill" style="width:61%;background:linear-gradient(90deg, #8b5cf6, #d946ef);"></div></div>
+              </div>
+
+              <!-- Card 3: পরীক্ষা কাউন্টডাউন -->
+              <div class="sm-item" style="padding:18px 22px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:20px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="sm-label" style="font-weight:800;font-size:0.85rem;"><i class="fa-solid fa-hourglass-half text-warning"></i> অর্ধবার্ষিকী পরীক্ষা</span>
+                  <span class="badge" style="background:rgba(245,158,11,0.12);color:var(--warning);">কাউন্টডাউন</span>
+                </div>
+                <div style="display:flex;align-items:baseline;justify-content:space-between;">
+                  <strong style="color:var(--danger);font-size:1.5rem;font-weight:900;">আর ৪৫ দিন বাকি</strong>
+                  <span style="font-size:0.82rem;font-weight:800;color:var(--success);">রিভিশন: ১৫ দিন</span>
+                </div>
+                <div class="tbl-progress-bar-wrap" style="height:8px;"><div class="tbl-progress-bar-fill" style="width:75%;background:linear-gradient(90deg, #f59e0b, #ef4444);"></div></div>
+              </div>
+
+              <!-- Card 4: সার্বিক শিক্ষার্থী ট্র্যাকার -->
+              <div class="sm-item" style="padding:18px 22px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:20px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="sm-label" style="font-weight:800;font-size:0.85rem;"><i class="fa-solid fa-graduation-cap text-success"></i> সেরা পারফরমার ট্র্যাকার</span>
+                  <span class="badge" style="background:rgba(16,185,129,0.12);color:var(--success);">≥৮০% মার্কস</span>
+                </div>
+                <div style="display:flex;align-items:baseline;justify-content:space-between;">
+                  <strong style="color:var(--success);font-size:1.5rem;font-weight:900;">১৫ জন সেরা (৩১%)</strong>
+                  <span style="font-size:0.82rem;font-weight:800;color:var(--text-muted);">মোট: ৪৮ জন</span>
+                </div>
+                <div class="tbl-progress-bar-wrap" style="height:8px;"><div class="tbl-progress-bar-fill" style="width:31%;background:linear-gradient(90deg, #10b981, #059669);"></div></div>
+              </div>
+
+            </div>
+
+            <!-- ⚡ সিলেবাস সুপার ফিল্টার ও লেয়ারিং কন্ট্রোল হাব (Compact Single Control Hub) -->
+            <div class="smart-card" style="padding:14px 18px;border-radius:18px;background:var(--bg-card);border:1.5px solid var(--border);margin-bottom:14px;box-shadow:var(--shadow-sm);">
+              
+              <!-- Row 1: Unified Scrollable Chips Bar -->
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;" class="months-timeline-bar">
+                <span style="font-size:0.82rem;font-weight:900;color:var(--text-main);white-space:nowrap;display:flex;align-items:center;gap:6px;padding-right:6px;border-right:1.5px solid var(--border);"><i class="fa-solid fa-filter text-primary"></i> কুইক ফিল্টার:</span>
+                
+                <div style="display:flex;align-items:center;gap:6px;margin-left:auto;padding-left:8px;border-left:1.5px solid var(--border);" class="view-mode-quick-bar">
+                  <button id="super-btn-card" class="tab-chip active" onclick="switchSyllabusView('card')" title="কার্ড ভিউ"><i class="fa-solid fa-address-card text-primary"></i> 🎴 কার্ড</button>
+                  <button id="super-btn-table" class="tab-chip" onclick="switchSyllabusView('table')" title="টেবিল ভিউ"><i class="fa-solid fa-table text-purple"></i> 📊 টেবিল</button>
+                </div>
+                <div class="chips-bar" id="super-filter-chips" style="margin:0;display:flex;gap:6px;flex-wrap:nowrap;">
+                  <button class="tab-chip active" onclick="applySuperFilter('all', this)"><i class="fa-solid fa-layer-group"></i> 🌐 সকল</button>
+                  <button class="tab-chip" onclick="applySuperFilter('today', this)"><i class="fa-solid fa-clock-rotate-left"></i> 📅 আজকের</button>
+                  <button class="tab-chip" onclick="applySuperFilter('week', this)"><i class="fa-solid fa-calendar-week"></i> ⚡ এই সপ্তাহ</button>
+                  <button class="tab-chip" onclick="switchMultiLayerPlan('annual', this)"><i class="fa-solid fa-calendar-days"></i> 🗺️ ১২ মাস</button>
+                  <button class="tab-chip" onclick="applySuperFilter('half_yearly', this)"><i class="fa-solid fa-award"></i> 🏆 অর্ধবার্ষিকী</button>
+                  <button class="tab-chip" onclick="switchMultiLayerPlan('annual_exam', this)"><i class="fa-solid fa-graduation-cap"></i> 🎯 বার্ষিকী</button>
+                  <button class="tab-chip" onclick="switchMultiLayerPlan('fortnightly', this)"><i class="fa-solid fa-bolt"></i> ⚡ পাক্ষিক (১৫ দিন)</button>
+                  <button class="tab-chip" onclick="applySuperFilter('revision', this)"><i class="fa-solid fa-rotate-right"></i> 🔄 রিভিশন</button>
+                </div>
+              </div>
+
+              <!-- Row 2: Compact Dropdowns & Search Inline Row -->
+              <div style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;align-items:center;padding-top:8px;border-top:1.5px dashed var(--border);">
+                <!-- Subject Filter -->
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <label style="font-size:0.78rem;font-weight:800;color:var(--text-muted);white-space:nowrap;"><i class="fa-solid fa-book-bookmark text-primary"></i> বিষয়:</label>
+                  <select id="super-subject-select" class="select-pill" onchange="filterSuperSubject(this.value)" style="flex:1;height:36px;font-size:0.82rem;padding:4px 10px;">
+                    <option value="all" selected>📚 সকল বিষয়</option>
+                    <option value="গণিত">গণিত (১০৯)</option>
+                    <option value="পদার্থবিজ্ঞান">পদার্থবিজ্ঞান (১৩৬)</option>
+                    <option value="সাধারণ বিজ্ঞান">সাধারণ বিজ্ঞান (১২৭)</option>
+                    <option value="বাংলা সাহিত্য">বাংলা সাহিত্য (১০১)</option>
+                    <option value="ইংরেজি">ইংরেজি (১০৭)</option>
+                    <option value="আইসিটি">আইসিটি (২৭৫)</option>
+                  </select>
+                </div>
+
+                <!-- Teacher Filter -->
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <label style="font-size:0.78rem;font-weight:800;color:var(--text-muted);white-space:nowrap;"><i class="fa-solid fa-chalkboard-user text-purple"></i> শিক্ষক:</label>
+                  <select id="super-teacher-select" class="select-pill" onchange="filterSuperTeacher(this.value)" style="flex:1;height:36px;font-size:0.82rem;padding:4px 10px;">
+                    <option value="all" selected>👨‍🏫 সকল শিক্ষক</option>
+                    <option value="মাগুরিব আলী">মাগুরিব আলী</option>
+                    <option value="রহিম স্যার">রহিম স্যার</option>
+                    <option value="ফাতিমা ম্যাডাম">ফাতিমা ম্যাডাম</option>
+                  </select>
+                </div>
+
+                <!-- Search Input -->
+                <div style="position:relative;">
+                  <input type="text" id="super-search-input" placeholder="অধ্যায়, টপিক বা বিষয় লিখুন..." onkeyup="searchSyllabusCards(this.value)" class="form-input" style="padding-left:32px;height:36px;font-size:0.82rem;">
+                  <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.8rem;"></i>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- ৩. অধ্যায়ভিত্তিক স্মার্ট কার্ড (Chapter Cards Container) -->
+            
+            <!-- 🛠️ কাস্টমাইজযোগ্য ডাইনামিক টেবিল বিল্ডার টুলবার (Customizable Dynamic Table Toolbar) -->
+            <div id="syllabus-table-builder-toolbar" class="smart-card" style="padding:14px 20px;border-radius:18px;background:var(--bg-card);border:1.5px solid var(--border);margin-bottom:14px;display:none;">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <i class="fa-solid fa-table-cells-large text-primary" style="font-size:1.1rem;"></i>
+                  <strong style="font-size:0.9rem;color:var(--text-main);">🛠️ ডাইনামিক টেবিল কন্ট্রোলস:</strong>
+                  <span style="font-size:0.78rem;color:var(--text-muted);" id="tbl-mode-hint">(প্রয়োজনে নতুন রো ও কলাম যোগ করুন অথবা টেবিল এডিট করুন)</span>
+                </div>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap;" id="tbl-toolbar-buttons-container">
+                  <button class="btn btn-primary btn-sm" onclick="addNewSyllabusRow()" style="font-weight:900;"><i class="fa-solid fa-plus"></i> ➕ রো অ্যাড করুন (Add Row)</button>
+                  <button class="btn btn-secondary btn-sm" onclick="addNewSyllabusColumn()" style="font-weight:900;"><i class="fa-solid fa-columns text-purple"></i> ➕ কলাম অ্যাড করুন (Add Col)</button>
+                  <button class="btn btn-light btn-sm" onclick="enableTableEditMode()" style="font-weight:900;border:1.5px solid var(--primary);color:var(--primary);"><i class="fa-solid fa-pen-to-square"></i> ✏️ টেবিল এডিট করুন</button>
+                </div>
+              </div>
+            </div>
+            <div id="syllabus-cards-container"></div>
+
+            <!-- ৪. সারসংক্ষেপ ও অ্যানালিটিক্স (Summary & Analytics) -->
+            <div class="smart-card" style="border-radius:20px;padding:24px;">
+              <h4 class="card-title" style="margin-bottom:16px;"><i class="fa-solid fa-chart-pie text-emerald"></i> ৪. সিলেবাস সারসংক্ষেপ ও অ্যানালিটিক্স (Summary & Analytics)</h4>
+              
+              <div class="summary-metrics-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:14px;margin-bottom:18px;">
+                <div class="sm-item" style="padding:16px;background:var(--bg-input);border-radius:14px;">
+                  <span class="sm-label">মোট সিলেবাস কভারেজ</span>
+                  <span class="sm-val" id="syll-stat-coverage" style="color:var(--primary);font-size:1.3rem;">৬৮%</span>
+                </div>
+                <div class="sm-item" style="padding:16px;background:var(--bg-input);border-radius:14px;">
+                  <span class="sm-label">সম্পন্ন অধ্যায়</span>
+                  <span class="sm-val" id="syll-stat-completed" style="color:var(--success);font-size:1.3rem;">৮টি অধ্যায়</span>
+                </div>
+                <div class="sm-item" style="padding:16px;background:var(--bg-input);border-radius:14px;">
+                  <span class="sm-label">বাকি অধ্যায়</span>
+                  <span class="sm-val" id="syll-stat-pending" style="color:var(--warning);font-size:1.3rem;">৪টি অধ্যায়</span>
+                </div>
+                <div class="sm-item" style="padding:16px;background:var(--bg-input);border-radius:14px;">
+                  <span class="sm-label">বাকি মোট ক্লাস</span>
+                  <span class="sm-val" style="color:var(--purple);font-size:1.3rem;">১৮টি ক্লাস</span>
+                </div>
+              </div>
+
+              <!-- Completion Forecast Box -->
+              <div style="background:rgba(16,185,129,0.1);border:1.5px solid rgba(16,185,129,0.3);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;">
+                <i class="fa-solid fa-chart-line text-emerald" style="font-size:1.4rem;"></i>
+                <div>
+                  <strong style="color:var(--success);font-size:0.9rem;display:block;">সমাপ্তির পূর্বাভাস (COMPLETION FORECAST)</strong>
+                  <span style="font-size:0.85rem;color:var(--text-main);"><i class="fa-solid fa-circle-check text-success"></i> বর্তমান গতিতে আগামী ২৫ নভেম্বরের মধ্যে সম্পূর্ণ সিলেবাস সফলভাবে সম্পন্ন হবে।</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ৫. ফুটার (Footer) -->
+            <div class="smart-card" style="padding:16px 20px;border-radius:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+              <div style="display:flex;gap:10px;">
+                <button class="btn btn-primary btn-sm" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> PDF / Print Export</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> প্রিন্ট ভিউ</button>
+              </div>
+              <div style="font-size:0.8rem;color:var(--text-muted);font-weight:700;">
+                <span>ভার্সন: v1.0.4 (অফিশিয়াল বোর্ড অনুমোদিত)</span>
+                <span style="margin-left:14px;">সর্বশেষ আপডেট: ২৩ জুলাই, ২০২৬</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+        <!-- ==================== MENU 3: SMART ROUTINE ==================== -->
+        <section class="dashboard-section" id="sec-routine">
+          <div class="smart-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+              <h3><i class="fa-solid fa-calendar-days text-primary"></i> স্মার্ট রুটিন ও সাপ্তাহিক সময়সূচি</h3>
+              <button class="btn btn-primary" onclick="openAddRoutineModal()"><i class="fa-solid fa-plus"></i> + নতুন পিরিয়ড যোগ</button>
+            </div>
+            <div class="chips-bar" id="routine-day-tabs" style="margin-bottom:16px;">
               <button class="tab-chip active" onclick="filterRoutineDay('রবিবার')">রবিবার</button>
               <button class="tab-chip" onclick="filterRoutineDay('সোমবার')">সোমবার</button>
               <button class="tab-chip" onclick="filterRoutineDay('মঙ্গলবার')">মঙ্গলবার</button>
               <button class="tab-chip" onclick="filterRoutineDay('বুধবার')">বুধবার</button>
               <button class="tab-chip" onclick="filterRoutineDay('বৃহস্পতিবার')">বৃহস্পতিবার</button>
             </div>
+            <div id="routine-cards-container"></div>
           </div>
-
-          <!-- 2. Adaptive Vertical Timeline Routine Grid -->
-          <div class="vertical-timeline-container" id="routine-cards-container">
-            <!-- Rendered via JS -->
-          </div>
-
-          <!-- 3. Special Schedules Grid -->
-          <div class="special-schedule-card mt-6">
-            <h4 class="mb-3 text-main font-bold"><i class="fa-solid fa-star text-warning"></i> বিশেষ সময়সূচি ও ইভেন্ট তালিকা</h4>
-            <div class="special-chips-grid">
-              <div class="chip-item blue"><i class="fa-solid fa-users"></i> প্রাত্যহিক সমাবেশ (০৮:৪৫ AM)</div>
-              <div class="chip-item orange"><i class="fa-solid fa-utensils"></i> টিফিন ও বিরতি (১২:০০ PM)</div>
-              <div class="chip-item green"><i class="fa-solid fa-mosque"></i> জোহরের নামাজ ও প্রার্থনা (০১:১৫ PM)</div>
-              <div class="chip-item purple"><i class="fa-solid fa-book-reader"></i> লাইব্রেরি ও বিজ্ঞান ল্যাব (০২:০০ PM)</div>
-            </div>
-          </div>
-
-          <!-- 4. AI Assistant Panel Widget -->
-          <div class="ai-assistant-panel-card mt-6">
-            <div class="ic-header">
-              <h3><i class="fa-solid fa-brain text-purple"></i> AI অ্যাসিস্ট্যান্ট প্যানেল ও প্রেডিক্টিভ অ্যানালিটিক্স</h3>
-            </div>
-            <div class="ai-panel-grid mt-3">
-              <div class="ai-panel-box">
-                <h5><i class="fa-solid fa-user-nurse text-primary"></i> বিকল্প শিক্ষক সাজেশন</h5>
-                <p>মাগুরিব স্যারের অনুপস্থিতিতে বিজ্ঞান ক্লাসে সাবস্টিটিউট শিক্ষক: <strong>রহিম স্যার (ফ্রি পিরিয়ড)</strong></p>
-              </div>
-              <div class="ai-panel-box">
-                <h5><i class="fa-solid fa-bullseye text-warning"></i> পার্সোনালাইজড কুইজ</h5>
-                <p>দুর্বল ৫ জন শিক্ষার্থীর জন্য ৩টি অটো-জেনারেটেড রিভিশন কুইজ সেট করা হয়েছে।</p>
-              </div>
-              <div class="ai-panel-box">
-                <h5><i class="fa-solid fa-clock-rotate-left text-success"></i> Spaced Repetition</h5>
-                <p>গত সপ্তাহের কারক ও সমাস অধ্যায়টির রিভিশন রিমাইন্ডার আজ পাঠাতে হবে।</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 5. Daily Summary Footer Bar -->
-          <div class="daily-summary-footer-card mt-6">
-            <h4 class="summary-title"><i class="fa-solid fa-chart-pie text-emerald"></i> আজকের দৈনিক সারসংক্ষেপ (Daily Summary)</h4>
-            <div class="summary-metrics-grid">
-              <div class="sm-item">
-                <span class="sm-label">মোট ক্লাস</span>
-                <span class="sm-val" id="ds-total-classes">৬টি</span>
-              </div>
-              <div class="sm-item">
-                <span class="sm-label">সম্পন্ন ক্লাস</span>
-                <span class="sm-val text-success" id="ds-done-classes">৪টি</span>
-              </div>
-              <div class="sm-item">
-                <span class="sm-label">বাকি ক্লাস</span>
-                <span class="sm-val text-warning" id="ds-pending-classes">২টি</span>
-              </div>
-              <div class="sm-item">
-                <span class="sm-label">মোট শিক্ষণ সময়</span>
-                <span class="sm-val text-primary">৪ ঘণ্টা ২০ মি.</span>
-              </div>
-              <div class="sm-item">
-                <span class="sm-label">উপস্থিতির হার</span>
-                <span class="sm-val text-purple" id="ds-att-rate">৯২%</span>
-              </div>
-              <div class="sm-item">
-                <span class="sm-label">আজকের অর্জন</span>
-                <span class="sm-val text-amber">৩টি ব্যাজ 🏆</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 6. Bottom Communication & Footer Toolbar -->
-          <div class="routine-footer-toolbar mt-6">
-            <div class="rft-left flex-align-center gap-3">
-              <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> প্রিন্ট</button>
-              <button class="btn btn-outline btn-sm" onclick="exportPDF()"><i class="fa-solid fa-file-pdf text-danger"></i> PDF এক্সপোর্ট</button>
-              <span class="sync-badge"><i class="fa-solid fa-wifi text-success"></i> অফলাইন সিঙ্কড</span>
-            </div>
-            <div class="rft-right flex-align-center gap-2">
-              <span class="text-xs text-muted">স্মার্ট রুটিন v1.0 | ভাষা: বাংলা</span>
-            </div>
-          </div>
-
         </section>
 
-        <!-- SECTION 3: SMART SYLLABUS CARDS (Final v1.0 Layout) -->
-        <section id="section-syllabus" class="content-section hidden">
+        <!-- ==================== MENU 4: ATTENDANCE & PARTICIPATION ==================== -->
+        <section id="sec-attendance" class="dashboard-section">
           
-          <!-- 1. Header (Context & Academic Year) -->
-          <div class="smart-syllabus-header-card mb-5">
-            <div class="ssh-top flex-between flex-wrap gap-3">
-              <div>
-                <h3 class="font-bold text-main mb-1"><i class="fa-solid fa-book-bookmark text-purple"></i> স্মার্ট সিলেবাস মডিউল (Smart Syllabus v1.0)</h3>
-                <span class="text-xs text-muted" id="syllabus-meta-subtitle">শিক্ষাবর্ষ: ২০২৬ | শ্রেণি: অষ্টম (শাখা-ক) | বিষয়: বীজগণিত ও কারিকুলাম</span>
-              </div>
-              <div class="flex-align-center gap-2">
-                <select id="term-selector" class="form-input-compact shadow-sm" onchange="filterSyllabusTerm(this.value)">
-                  <option value="all" selected>সকল টার্ম সিলেবাস</option>
-                  <option value="half_yearly">অর্ধবার্ষিক পরীক্ষা (Half-Yearly)</option>
-                  <option value="annual">বার্ষিক পরীক্ষা (Annual Exam)</option>
-                </select>
-                <button class="btn btn-primary" onclick="openAddSyllabusModal()"><i class="fa-solid fa-plus"></i> + নতুন সিলেবাস অধ্যায়</button>
-              </div>
+          <!-- 5 KPI Cards (Matching User Image Reference) -->
+          <div class="attendance-kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px;margin-bottom:20px;">
+            <div class="att-kpi-card purple" style="background:rgba(139,92,246,0.1);border:1.5px solid rgba(139,92,246,0.25);padding:18px;border-radius:18px;">
+              <div style="font-size:0.8rem;color:var(--purple);font-weight:700;">মোট শিক্ষার্থী</div>
+              <strong style="font-size:1.6rem;color:var(--purple);font-weight:900;">৪৮ জন</strong>
             </div>
-
-            <!-- Progress Bar & Countdown -->
-            <div class="ssh-bottom-grid mt-4">
-              <div class="syll-progress-box">
-                <div class="flex-between text-xs fw-bold mb-1">
-                  <span>📊 সার্বিক সিলেবাস অগ্রগতি</span>
-                  <span id="syll-total-percent">৬৮% সম্পন্ন</span>
-                </div>
-                <div class="progress-bar-wrap"><div class="progress-fill bg-purple" id="syll-total-progress-fill" style="width:68%;"></div></div>
-              </div>
-              <div class="countdown-timer-box">
-                <i class="fa-solid fa-hourglass-half text-warning"></i>
-                <div>
-                  <span class="cd-title">বার্ষিক পরীক্ষা শুরু হতে বাকি:</span>
-                  <strong class="cd-digits text-danger" id="syll-countdown-digits">১২৪ দিন ০০ ঘণ্টা ১৫ মিনিট</strong>
-                </div>
-              </div>
+            <div class="att-kpi-card green" style="background:rgba(16,185,129,0.1);border:1.5px solid rgba(16,185,129,0.25);padding:18px;border-radius:18px;">
+              <div style="font-size:0.8rem;color:var(--success);font-weight:700;">সেরা পারফরমার (≥৮০%)</div>
+              <strong style="font-size:1.6rem;color:var(--success);font-weight:900;">১৫ জন</strong>
+            </div>
+            <div class="att-kpi-card yellow" style="background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.25);padding:18px;border-radius:18px;">
+              <div style="font-size:0.8rem;color:var(--warning);font-weight:700;">মাঝারি পারফরমার (৫০-৭৯%)</div>
+              <strong style="font-size:1.6rem;color:var(--warning);font-weight:900;">২৪ জন</strong>
+            </div>
+            <div class="att-kpi-card red" style="background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.25);padding:18px;border-radius:18px;">
+              <div style="font-size:0.8rem;color:var(--danger);font-weight:700;">দুর্বল শিক্ষার্থী (<৫০%)</div>
+              <strong style="font-size:1.6rem;color:var(--danger);font-weight:900;">৯ জন</strong>
+            </div>
+            <div class="att-kpi-card blue" style="background:rgba(59,130,246,0.1);border:1.5px solid rgba(59,130,246,0.25);padding:18px;border-radius:18px;">
+              <div style="font-size:0.8rem;color:var(--primary);font-weight:700;">গড় উপস্থিতি হার</div>
+              <strong style="font-size:1.6rem;color:var(--primary);font-weight:900;">৯২.৫%</strong>
             </div>
           </div>
 
-          <!-- 2. Navigation (Timeline, Search & Filter Bar) -->
-          <div class="interactive-card mb-4">
-            <div class="syllabus-nav-toolbar">
-              <div class="snt-search flex-1">
-                <div class="search-input-wrap">
-                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                  <input type="text" id="syllabus-search-input" placeholder="অধ্যায়, টপিক বা বিষয় দিয়ে খুঁজুন..." onkeyup="searchSyllabusCards(this.value)" class="form-input">
-                </div>
-              </div>
-              <div class="snt-filters flex-gap-center flex-wrap">
-                <select id="syll-status-filter" class="form-input-compact" onchange="filterSyllabusByStatus(this.value)">
-                  <option value="all" selected>সকল অবস্থা</option>
-                  <option value="not_started">⚪ শুরু হয়নি</option>
-                  <option value="running">🟢 চলছে</option>
-                  <option value="completed">💙 সম্পন্ন</option>
-                  <option value="revision_needed">🔴 রিভিশন বাকি</option>
-                </select>
-
-                <select id="syll-priority-filter" class="form-input-compact" onchange="filterSyllabusByPriority(this.value)">
-                  <option value="all" selected>সকল গুরুত্ব (Priority)</option>
-                  <option value="High">🔴 High Priority</option>
-                  <option value="Medium">🟡 Medium Priority</option>
-                  <option value="Low">🟢 Low Priority</option>
-                </select>
-              </div>
+          <!-- Student Table Controls -->
+          <div class="smart-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+              <h4 class="card-title"><i class="fa-solid fa-users text-primary"></i> শিক্ষার্থী উপস্থিতি ও বিষয়াভিত্তিক পারফরম্যান্স গ্যাপ</h4>
+              <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> A4 রিপোর্ট ডাউনলোড</button>
             </div>
-
-            <!-- 12 Months Timeline Chips -->
-            <div class="months-timeline-bar mt-3" id="syllabus-month-chips">
-              <button class="month-chip active" onclick="filterSyllabusMonth('all')">সব মাস</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('জানুয়ারি')">জানুয়ারি</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('ফেব্রুয়ারি')">ফেব্রুয়ারি</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('মার্চ')">মার্চ</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('এপ্রিল')">এপ্রিল</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('মে')">মে</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('জুন')">জুন</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('জুলাই')">জুলাই</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('আগস্ট')">আগস্ট</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('সেপ্টেম্বর')">সেপ্টেম্বর</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('অক্টোবর')">অক্টোবর</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('নভেম্বর')">নভেম্বর</button>
-              <button class="month-chip" onclick="filterSyllabusMonth('ডিসেম্বর')">ডিসেম্বর</button>
-            </div>
-          </div>
-
-          <!-- 3. Chapter Cards Container (Accordion / Expandable Glass Cards) -->
-          <div class="syllabus-chapter-cards-grid" id="syllabus-cards-container">
-            <!-- Rendered via JS -->
-          </div>
-
-          <!-- 4. Summary & Analytics Dashboard -->
-          <div class="syllabus-analytics-summary-card mt-6">
-            <h4 class="summary-title mb-3"><i class="fa-solid fa-chart-line text-purple"></i> সিলেবাস সারসংক্ষেপ ও অ্যানালিটিক্স (Summary & Analytics)</h4>
-            <div class="analytics-metrics-grid">
-              <div class="am-item">
-                <span class="am-label">মোট সিলেবাস কভারেজ</span>
-                <span class="am-val text-purple" id="syll-stat-coverage">৬৮%</span>
-              </div>
-              <div class="am-item">
-                <span class="am-label">সম্পন্ন অধ্যায়</span>
-                <span class="am-val text-success" id="syll-stat-completed">৮টি অধ্যায়</span>
-              </div>
-              <div class="am-item">
-                <span class="am-label">বাকি অধ্যায়</span>
-                <span class="am-val text-warning" id="syll-stat-pending">৪টি অধ্যায়</span>
-              </div>
-              <div class="am-item">
-                <span class="am-label">বাকি মোট ক্লাস</span>
-                <span class="am-val text-primary" id="syll-stat-classes">১৮টি ক্লাস</span>
-              </div>
-              <div class="am-item wide">
-                <span class="am-label">সমাপ্তির পূর্বাভাস (Completion Forecast)</span>
-                <span class="am-val text-emerald" id="syll-stat-forecast">✅ বর্তমান গতিতে আগামী ১৫ নভেম্বরের মধ্যে সিলেবাস সম্পন্ন হবে।</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 5. Syllabus Footer Bar -->
-          <div class="syllabus-footer-bar mt-6 flex-between flex-wrap gap-3">
-            <div class="sfb-left flex-align-center gap-3">
-              <button class="btn btn-outline btn-sm" onclick="exportPDF()"><i class="fa-solid fa-file-pdf text-danger"></i> PDF এক্সপোর্ট</button>
-              <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> প্রিন্ট</button>
-              <span class="text-xs text-muted">ভার্সন: v1.0.4 (অফিসিয়াল বোর্ড অনুমোদিত)</span>
-            <div class="sfb-right text-xs text-muted">
-              সর্বশেষ আপডেট: <strong id="syll-last-updated">২৩ জুলাই, ২০২৬</strong>
+            <div style="overflow-x:auto;">
+              <table class="syl-table" id="student-attendance-table">
+                <thead>
+                  <tr>
+                    <th>রোল</th>
+                    <th>শিক্ষার্থীর নাম</th>
+                    <th>বাংলা</th>
+                    <th>ইংরেজি</th>
+                    <th>গণিত</th>
+                    <th>বিজ্ঞান</th>
+                    <th>সমাজ</th>
+                    <th>আইসিটি</th>
+                    <th>মোট নম্বর</th>
+                    <th>শতকরা (%)</th>
+                    <th>গ্রেড</th>
+                    <th>অবস্থা</th>
+                    <th style="text-align:right;">অ্যাকশন</th>
+                  </tr>
+                </thead>
+                <tbody id="student-table-body"></tbody>
+              </table>
             </div>
           </div>
 
         </section>
 
-        <!-- SECTION 4: ATTENDANCE & PARTICIPATION -->
-        <section id="section-attendance" class="content-section hidden">
-          <div class="interactive-card">
-            <div class="ic-header space-between">
-              <div>
-                <h3><i class="fa-solid fa-users-check text-success"></i> দৈনিক স্মার্ট উপস্থিতি ও ক্লাস এনগেজমেন্ট কার্ড</h3>
-                <span class="section-subtitle">শিক্ষার্থীদের সরাসরি উপস্থিতি, বিলম্ব ও পার্টিসিপেশন স্টার মার্ক প্রদান</span>
-              </div>
-              <div class="flex-gap-center flex-wrap">
-                <select id="att-class-select" class="form-input-compact" onchange="filterAttendanceByClass()">
-                  <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
-                  <option value="সপ্তম">সপ্তম শ্রেণি</option>
-                  <option value="অষ্টম" selected>অষ্টম শ্রেণি</option>
-                  <option value="নবম">নবম শ্রেণি</option>
-                  <option value="দশম">দশম শ্রেণি</option>
-                </select>
-
-                <select id="att-section-select" class="form-input-compact" onchange="filterAttendanceByClass()">
-                  <option value="ক" selected>শাখা - ক</option>
-                  <option value="খ">শাখা - খ</option>
-                  <option value="গ">শাখা - গ</option>
-                </select>
-
-                <select id="att-group-select" class="form-input-compact" onchange="filterAttendanceByClass()">
-                  <option value="সাধারণ" selected>সাধারণ বিভাগ</option>
-                  <option value="বিজ্ঞান">বিজ্ঞান বিভাগ</option>
-                  <option value="মানবিক">মানবিক বিভাগ</option>
-                  <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা বিভাগ</option>
-                </select>
-
-                <input type="date" class="form-input-compact" id="attendance-date-picker">
-                <button class="btn btn-green" onclick="saveAttendance()"><i class="fa-solid fa-floppy-disk"></i> সংরক্ষণ করুন</button>
-              </div>
-            </div>
-
-            <div class="attendance-cards-grid mt-6" id="attendance-cards-container">
-              <!-- Rendered via JS -->
-            </div>
+        <!-- ==================== MENU 5: LESSON PLAN ==================== -->
+        <section class="dashboard-section" id="sec-lesson">
+          <div class="smart-card">
+            <h3><i class="fa-solid fa-chalkboard-user text-purple"></i> লেসন প্ল্যান ট্র্যাকার ও এআই শিখন সহায়িকা</h3>
+            <p style="color:var(--text-muted);">প্রতিদিনের পাঠ পরিকল্পনা, উদ্দেশ্য ও হ্যান্ডআউট ব্যবস্থাপনা</p>
           </div>
         </section>
 
-        <!-- SECTION 5: EXAM ROUTINE CARDS -->
-        <section id="section-exams" class="content-section hidden">
-          <div class="interactive-card">
-            <div class="ic-header space-between">
-              <div>
-                <h3><i class="fa-solid fa-bullseye text-warning"></i> ক্যাটাগরিভিত্তিক পরীক্ষার রুটিন ও সিলেবাস কার্ড</h3>
-                <span class="section-subtitle">ক্লাস টেস্ট থেকে বার্ষিকী পরীক্ষার সময়সূচী, মান বণ্টন ও তারিখ নির্ধারণ</span>
-              </div>
-              <button class="btn btn-primary" onclick="openAddExamModal()"><i class="fa-solid fa-plus"></i> + নতুন পরীক্ষা কার্ড যোগ</button>
-            </div>
-
-            <div class="day-tabs-bar" id="exam-type-tabs">
-              <button class="tab-chip active" onclick="filterExamType('all')">সকল পরীক্ষা</button>
-              <button class="tab-chip" onclick="filterExamType('ক্লাস টেস্ট')">ক্লাস টেস্ট</button>
-              <button class="tab-chip" onclick="filterExamType('সাপ্তাহিক টেস্ট')">সাপ্তাহিক টেস্ট</button>
-              <button class="tab-chip" onclick="filterExamType('মাসিক টেস্ট')">মাসিক টেস্ট</button>
-              <button class="tab-chip" onclick="filterExamType('ত্রৈমাসিক টেস্ট')">ত্রৈমাসিক টেস্ট</button>
-              <button class="tab-chip" onclick="filterExamType('অর্ধবার্ষিকী')">অর্ধবার্ষিকী</button>
-              <button class="tab-chip" onclick="filterExamType('বার্ষিকী')">বার্ষিকী</button>
-            </div>
-
-            <div class="exams-grid mt-6" id="exams-cards-container">
-              <!-- Rendered via JS -->
-            </div>
+        <!-- ==================== MENU 6: EXAMS & EVALUATION ==================== -->
+        <section class="dashboard-section" id="sec-exams">
+          <div class="smart-card">
+            <h3><i class="fa-solid fa-file-pen text-warning"></i> পরীক্ষা ও পারদর্শিতার সূচক (PI) মূল্যায়ন</h3>
+            <p style="color:var(--text-muted);">চতুর্ভুজ, বৃত্ত ও ত্রিভুজভিত্তিক নতুন কারিকুলাম মূল্যায়ন ও মার্কস এন্ট্রি</p>
           </div>
         </section>
 
-        <!-- SECTION 6: LIVE CONTROL HUB -->
-        <section id="section-live_control" class="content-section hidden">
-          <!-- Class Meta Context Bar -->
-          <div class="interactive-card mb-4">
-            <div class="ic-header space-between flex-wrap gap-4">
-              <div class="flex-align-center gap-3">
-                <i class="fa-solid fa-graduation-cap text-primary" style="font-size:22px;"></i>
-                <div>
-                  <h4 style="margin:0; font-size:15px; font-weight:800;">লাইভ ক্লাসের অবস্থান ও পরিচয়</h4>
-                  <span style="font-size:12px; color:var(--text-muted);" id="live-context-summary">শ্রেণি: অষ্টম | শাখা: ক | বিভাগ: সাধারণ | বোর্ড: ঢাকা বোর্ড</span>
-                </div>
-              </div>
-
-              <div class="flex-gap-center flex-wrap">
-                <select id="live-board-select" class="form-input-compact" onchange="updateLiveContext()">
-                  <option value="ঢাকা বোর্ড" selected>ঢাকা বোর্ড</option>
-                  <option value="রাজশাহী বোর্ড">রাজশাহী বোর্ড</option>
-                  <option value="চট্টগ্রাম বোর্ড">চট্টগ্রাম বোর্ড</option>
-                  <option value="কুমিল্লা বোর্ড">কুমিল্লা বোর্ড</option>
-                  <option value="যশোর বোর্ড">যশোর বোর্ড</option>
-                  <option value="সিলেট বোর্ড">সিলেট বোর্ড</option>
-                  <option value="বরিশাল বোর্ড">বরিশাল বোর্ড</option>
-                  <option value="দিনাজপুর বোর্ড">দিনাজপুর বোর্ড</option>
-                  <option value="ময়মনসিংহ বোর্ড">ময়মনসিংহ বোর্ড</option>
-                  <option value="মাদ্রাসা বোর্ড">মাদ্রাসা বোর্ড</option>
-                  <option value="কারিগরি বোর্ড">কারিগরি বোর্ড</option>
-                </select>
-
-                <select id="live-class-select" class="form-input-compact" onchange="updateLiveContext()">
-                  <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি</option>
-                  <option value="সপ্তম">সপ্তম শ্রেণি</option>
-                  <option value="অষ্টম" selected>অষ্টম শ্রেণি</option>
-                  <option value="নবম">নবম শ্রেণি</option>
-                  <option value="দশম">দশম শ্রেণি</option>
-                </select>
-
-                <select id="live-section-select" class="form-input-compact" onchange="updateLiveContext()">
-                  <option value="ক" selected>শাখা - ক</option>
-                  <option value="খ">শাখা - খ</option>
-                  <option value="গ">শাখা - গ</option>
-                </select>
-
-                <select id="live-group-select" class="form-input-compact" onchange="updateLiveContext()">
-                  <option value="সাধারণ" selected>সাধারণ বিভাগ</option>
-                  <option value="বিজ্ঞান">বিজ্ঞান বিভাগ</option>
-                  <option value="মানবিক">মানবিক বিভাগ</option>
-                  <option value="ব্যবসায় শিক্ষা">ব্যবসায় শিক্ষা বিভাগ</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="interactive-grid-layout">
-            
-            <div class="interactive-card text-center">
-              <div class="ic-header">
-                <h3><i class="fa-solid fa-stopwatch text-indigo"></i> লাইভ লেকচার ও কুইজ কাউন্টডাউন টাইমার</h3>
-              </div>
-              <div class="timer-display-box mt-4">
-                <div class="timer-digits" id="live-timer-digits">৪০:০০</div>
-                <div class="timer-controls mt-6 flex-center-gap">
-                  <button class="btn btn-green" onclick="startLiveTimer()"><i class="fa-solid fa-play"></i> শুরু করুন</button>
-                  <button class="btn btn-warning" onclick="pauseLiveTimer()"><i class="fa-solid fa-pause"></i> বিরতি</button>
-                  <button class="btn btn-danger" onclick="resetLiveTimer()"><i class="fa-solid fa-rotate-left"></i> রিসেট (৪০ মি.)</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="interactive-card text-center">
-              <div class="ic-header">
-                <h3><i class="fa-solid fa-shuffle text-purple"></i> র‍্যান্ডম শিক্ষার্থী নির্বাচন কার্ড (Randomizer)</h3>
-              </div>
-              <div class="randomizer-box mt-4">
-                <div class="selected-student-avatar-ring">
-                  <i class="fa-solid fa-user-graduate"></i>
-                </div>
-                <div class="selected-student-display mt-4" id="random-student-name">আজকের প্রশ্নের উত্তর কে দেবে?</div>
-                <div class="mt-2" style="font-size:12px; font-weight:700; color:var(--text-muted);" id="random-student-meta">শ্রেণি: অষ্টম (ক) | সাধারণ বিভাগ</div>
-                <button class="btn btn-primary mt-6" onclick="pickRandomStudent()"><i class="fa-solid fa-dice"></i> এলোমেলো শিক্ষার্থী বাছাই করুন</button>
-              </div>
-            </div>
-
+        <!-- ==================== MENU 7: NOTICE ==================== -->
+        <section class="dashboard-section" id="sec-notice">
+          <div class="smart-card">
+            <h3><i class="fa-solid fa-bullhorn text-danger"></i> নোটিশ ও অভিভাবক যোগাযোগ সেন্টার</h3>
+            <p style="color:var(--text-muted);">অটোমেটেড এসএমএস নোটিফিকেশন ও ডিজিটাল নোটিশ বোর্ড</p>
           </div>
         </section>
 
-        <!-- SECTION 7: AI INSIGHTS & ACTIONS -->
-        <section id="section-ai_insights" class="content-section hidden">
-          <div class="interactive-card">
-            <div class="ic-header">
-              <h3><i class="fa-solid fa-brain text-purple"></i> AI শ্রেণিকক্ষ পারফরম্যান্স অ্যানালিটিক্স ও সুপারিশ</h3>
-            </div>
-            <div class="ai-insights-grid mt-6" id="ai-insights-container">
-              <!-- Rendered via JS -->
-            </div>
+        <!-- ==================== MENU 8: ANALYTICS ==================== -->
+        <section class="dashboard-section" id="sec-analytics">
+          <div class="smart-card">
+            <h3><i class="fa-solid fa-chart-line text-primary"></i> পারফরম্যান্স অ্যানালিটিক্স ও বিহেভিয়ারাল রিপোর্ট</h3>
+            <p style="color:var(--text-muted);">শ্রেণির সামগ্রিক ফলাফলের গ্রাফিক্যাল ও পরিসংখ্যানভিত্তিক অ্যানালিটিক্স</p>
           </div>
         </section>
 
-        <!-- SECTION 8: CLASS HISTORY -->
-        <section id="section-history" class="content-section hidden">
-          <div class="interactive-card">
-            <div class="ic-header">
-              <h3><i class="fa-solid fa-clock-rotate-left text-primary"></i> সম্পন্নকৃত ক্লাসের ডিজিটাল রেকর্ড ও ইতিহাস</h3>
-            </div>
-            <div class="history-cards-grid mt-6" id="history-cards-container">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION 9: ALERTS & NOTICES -->
-        <section id="section-alerts" class="content-section hidden">
-          <div class="interactive-card">
-            <div class="ic-header">
-              <h3><i class="fa-solid fa-bell text-danger"></i> জরুরি সতর্কতা ও ডাইনামিক নোটিশ কার্ড</h3>
-            </div>
-            <div class="alerts-list mt-6" id="alerts-container">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION 10: SETTINGS -->
-        <section id="section-settings" class="content-section hidden">
-          <div class="interactive-card max-w-2xl">
-            <div class="ic-header">
-              <h3><i class="fa-solid fa-gear text-primary"></i> শ্রেণিকক্ষ ও শিক্ষক কনফিগারেশন সেটিংস</h3>
-            </div>
-            <form onsubmit="saveSettings(event)" class="settings-form mt-6">
+        <!-- ==================== MENU 9: SETTINGS ==================== -->
+        <section class="dashboard-section" id="sec-settings">
+          <div class="smart-card">
+            <h3><i class="fa-solid fa-gear text-primary"></i> প্রতিষ্ঠান সেটিংস ও ইউনিভার্সাল SaaS কনফিগারেশন</h3>
+            <form onsubmit="saveSettings(event)" style="margin-top:16px;">
               <div class="form-group">
-                <label>বিদ্যালয়ের নাম</label>
-                <input type="text" id="cfg-school-name" class="form-input">
+                <label class="form-label">বিদ্যালয়ের নাম</label>
+                <input type="text" id="cfg-school-name" class="form-input" value="মাগুরিব হাই স্কুল অ্যান্ড কলেজ">
               </div>
               <div class="form-group">
-                <label>শিক্ষকের নাম</label>
-                <input type="text" id="cfg-teacher-name" class="form-input">
+                <label class="form-label">শিক্ষকের নাম</label>
+                <input type="text" id="cfg-teacher-name" class="form-input" value="মাগুরিব আলী">
               </div>
               <div class="form-group">
-                <label>দায়িত্বপ্রাপ্ত শ্রেণি ও শাখা</label>
-                <input type="text" id="cfg-class-name" class="form-input">
+                <label class="form-label">দায়িত্বপ্রাপ্ত শ্রেণি ও শাখা</label>
+                <input type="text" id="cfg-class-name" class="form-input" value="অষ্টম (শাখা-ক)">
               </div>
-              <button type="submit" class="btn btn-primary mt-4"><i class="fa-solid fa-floppy-disk"></i> সেটিং সংরক্ষণ করুন</button>
+              <button type="submit" class="btn btn-primary" style="margin-top:10px;"><i class="fa-solid fa-floppy-disk"></i> সেটিং সংরক্ষণ করুন</button>
             </form>
           </div>
         </section>
@@ -701,358 +543,283 @@
     </main>
   </div>
 
-  <!-- ADD ROUTINE MODAL -->
-  <div class="modal-backdrop hidden" id="routine-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3><i class="fa-solid fa-calendar-plus text-primary"></i> নতুন পিরিয়ড যোগ করুন</h3>
-        <button class="close-btn" onclick="closeRoutineModal()">&times;</button>
+  
+  <!-- UNIFIED MASTER A4 EXECUTIVE SETUP SHEET MODAL (#syllabus-modal) -->
+  <div class="modal-overlay hidden" id="syllabus-modal" style="z-index:9999;">
+    <div class="smart-card-modal a4-modal-sheet" style="max-width:700px;width:92%;padding:32px 36px;border-radius:24px;position:relative;background:var(--bg-card);box-shadow:0 20px 60px rgba(0,0,0,0.3);border:1.5px solid var(--border);">
+      
+      <!-- Close Button -->
+      <button class="modal-close-btn" onclick="closeSyllabusModal()" style="position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;background:var(--bg-input);border:1.5px solid var(--border);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
+
+      <!-- Header Badge & Title -->
+      <div style="text-align:center;margin-bottom:20px;">
+        <div id="modal-logo-badge" onclick="triggerSchoolLogoUpload()" title="লোগো আপলোড করতে ক্লিক করুন" style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg, #3b82f6, #6366f1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 10px;cursor:pointer;box-shadow:0 8px 24px rgba(59,130,246,0.3);overflow:hidden;position:relative;border:3.5px solid #fff;">
+          <i class="fa-solid fa-graduation-cap" id="badge-default-cap-icon"></i>
+          <img id="badge-school-logo-img" src="" style="width:100%;height:100%;object-fit:cover;display:none;" alt="স্কুল লোগো">
+        </div>
+        
+        <h2 style="font-size:1.45rem;font-weight:900;color:var(--text-main);margin:4px 0 2px;" id="modal-school-name-display">সশিবা সরকারি মডেল হাই স্কুল & কলেজ</h2>
+        <div style="font-size:0.9rem;font-weight:800;color:var(--primary);margin-bottom:2px;" id="modal-sub-dynamic-title">
+          বিষয়: <span id="modal-subject-subtitle">সাধারণ বিজ্ঞান</span> | মাস্টার রুটিন ও সিলেবাস এডিট শিট (A4)
+        </div>
+        <p style="font-size:0.78rem;color:var(--primary);font-weight:700;margin:2px 0 0;" id="modal-school-sub-info">ঢাকা বোর্ড | EIIN: ১২৩৪৫৬ | স্থাপিত: ১৯৯৫ | মেইন ক্যাম্পাস, ঢাকা</p>
       </div>
-      <form onsubmit="saveRoutineModal(event)" class="mt-4">
-        <div class="form-group">
-          <label>বার বেছে নিন</label>
-          <select id="m-day" class="form-input">
-            <option value="রবিবার">রবিবার</option>
-            <option value="সোমবার">সোমবার</option>
-            <option value="মঙ্গলবার">মঙ্গলবার</option>
-            <option value="বুধবার">বুধবার</option>
-            <option value="বৃহস্পতিবার">বৃহস্পতিবার</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>বিষয় (ড্রপডাউন থেকে নির্বাচন করুন)</label>
-          <select id="m-subject" class="form-input" required>
-            <option value="গণিত" selected>গণিত</option>
-            <option value="বাংলা">বাংলা</option>
-            <option value="ইংরেজি">ইংরেজি</option>
-            <option value="বিজ্ঞান">বিজ্ঞান</option>
-            <option value="ডিজিটাল প্রযুক্তি">ডিজিটাল প্রযুক্তি</option>
-            <option value="ইতিহাস ও সামাজিক বিজ্ঞান">ইতিহাস ও সামাজিক বিজ্ঞান</option>
-            <option value="জীবন ও জীবিকা">জীবন ও জীবিকা</option>
-            <option value="স্বাস্থ্য সুরক্ষা">স্বাস্থ্য সুরক্ষা</option>
-            <option value="ধর্ম ও নৈতিক শিক্ষা">ধর্ম ও নৈতিক শিক্ষা</option>
-            <option value="শিল্প ও সংস্কৃতি">শিল্প ও সংস্কৃতি</option>
-            <option value="পদার্থবিজ্ঞান">পদার্থবিজ্ঞান</option>
-            <option value="রসায়ন">রসায়ন</option>
-            <option value="জীববিজ্ঞান">জীববিজ্ঞান</option>
-            <option value="উচ্চতর গণিত">উচ্চতর গণিত</option>
-            <option value="হিসাববিজ্ঞান">হিসাববিজ্ঞান</option>
-            <option value="ব্যবসায় উদ্যোগ">ব্যবসায় উদ্যোগ</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>সময়কাল (যেমন: ০৯:০০ - ০৯:৪৫)</label>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="m-time-text" class="form-input" style="flex:1;" placeholder="০৯:০০ - ০৯:৪৫" value="১০:০০ - ১০:৪৫" required>
-            <select id="m-time-ampm" class="form-input" style="width:90px; font-weight:800;">
-              <option value="AM" selected>AM</option>
-              <option value="PM">PM</option>
+
+      <!-- UNIFIED MASTER TABS: Row, Column & Table Edit -->
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:20px;background:var(--bg-input);padding:5px;border-radius:16px;border:1.5px solid var(--border);">
+        <button type="button" class="syl-tab-btn active" id="stb-row" onclick="switchSyllabusModalTab('row')"><i class="fa-solid fa-plus"></i> 📝 ১. রো সেটআপ (Add Row)</button>
+        <button type="button" class="syl-tab-btn" id="stb-col" onclick="switchSyllabusModalTab('col')"><i class="fa-solid fa-columns text-purple"></i> 📊 ২. কলাম সেটআপ (Add Col)</button>
+        <button type="button" class="syl-tab-btn" id="stb-manage" onclick="switchSyllabusModalTab('manage')"><i class="fa-solid fa-pen-to-square text-warning"></i> ✏️ ৩. কলাম এডিটর (Manage Table)</button>
+      </div>
+
+      <!-- Form Container -->
+      <form onsubmit="handleMasterModalSubmit(event)" style="text-align:left;display:flex;flex-direction:column;gap:14px;">
+        <input type="hidden" id="ms-edit-id" value="">
+        <input type="hidden" id="ms-active-tab" value="row">
+
+        <!-- ================================================================= -->
+        <!-- TAB SECTION 1: ROW SETUP (রো সেটআপ) -->
+        <!-- ================================================================= -->
+        <div id="tab-sec-row" style="display:flex;flex-direction:column;gap:14px;">
+          <!-- Row 1: School Name & Logo Upload -->
+          <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px;background:var(--bg-input);padding:14px;border-radius:14px;border:1.5px solid var(--border);">
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);"><i class="fa-solid fa-school text-primary"></i> প্রতিষ্ঠানের নাম (School Name - Centered)</label>
+              <input type="text" id="ms-school-name" class="form-input" value="সশিবা সরকারি মডেল হাই স্কুল & কলেজ" style="text-align:center;font-weight:800;" oninput="document.getElementById('modal-school-name-display').textContent=this.value">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);"><i class="fa-solid fa-image text-purple"></i> লোগো সংযুক্তি / ফাইল আপলোড</label>
+              <div style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:1.5px solid var(--border);padding:6px 12px;border-radius:10px;cursor:pointer;" onclick="triggerSchoolLogoUpload()">
+                <i class="fa-solid fa-camera text-primary" style="font-size:1.1rem;"></i>
+                <span style="font-size:0.82rem;font-weight:700;color:var(--primary);" id="logo-file-name-label">লোগো নির্বাচন করুন (অটো-ফিট)</span>
+              </div>
+              <input type="file" id="school-logo-file-input" accept="image/*" style="display:none;" onchange="uploadSchoolLogo(event)">
+            </div>
+          </div>
+
+          <!-- Row 2: Date Picker & Class -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);">তারিখ (Date Picker / Input)</label>
+              <input type="date" id="ms-date" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);">Class (শ্রেণি: প্রথম থেকে দ্বাদশ)</label>
+              <select id="ms-class" class="form-input">
+                <option value="প্রথম">প্রথম শ্রেণি (Class 1)</option>
+                <option value="দ্বিতীয়">দ্বিতীয় শ্রেণি (Class 2)</option>
+                <option value="তৃতীয়">তৃতীয় শ্রেণি (Class 3)</option>
+                <option value="চতুর্থ">চতুর্থ শ্রেণি (Class 4)</option>
+                <option value="পঞ্চম">পঞ্চম শ্রেণি (Class 5)</option>
+                <option value="ষষ্ঠ">ষষ্ঠ শ্রেণি (Class 6)</option>
+                <option value="সপ্তম">সপ্তম শ্রেণি (Class 7)</option>
+                <option value="অষ্টম" selected>অষ্টম শ্রেণি (Class 8)</option>
+                <option value="নবম">নবম শ্রেণি (Class 9)</option>
+                <option value="দশম">দশম শ্রেণি (Class 10)</option>
+                <option value="একাদশ">একাদশ শ্রেণি (Class 11)</option>
+                <option value="দ্বাদশ">দ্বাদশ শ্রেণি (Class 12)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 3: Section & Subject -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);">শাখা (ক, খ, গ, ঘ, ঙ)</label>
+              <select id="ms-section" class="form-input">
+                <option value="ক" selected>শাখা: "ক"</option>
+                <option value="খ">শাখা: "খ"</option>
+                <option value="গ">শাখা: "গ"</option>
+                <option value="ঘ">শাখা: "ঘ"</option>
+                <option value="ঙ">শাখা: "ঙ"</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);">বিষয় (Subject - Centered Alignment)</label>
+              <select id="ms-subject" class="form-input" style="text-align:center;font-weight:800;" onchange="document.getElementById('modal-subject-subtitle').textContent=this.value">
+                <option value="সাধারণ বিজ্ঞান" selected>সাধারণ বিজ্ঞান (১২৭)</option>
+                <option value="গণিত">গণিত (১০৯)</option>
+                <option value="পদার্থবিজ্ঞান">পদার্থবিজ্ঞান (১৩৬)</option>
+                <option value="বাংলা সাহিত্য">বাংলা সাহিত্য (১০১)</option>
+                <option value="ইংরেজি">ইংরেজি (১০৭)</option>
+                <option value="আইসিটি">আইসিটি (২৭৫)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 4: Chapter & Room No -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);"><i class="fa-solid fa-book-open text-primary"></i> অধ্যায় (Chapter Submenu)</label>
+              <select id="ms-chapter" class="form-input">
+                <option value="১ম অধ্যায়: সাধারণ পরিচিতি & পরিমাপ">১ম অধ্যায়: সাধারণ পরিচিতি & পরিমাপ</option>
+                <option value="২য় অধ্যায়: ভৌত পরিমাপ ও ডাটা তথ্য">২য় অধ্যায়: ভৌত পরিমাপ ও ডাটা তথ্য</option>
+                <option value="৩য় অধ্যায়: বীজগণিতীয় রাশি ও সমীকরণ" selected>৩য় অধ্যায়: বীজগণিতীয় রাশি ও সমীকরণ</option>
+                <option value="অধ্যায় ৪: বলবিদ্যা, কাজ, ক্ষমতা ও শক্তি">অধ্যায় ৪: বলবিদ্যা, কাজ, ক্ষমতা ও শক্তি</option>
+                <option value="অধ্যায় ৫: আলোক বিজ্ঞান ও প্রতিফলন">অধ্যায় ৫: আলোক বিজ্ঞান ও প্রতিফলন</option>
+                <option value="৬ষ্ঠ অধ্যায়: রাসায়নিক বিক্রিয়া ও বন্ধন">৬ষ্ঠ অধ্যায়: রাসায়নিক বিক্রিয়া ও বন্ধন</option>
+                <option value="৭ম অধ্যায়: তরঙ্গ, শব্দ ও স্পন্দন">৭ম অধ্যায়: তরঙ্গ, শব্দ ও স্পন্দন</option>
+                <option value="৮ম অধ্যায়: আধুনিক পদার্থবিজ্ঞান ও প্রোগ্রামিং">৮ম অধ্যায়: আধুনিক পদার্থবিজ্ঞান ও প্রোগ্রামিং</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);"><i class="fa-solid fa-door-open text-purple"></i> Room No (কক্ষ নম্বর সাব-মেনু)</label>
+              <select id="ms-room" class="form-input">
+                <option value="১০১ (১ম তলা)">১০১ (১ম তলা)</option>
+                <option value="১০২ (১ম তলা)">১০২ (১ম তলা)</option>
+                <option value="১০৩ (২য় তলা)">১০৩ (২য় তলা)</option>
+                <option value="১০৪ (২য় তলা)" selected>১০৪ (২য় তলা)</option>
+                <option value="২০১ (৩য় তলা)">২০১ (৩য় তলা)</option>
+                <option value="ল্যাব-১ (বিজ্ঞান ল্যাব)">ল্যাব-১ (বিজ্ঞান ল্যাব)</option>
+                <option value="ল্যাব-২ (কম্পিউটার ল্যাব)">ল্যাব-২ (কম্পিউটার ল্যাব)</option>
+                <option value="অডিটোরিয়াম">অডিটোরিয়াম</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 5: Topic Content -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);"><i class="fa-solid fa-list-check text-success"></i> Topic / বিষয়বস্তু (Topic Submenu)</label>
+            <select id="ms-topic" class="form-input">
+              <option value="সূত্রাবলী, মান নির্ণয়, উৎপাদকে বিশ্লেষণ" selected>সূত্রাবলী, মান নির্ণয়, উৎপাদকে বিশ্লেষণ</option>
+              <option value="বলের ধারণা, নিউটন ৩য় সূত্র, কাজ ও শক্তি">বলের ধারণা, নিউটন ৩য় সূত্র, কাজ ও শক্তি</option>
+              <option value="আলোর প্রতিফলন, অবতল দর্পণ ও প্রতিবিম্ব">আলোর প্রতিফলন, অবতল দর্পণ ও প্রতিবিম্ব</option>
+              <option value="১.১ মৌলিক ধারণা, পরিমাপ ও এককাবলী">১.১ মৌলিক ধারণা, পরিমাপ ও এককাবলী</option>
+              <option value="৬.১ রাসায়নিক বন্ধন ও সমীকরণ সমতাকরণ">৬.১ রাসায়নিক বন্ধন ও সমীকরণ সমতাকরণ</option>
+              <option value="৮.১ পাইথন প্রোগ্রামিং ও ডাটা স্ট্রাকচার">৮.১ পাইথন প্রোগ্রামিং ও ডাটা স্ট্রাকচার</option>
             </select>
           </div>
+
+          <!-- Row 6: Time Range & Assigned Teacher -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);">সময় নির্বাচন করুন (Time Range Selector)</label>
+              <select id="ms-time" class="form-input">
+                <option value="০৯:০০ - ০৯:৪৫ (১ম পিরিয়ড)">০৯:০০ - ০৯:৪৫ (১ম পিরিয়ড)</option>
+                <option value="১০:০০ - ১০:৪৫ (২য় পিরিয়ড)" selected>১০:০০ - ১০:৪৫ (২য় পিরিয়ড)</option>
+                <option value="১১:০০ - ১১:৪৫ (৩য় পিরিয়ড)">১১:০০ - ১১:৪৫ (৩য় পিরিয়ড)</option>
+                <option value="১২:০০ - ১২:৪৫ (৪র্থ পিরিয়ড)">১২:০০ - ১২:৪৫ (৪র্থ পিরিয়ড)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);">Assigned Teacher (বরাদ্দকৃত শিক্ষক)</label>
+              <input type="text" id="ms-teacher" class="form-input" value="মাগুরিব আলী">
+            </div>
+          </div>
+
+          <!-- Row 7: Resources & Additional Attributes -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);"><i class="fa-solid fa-laptop-code text-warning"></i> Resource (রিসোর্স সাব-মেনু)</label>
+              <select id="ms-resource" class="form-input">
+                <option value="🎥 ভিডিও ক্লাস + 📄 লেকচার নোট + 📝 কুইজ" selected>🎥 ভিডিও ক্লাস + 📄 লেকচার নোট + 📝 কুইজ</option>
+                <option value="💻 প্রজেক্টর প্রেজেন্টেশন + 📐 জ্যামিতি বক্স">💻 প্রজেক্টর প্রেজেন্টেশন + 📐 জ্যামিতি বক্স</option>
+                <option value="📖 পাঠ্যবই + 📝 অনুশীলনী ওয়ার্কশিট">📖 পাঠ্যবই + 📝 অনুশীলনী ওয়ার্কশিট</option>
+                <option value="🔬 ল্যাব প্র্যাকটিক্যাল + 📊 মডেল অ্যানিমেশন">🔬 ল্যাব প্র্যাকটিক্যাল + 📊 মডেল অ্যানিমেশন</option>
+                <option value="📄 বিগত বছরের প্রশ্নপত্র + ✍️ রিভিশন নোটস">📄 বিগত বছরের প্রশ্নপত্র + ✍️ রিভিশন নোটস</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);">গুরুত্ব (Priority)</label>
+              <select id="ms-priority" class="form-input">
+                <option value="High" selected>🔴 High Priority</option>
+                <option value="Medium">🟡 Medium Priority</option>
+                <option value="Low">🟢 Low Priority</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label>দায়িত্বপ্রাপ্ত শিক্ষক</label>
-          <input type="text" id="m-teacher" class="form-input" placeholder="যেমন: মাগুরিব স্যার">
+
+        <!-- ================================================================= -->
+        <!-- TAB SECTION 2: COLUMN SETUP (কলাম সেটআপ) -->
+        <!-- ================================================================= -->
+        <div id="tab-sec-col" style="display:none;flex-direction:column;gap:14px;">
+          <div class="form-group" style="background:var(--bg-input);padding:14px;border-radius:14px;border:1.5px solid var(--border);">
+            <label class="form-label" style="font-weight:800;font-size:0.82rem;color:var(--text-secondary);"><i class="fa-solid fa-heading text-primary"></i> কলামের নাম (Column Header Title)</label>
+            <input type="text" id="col-title-input" class="form-input" placeholder="যেমন: অ্যাসাইনমেন্ট / ল্যাব নোট / বিশেষ মন্তব্য" style="font-weight:800;height:42px;">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);"><i class="fa-solid fa-align-center text-purple"></i> টেক্সট পজিশনিং (Alignment)</label>
+              <select id="col-align-input" class="form-input" style="height:42px;font-weight:800;">
+                <option value="center" selected>🎯 মাঝখানে (Center)</option>
+                <option value="left">📝 বামপাশে (Left)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);"><i class="fa-solid fa-text-width text-warning"></i> কলাম প্রস্থ (Column Width)</label>
+              <select id="col-width-input" class="form-input" style="height:42px;font-weight:800;">
+                <option value="140px" selected>১৪০ পিক্সেল (স্ট্যান্ডার্ড)</option>
+                <option value="180px">১৮০ পিক্সেল (প্রশস্ত)</option>
+                <option value="100px">১০০ পিক্সেল (কম্প্যাক্ট)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="font-weight:800;font-size:0.8rem;color:var(--text-secondary);"><i class="fa-solid fa-pen-to-square text-success"></i> ঘরের প্রারম্ভিক তথ্য (Default Cell Value)</label>
+            <input type="text" id="col-default-input" class="form-input" value="অন-ট্র্যাক" style="height:42px;font-weight:800;">
+          </div>
         </div>
-        <div class="form-group">
-          <label><i class="fa-solid fa-phone text-primary"></i> শিক্ষকের মোবাইল নম্বর (অটো রিং/SMS টেস্ট)</label>
-          <input type="tel" id="m-phone" class="form-input" placeholder="যেমন: 01700000000" required>
+
+        <!-- ================================================================= -->
+        <!-- TAB SECTION 3: TABLE & COLUMN STRUCTURE EDITOR (কলাম এডিটর) -->
+        <!-- ================================================================= -->
+        <div id="tab-sec-manage" style="display:none;flex-direction:column;gap:14px;">
+          <label class="form-label" style="font-weight:800;font-size:0.84rem;color:var(--text-secondary);"><i class="fa-solid fa-list-check text-primary"></i> কলামের নাম ও প্রস্থ পরিবর্তন করুন:</label>
+          <div id="manage-columns-list-container" style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:6px;">
+            <!-- Injected via JavaScript -->
+          </div>
         </div>
-        <div class="form-group">
-          <label><i class="fa-solid fa-bell text-warning"></i> অটো রিমাইন্ডার পাঠানোর সময়</label>
-          <select id="m-alert-time" class="form-input">
-            <option value="1">ক্লাস শুরুর ১ মিনিট পূর্বে</option>
-            <option value="2">ক্লাস শুরুর ২ মিনিট পূর্বে</option>
-            <option value="3">ক্লাস শুরুর ৩ মিনিট পূর্বে</option>
-            <option value="5">ক্লাস শুরুর ৫ মিনিট পূর্বে</option>
-            <option value="10" selected>ক্লাস শুরুর ১০ মিনিট পূর্বে</option>
-            <option value="15">ক্লাস শুরুর ১৫ মিনিট পূর্বে</option>
-            <option value="20">ক্লাস শুরুর ২০ মিনিট পূর্বে</option>
-            <option value="30">ক্লাস শুরুর ৩০ মিনিট পূর্বে</option>
-            <option value="45">ক্লাস শুরুর ৪৫ মিনিট পূর্বে</option>
-            <option value="60">ক্লাস শুরুর ১ ঘণ্টা (৬০ মি.) পূর্বে</option>
-          </select>
+
+        <!-- Standardized Action Buttons (Matching User Image) -->
+        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px;padding-top:18px;border-top:1.5px solid var(--border);">
+          <button type="button" class="btn btn-secondary" onclick="closeSyllabusModal()" style="font-weight:800;padding:10px 20px;border-radius:12px;"><i class="fa-solid fa-xmark"></i> ❌ ✕ বাতিল করুন</button>
+          <button type="submit" class="btn btn-success" style="font-weight:900;padding:10px 24px;border-radius:12px;background:linear-gradient(135deg, #10b981, #059669);"><i class="fa-solid fa-floppy-disk"></i> 💾 🔒 তথ্য সেট করুন</button>
         </div>
-        <div class="form-group">
-          <label><i class="fa-solid fa-tower-cell text-success"></i> রিমাইন্ডার মোড</label>
-          <select id="m-alert-mode" class="form-input">
-            <option value="call_sms" selected>📞 অটো ভয়েস কল ও SMS (উভয়ই)</option>
-            <option value="sms">💬 শুধুমাত্র SMS রিমাইন্ডার</option>
-            <option value="call">📞 শুধুমাত্র অটো ভয়েস কল</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>কক্ষ নং</label>
-          <input type="text" id="m-room" class="form-input" value="১০২">
-        </div>
-        <div class="form-group">
-          <label>অধ্যায়/বিষয়বস্তু</label>
-          <input type="text" id="m-topic" class="form-input" placeholder="যেমন: অধ্যায় ৩ - বীজগণিত">
-        </div>
-        <div class="modal-actions mt-6">
-          <button type="button" class="btn btn-outline" onclick="closeRoutineModal()">বাতিল</button>
-          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> কার্ড সংরক্ষণ করুন</button>
-        </div>
+
       </form>
     </div>
   </div>
 
-  <!-- ADD SYLLABUS MODAL -->
-  <div class="modal-backdrop hidden" id="syllabus-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3><i class="fa-solid fa-book-bookmark text-purple"></i> নতুন সিলেবাস টার্গেট যোগ</h3>
-        <button class="close-btn" onclick="closeSyllabusModal()">&times;</button>
+
+        
+
+  
+
+
+<!-- JavaScript File -->
+  <script src="script.js?v=5.1.8"></script>
+
+  <!-- SYLLABUS DETAILS POPUP MODAL (🔍 বিস্তারিত পপআপ) -->
+  <div class="modal-overlay hidden" id="syllabus-details-modal">
+    <div class="smart-card-modal" style="max-width:640px;width:92%;padding:28px 32px;border-radius:24px;position:relative;background:var(--bg-card);box-shadow:0 20px 60px rgba(0,0,0,0.3);border:1.5px solid var(--border);">
+      
+      <!-- Close Button -->
+      <button class="modal-close-btn" onclick="closeSyllabusDetailsModal()" style="position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:50%;background:var(--bg-input);border:1.5px solid var(--border);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:1.5px solid var(--border);">
+        <div style="width:48px;height:48px;border-radius:14px;background:var(--hero-gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div>
+          <h3 style="font-size:1.25rem;font-weight:900;color:var(--text-main);" id="dtl-chapter-title">৩য় অধ্যায়: বীজগণিতীয় রাশি</h3>
+          <span style="font-size:0.82rem;color:var(--primary);font-weight:800;" id="dtl-subject-subtitle">📚 গণিত (১০৯) | পিরিয়ড: 02 / 06 | PI 8.3.1</span>
+        </div>
       </div>
-      <form onsubmit="saveSyllabusModal(event)" class="mt-4">
-        <div class="form-group">
-          <label><i class="fa-solid fa-calendar-check text-purple"></i> সিলেবাসের ধরণ ও সময়সীমা (Plan Mode)</label>
-          <select id="ms-timeframe" class="form-input" onchange="toggleSyllabusFormMode(this.value)">
-            <option value="12months" selected>🗓️ ১২ মাসের বাৎসরিক মাস্টার সিলেবাস (Annual Master Plan)</option>
-            <option value="6months">🗓️ ৬ মাসের অর্ধবার্ষিকী সিলেবাস (Half-Yearly Plan)</option>
-            <option value="3months">🗓️ ৩ মাসের টার্ম/ত্রৈমাসিক সিলেবাস (Quarterly Plan)</option>
-            <option value="1month">🗓️ ১ মাসের মাসিক পাঠ পরিকল্পনা (Monthly Lesson Plan)</option>
-            <option value="15days">🗓️ ১৫ দিনের ফোর্টনাইটলি প্ল্যান (Fortnightly Plan)</option>
-            <option value="1week">🗓️ ১ সপ্তাহের উইকলি লেসন প্ল্যান (Weekly Plan)</option>
-            <option value="today">📌 ১ দিনের দৈনিক ক্লাস টপিক (Daily Class Topic)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>বিষয় (ড্রপডাউন)</label>
-          <select id="ms-subject" class="form-input" onchange="autoFillSubjectCode(this.value)" required>
-            <option value="গণিত" selected>গণিত</option>
-            <option value="বাংলা">বাংলা</option>
-            <option value="ইংরেজি">ইংরেজি</option>
-            <option value="বিজ্ঞান">বিজ্ঞান</option>
-            <option value="ডিজিটাল প্রযুক্তি">ডিজিটাল প্রযুক্তি</option>
-            <option value="ইতিহাস ও সামাজিক বিজ্ঞান">ইতিহাস ও সামাজিক বিজ্ঞান</option>
-            <option value="পদার্থবিজ্ঞান">পদার্থবিজ্ঞান</option>
-            <option value="রসায়ন">রসায়ন</option>
-            <option value="জীববিজ্ঞান">জীববিজ্ঞান</option>
-            <option value="উচ্চতর গণিত">উচ্চতর গণিত</option>
-            <option value="হিসাববিজ্ঞান">হিসাববিজ্ঞান</option>
-            <option value="ব্যবসায় উদ্যোগ">ব্যবসায় উদ্যোগ</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>বিষয় কোড (অটো ড্রপডাউন)</label>
-          <select id="ms-subject-code" class="form-input">
-            <option value="১০৯" selected>১০৯ (গণিত)</option>
-            <option value="১০১">১০১ (বাংলা)</option>
-            <option value="১০৭">১০৭ (ইংরেজি)</option>
-            <option value="১২৭">১২৭ (বিজ্ঞান)</option>
-            <option value="১৩১">১৩১ (ডিজিটাল প্রযুক্তি)</option>
-            <option value="১৫০">১৫০ (ইতিহাস ও সামাজিক বিজ্ঞান)</option>
-            <option value="১৩৬">১৩৬ (পদার্থবিজ্ঞান)</option>
-            <option value="১৩৭">১৩৭ (রসায়ন)</option>
-            <option value="১৩৮">১৩৮ (জীববিজ্ঞান)</option>
-            <option value="১২৬">১২৬ (উচ্চতর গণিত)</option>
-            <option value="১৪৬">১৪৬ (হিসাববিজ্ঞান)</option>
-            <option value="১৪৩">১৪৩ (ব্যবসায় উদ্যোগ)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label><i class="fa-solid fa-layer-group text-primary"></i> একদিনে/সেশনে একাধিক অধ্যায় ও বিষয়বস্তু নির্বাচন (Multi-Chapter Selection)</label>
-          <select id="ms-chapter" class="form-input" multiple style="height:110px;" title="Ctrl চেপে একাধিক অধ্যায় বেছে নিন">
-            <option value="অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র" selected>অধ্যায় ১: বীজগণিতীয় রাশি ও সূত্র</option>
-            <option value="অধ্যায় ২: জ্যামিতি ও বৃত্তের পরিধি" selected>অধ্যায় ২: জ্যামিতি ও বৃত্তের পরিধি</option>
-            <option value="অধ্যায় ৩: পরিবেশ, গতি ও বল">অধ্যায় ৩: পরিবেশ, গতি ও বল</option>
-            <option value="অধ্যায় ৪: আলোক বিজ্ঞান ও তার তরঙ্গ">অধ্যায় ৪: আলোক বিজ্ঞান ও তার তরঙ্গ</option>
-            <option value="অধ্যায় ৫: ব্যাকরণ, সমাস ও নির্মিতি">অধ্যায় ৫: ব্যাকরণ, সমাস ও নির্মিতি</option>
-            <option value="অধ্যায় ৬: English Grammar & Composition">অধ্যায় ৬: English Grammar & Composition</option>
-            <option value="অধ্যায় ৭: পাইথন প্রোগ্রামিং পরিচিতি">অধ্যায় ৭: পাইথন প্রোগ্রামিং পরিচিতি</option>
-            <option value="অধ্যায় ৮: কম্পিউটার নেটওয়ার্ক ও ডাটাবেজ">অধ্যায় ৮: কম্পিউটার নেটওয়ার্ক ও ডাটাবেজ</option>
-            <option value="অধ্যায় ৯: হিসাববিজ্ঞান মূলনীতি ও খতিয়ান">অধ্যায় ৯: হিসাববিজ্ঞান মূলনীতি ও খতিয়ান</option>
-            <option value="অধ্যায় ১০: বার্ষিক মাস্টার কারিকুলাম রিভিশন">অধ্যায় ১০: বার্ষিক মাস্টার কারিকুলাম রিভিশন</option>
-          </select>
-          <span style="font-size:10.5px; color:var(--text-muted);"><i class="fa-solid fa-circle-info"></i> কিবোর্ডের <strong>Ctrl</strong> চেপে একসাথে ১ থেকে ৫টি অধ্যায় নির্বাচন করতে পারবেন।</span>
-        </div>
 
-        <div class="form-group">
-          <label><i class="fa-solid fa-calendar-week text-success"></i> ১২ মাসের পূর্ণাঙ্গ একাডেমিক ক্যালেন্ডার ও ছুটি (Annual Calendar & Holidays)</label>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <select id="ms-working-days" class="form-input">
-              <option value="১৮০টি মোট কার্যদিবস (বছরে)" selected>১৮০টি মোট কার্যদিবস (বছরে)</option>
-              <option value="২০০টি মোট কার্যদিবস (বছরে)">২০০টি মোট কার্যদিবস (বছরে)</option>
-              <option value="২২০টি মোট কার্যদিবস (বছরে)">২২০টি মোট কার্যদিবস (বছরে)</option>
-            </select>
-            <select id="ms-holidays" class="form-input">
-              <option value="৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)" selected>৮৫ দিন মোট ছুটি (সরকারি ও উৎসব)</option>
-              <option value="৭০ দিন মোট ছুটি (সরকারি ও উৎসব)">৭০ দিন মোট ছুটি (সরকারি ও উৎসব)</option>
-              <option value="৯০ দিন মোট ছুটি (সরকারি ও উৎসব)">৯০ দিন মোট ছুটি (সরকারি ও উৎসব)</option>
-            </select>
-          </div>
-        </div>
+      <div style="display:flex;flex-direction:column;gap:14px;font-size:0.9rem;text-align:left;" id="dtl-content-body">
+        <!-- Injected via JavaScript -->
+      </div>
 
-        <div class="form-group">
-          <label><i class="fa-solid fa-map-location-dot text-purple"></i> ১২ মাসের বিষয়ভিত্তিক বার্ষিক রোডম্যাপ (12-Month Course Roadmap)</label>
-          <select id="ms-weekly-plan" class="form-input">
-            <option value="১ম-৩য় মাস: অধ্যায় ১-৪ (মৌলিক ধারণা ও ১ম সাময়িক)" selected>১ম-৩য় মাস: অধ্যায় ১-৪ (মৌলিক ধারণা ও ১ম সাময়িক)</option>
-            <option value="৪র্থ-৬ষ্ঠ মাস: অধ্যায় ৫-৭ (অর্ধবার্ষিকী প্রস্তুতি)">৪র্থ-৬ষ্ঠ মাস: অধ্যায় ৫-৭ (অর্ধবার্ষিকী প্রস্তুতি)</option>
-            <option value="৭ম-৯ম মাস: অধ্যায় ৮-১০ (প্রজেক্ট ও ৩য় সাময়িক)">৭ম-৯ম মাস: অধ্যায় ৮-১০ (প্রজেক্ট ও ৩য় সাময়িক)</option>
-            <option value="১০ম-১২তম মাস: অল-অধ্যায় রিভিশন ও বার্ষিক পরীক্ষা">১০ম-১২তম মাস: অল-অধ্যায় রিভিশন ও বার্ষিক পরীক্ষা</option>
-            <option value="১২ মাসের মাস্টার প্ল্যান: প্রতিটি অধ্যায় কভারেজ">১২ মাসের মাস্টার প্ল্যান: প্রতিটি অধ্যায় কভারেজ</option>
-          </select>
-        </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1.5px solid var(--border);">
+        <button class="btn btn-secondary" onclick="closeSyllabusDetailsModal()"><i class="fa-solid fa-xmark"></i> বন্ধ করুন</button>
+        <button class="btn btn-primary" id="dtl-edit-btn" onclick=""><i class="fa-solid fa-pen-to-square"></i> ✏️ তথ্য এডিট করুন</button>
+      </div>
 
-        <div class="form-group">
-          <label><i class="fa-solid fa-bullseye text-warning"></i> ১২ মাসের বাৎসরিক পরীক্ষার রুটিন ও নম্বর বিভাজন (Annual Exams Breakdown)</label>
-          <select id="ms-exam-schedule" class="form-input">
-            <option value="১ম সাময়িক (মার্চ): ২০ নম্বর | অর্ধবার্ষিকী (জুন): ৫০ নম্বর | ৩য় সাময়িক (সেপ্টেম্বর): ২০ নম্বর | বার্ষিকী (ডিসেম্বর): ১০০ নম্বর" selected>১ম সাময়িক (মার্চ): ২০ নম্বর | অর্ধবার্ষিকী (জুন): ৫০ নম্বর | ৩য় সাময়িক (সেপ্টেম্বর): ২০ নম্বর | বার্ষিকী (ডিসেম্বর): ১০০ নম্বর</option>
-            <option value="সাপ্তাহিক কুইজ টেস্ট (প্রতি শুক্র) + অর্ধবার্ষিকী (জুন) + বার্ষিকী (ডিসেম্বর)">সাপ্তাহিক কুইজ টেস্ট (প্রতি শুক্র) + অর্ধবার্ষিকী (জুন) + বার্ষিকী (ডিসেম্বর)</option>
-            <option value="মাসিক টিউটোরিয়াল টেস্ট (প্রতি মাসের ৩০ তারিখ) + বার্ষিকী পরীক্ষা (নভেম্বর)">মাসিক টিউটোরিয়াল টেস্ট (প্রতি মাসের ৩০ তারিখ) + বার্ষিকী পরীক্ষা (নভেম্বর)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>প্রয়োজনীয় ক্লাস পিরিয়ডের সংখ্যা</label>
-          <select id="ms-periods" class="form-input">
-            <option value="২">২টি পিরিয়ড</option>
-            <option value="৪">৪টি পিরিয়ড</option>
-            <option value="৬" selected>৬টি পিরিয়ড</option>
-            <option value="৮">৮টি পিরিয়ড</option>
-            <option value="১০">১০টি পিরিয়ড</option>
-            <option value="১২">১২টি পিরিয়ড</option>
-            <option value="১৬">১৬টি পিরিয়ড</option>
-            <option value="২০">২০টি পিরিয়ড</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label><i class="fa-solid fa-calendar-day text-primary"></i> ক্লাসের শুরুর তারিখ (Start Date)</label>
-          <input type="date" id="ms-start-date" class="form-input" value="2026-07-25" required>
-        </div>
-        <div class="form-group">
-          <label><i class="fa-solid fa-clock text-warning"></i> ক্লাস শুরুর সময় ও স্থায়িত্ব (Duration)</label>
-          <div style="display:flex; gap:8px;">
-            <select id="ms-start-time" class="form-input" style="flex:1;">
-              <option value="০৯:০০ AM" selected>০৯:০০ AM</option>
-              <option value="১০:০০ AM">১০:০০ AM</option>
-              <option value="১১:০০ AM">১১:০০ AM</option>
-              <option value="১২:০০ PM">১২:০০ PM</option>
-              <option value="০২:০০ PM">০২:০০ PM</option>
-            </select>
-            <select id="ms-duration" class="form-input" style="flex:1;">
-              <option value="৪৫ মিনিট">৪৫ মিনিট চলবে</option>
-              <option value="১ ঘণ্টা" selected>১ ঘণ্টা চলবে</option>
-              <option value="১ ঘণ্টা ৩০ মি.">১ ঘণ্টা ৩০ মি. চলবে</option>
-              <option value="২ ঘণ্টা">২ ঘণ্টা চলবে</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label><i class="fa-solid fa-right-long text-purple"></i> পরবর্তী ক্লাস ও পর্যায়ক্রমিক ফ্লো (Next Class & Sequence)</label>
-          <select id="ms-next-class" class="form-input">
-            <option value="পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)" selected>পরবর্তী বিষয়: বিজ্ঞান (১০:০০ AM - ১১:০০ AM)</option>
-            <option value="পরবর্তী বিষয়: ইংরেজি (১১:০০ AM - ১২:০০ PM)">পরবর্তী বিষয়: ইংরেজি (১১:০০ AM - ১২:০০ PM)</option>
-            <option value="পরবর্তী বিষয়: টিফিন ও ব্রেক (১২:০০ PM - ১২:৪৫ PM)">পরবর্তী বিষয়: টিফিন ও ব্রেক (১২:০০ PM - ১২:৪৫ PM)</option>
-            <option value="পরবর্তী বিষয়: তথ্য ও প্রযুক্তি (১২:৪৫ PM - ০১:৩০ PM)">পরবর্তী বিষয়: তথ্য ও প্রযুক্তি (১২:৪৫ PM - ০১:৩০ PM)</option>
-            <option value="দৈনিক ক্লাস শেষ (পরবর্তী দিন রুটিন অনুসরণ)">দৈনিক ক্লাস শেষ (পরবর্তী দিন রুটিন অনুসরণ)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>সহায়ক বই / প্র্যাকটিক্যাল / ল্যাবওয়ার্কের বিবরণ</label>
-          <select id="ms-ref-books" class="form-input">
-            <option value="NCTB বোর্ড অনুমোদিত মূল বই (২০২৬)" selected>NCTB বোর্ড অনুমোদিত মূল বই (২০২৬)</option>
-            <option value="বিজ্ঞান ল্যাব ম্যানুয়াল ও প্র্যাকটিক্যাল নোটবুক">বিজ্ঞান ল্যাব ম্যানুয়াল ও প্র্যাকটিক্যাল নোটবুক</option>
-            <option value="English Grammar & Composition Supplementary">English Grammar & Composition Supplementary</option>
-            <option value="কম্পিউটার ল্যাব প্র্যাকটিক্যাল ফাইল">কম্পিউটার ল্যাব প্র্যাকটিক্যাল ফাইল</option>
-            <option value="সহায়ক মডেল কোশ্চেন ও উত্তরপত্র">সহায়ক মডেল কোশ্চেন ও উত্তরপত্র</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>শিখন লক্ষ্য ও মূল্যায়ন রূপরেখা</label>
-          <select id="ms-target" class="form-input">
-            <option value="বীজগণিতীয় সূত্রের সঠিক প্রয়োগ ও মান নির্ণয় শিখবে" selected>বীজগণিতীয় সূত্রের সঠিক প্রয়োগ ও মান নির্ণয় শিখবে</option>
-            <option value="গাণিতিক সমস্যা সমাধান ও কুইজ টেস্টে পারদর্শিতা">গাণিতিক সমস্যা সমাধান ও কুইজ টেস্টে পারদর্শিতা</option>
-            <option value="সৃজনশীল প্রশ্ন উপস্থাপন ও নির্মিতি দক্ষতা অর্জন">সৃজনশীল প্রশ্ন উপস্থাপন ও নির্মিতি দক্ষতা অর্জন</option>
-            <option value="প্র্যাকটিক্যাল ল্যাবওয়ার্ক সম্পন্নকরণ ও প্রজেক্ট জমা">প্র্যাকটিক্যাল ল্যাবওয়ার্ক সম্পন্নকরণ ও প্রজেক্ট জমা</option>
-            <option value="১০০% সিলেবাস কভারেজ ও চূড়ান্ত বার্ষিক সফলতা">১০০% সিলেবাস কভারেজ ও চূড়ান্ত বার্ষিক সফলতা</option>
-          </select>
-        </div>
-        <div class="modal-actions mt-6">
-          <button type="button" class="btn btn-outline" onclick="closeSyllabusModal()">বাতিল</button>
-          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> সেভ করুন</button>
-        </div>
-      </form>
     </div>
   </div>
 
-  <!-- ADD EXAM MODAL -->
-  <div class="modal-backdrop hidden" id="exam-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3><i class="fa-solid fa-bullseye text-warning"></i> নতুন পরীক্ষা রুটিন কার্ড</h3>
-        <button class="close-btn" onclick="closeExamModal()">&times;</button>
-      </div>
-      <form onsubmit="saveExamModal(event)" class="mt-4">
-        <div class="form-group">
-          <label>পরীক্ষার ধরন</label>
-          <select id="me-type" class="form-input">
-            <option value="ক্লাস টেস্ট">ক্লাস টেস্ট</option>
-            <option value="সাপ্তাহিক টেস্ট">সাপ্তাহিক টেস্ট</option>
-            <option value="মাসিক টেস্ট">মাসিক টেস্ট</option>
-            <option value="ত্রৈমাসিক টেস্ট">ত্রৈমাসিক টেস্ট</option>
-            <option value="অর্ধবার্ষিকী">অর্ধবার্ষিকী</option>
-            <option value="বার্ষিকী">বার্ষিকী</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>বিষয় (ড্রপডাউন)</label>
-          <select id="me-subject" class="form-input" required>
-            <option value="গণিত" selected>গণিত</option>
-            <option value="বাংলা">বাংলা</option>
-            <option value="ইংরেজি">ইংরেজি</option>
-            <option value="বিজ্ঞান">বিজ্ঞান</option>
-            <option value="ডিজিটাল প্রযুক্তি">ডিজিটাল প্রযুক্তি</option>
-            <option value="ইতিহাস ও সামাজিক বিজ্ঞান">ইতিহাস ও সামাজিক বিজ্ঞান</option>
-            <option value="পদার্থবিজ্ঞান">পদার্থবিজ্ঞান</option>
-            <option value="রসায়ন">রসায়ন</option>
-            <option value="জীববিজ্ঞান">জীববিজ্ঞান</option>
-            <option value="উচ্চতর গণিত">উচ্চতর গণিত</option>
-            <option value="হিসাববিজ্ঞান">হিসাববিজ্ঞান</option>
-            <option value="ব্যবসায় উদ্যোগ">ব্যবসায় উদ্যোগ</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>তারিখ</label>
-          <input type="date" id="me-date" class="form-input" required>
-        </div>
-        <div class="form-group">
-          <label>সময়কাল (ড্রপডাউন)</label>
-          <select id="me-time" class="form-input">
-            <option value="১০:০০ AM - ১১:০০ AM" selected>১০:০০ AM - ১১:০০ AM</option>
-            <option value="১১:০০ AM - ১২:০০ PM">১১:০০ AM - ১২:০০ PM</option>
-            <option value="০২:০০ PM - ০৩:০০ PM">০২:০০ PM - ০৩:০০ PM</option>
-            <option value="০৯:০০ AM - ১২:০০ PM (৩ ঘণ্টা)">০৯:০০ AM - ১২:০০ PM (৩ ঘণ্টা)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>পূর্ণমান (ড্রপডাউন)</label>
-          <select id="me-marks" class="form-input">
-            <option value="১০">১০ নম্বর</option>
-            <option value="২০" selected>২০ নম্বর</option>
-            <option value="৩০">৩০ নম্বর</option>
-            <option value="৫০">৫০ নম্বর</option>
-            <option value="১০০">১০০ নম্বর</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>সিলেবাস কভারেজ (ড্রপডাউন)</label>
-          <select id="me-coverage" class="form-input">
-            <option value="অধ্যায় ১ ও ২ (বীজগণিত ও জ্যামিতি)" selected>অধ্যায় ১ ও ২ (বীজগণিত ও জ্যামিতি)</option>
-            <option value="অধ্যায় ৩ ও ৪ (পরিবেশ ও বল)">অধ্যায় ৩ ও ৪ (পরিবেশ ও বল)</option>
-            <option value="গদ্য, পদ্য ও ব্যাকরণ সম্পূর্ণ">গদ্য, পদ্য ও ব্যাকরণ সম্পূর্ণ</option>
-            <option value="৫০% মূল কারিকুলাম কভারেজ">৫০% মূল কারিকুলাম কভারেজ</option>
-            <option value="১০০% বার্ষিক কারিকুলাম কভারেজ">১০০% বার্ষিক কারিকুলাম কভারেজ</option>
-          </select>
-        </div>
-        <div class="modal-actions mt-6">
-          <button type="button" class="btn btn-outline" onclick="closeExamModal()">বাতিল</button>
-          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> পরীক্ষা কার্ড যোগ</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
 </body>
 </html>
