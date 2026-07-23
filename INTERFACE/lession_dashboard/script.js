@@ -629,6 +629,37 @@ window.onload = () => {
       }
     });
   }
+
+  // 🚀 ক্লাস ম্যানেজার থেকে গ্লোবাল সেশন ডাইনামিক অটো-লোড
+  try {
+    const globalSessionStr = localStorage.getItem("sashiba_global_active_session");
+    if (globalSessionStr) {
+      const gSession = JSON.parse(globalSessionStr);
+      if (gSession.schoolName) {
+        const schInput = document.getElementById("schName");
+        if (schInput) schInput.value = gSession.schoolName;
+      }
+      if (gSession.className) {
+        const classSelect = document.getElementById("class");
+        if (classSelect) {
+          let matchedCls = gSession.className;
+          if (matchedCls.includes("অষ্টম") || matchedCls.includes("8")) matchedCls = "অষ্টম";
+          else if (matchedCls.includes("পঞ্চম") || matchedCls.includes("5")) matchedCls = "পঞ্চম";
+          classSelect.value = matchedCls;
+          if (typeof handleClassChange === "function") handleClassChange();
+        }
+      }
+      if (gSession.subject) {
+        const subSelect = document.getElementById("subject");
+        if (subSelect) {
+          setTimeout(() => {
+            subSelect.value = gSession.subject;
+            if (typeof onSubjectChange === "function") onSubjectChange();
+          }, 100);
+        }
+      }
+    }
+  } catch (e) {}
 };
 
 // ==========================================

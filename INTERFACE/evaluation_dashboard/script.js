@@ -1473,16 +1473,80 @@ function loadFromStorage(){
     const set=localStorage.getItem('sashiba_eval_settings');
     const hist=localStorage.getItem('sashiba_eval_history');
     const rub=localStorage.getItem('sashiba_eval_rubrics');
+    const globalSession = localStorage.getItem('sashiba_global_active_session');
+
     if(ss) students=JSON.parse(ss);
     if(set) settings={...settings,...JSON.parse(set)};
     if(hist) assessmentHistory=JSON.parse(hist);
     if(rub) savedRubrics=JSON.parse(rub);
+
+    // 🚀 ক্লাস ম্যানেজার থেকে বাস্তব শিক্ষার্থীদের তথ্য ও এটেন্ডেন্স সরাসরি কানেক্ট করা
+    if(globalSession) {
+      try {
+        const gData = JSON.parse(globalSession);
+        if(gData.students && gData.students.length > 0) {
+          students = gData.students.map((st, i) => {
+            const existing = (students || []).find(s => s.roll == st.roll || s.name == st.name);
+            return {
+              id: st.id || 'sid_cm_' + (st.roll || i+1),
+              name: st.name || `শিক্ষার্থী ${st.roll || i+1}`,
+              roll: st.roll || i+1,
+              isAbsent: st.status === 'absent' || (existing ? existing.isAbsent : false),
+              scores: existing ? existing.scores : { বাংলা: 78, ইংরেজি: 82, গণিত: 88, বিজ্ঞান: 80, সমাজ: 85 },
+              timeline: existing ? existing.timeline : { quiz: [80,82,85], assignment: [85,88,90], oral: [80,85,87], practical: [85,90,88], attendance: [90,95,92], homework: [85,88,90] },
+              remarks: st.status === 'absent' ? 'পরীক্ষা/ক্লাসে অনুপস্থিত শিক্ষার্থী।' : (existing ? existing.remarks : 'নিয়মিত শিক্ষার্থী।'),
+              parentName: st.parentName || 'অভিভাবক',
+              phone: st.phone || ''
+            };
+          });
+        }
+        if(gData.schoolName) settings.school = gData.schoolName;
+        if(gData.className) settings.className = gData.className;
+        if(gData.teacherName) settings.teacherName = gData.teacherName;
+      } catch(e) {}
+    }
   }catch(e){}
   if(students.length===0){
-    students=sampleStudents.map((s,i)=>({id:'sid_sample_'+(i+1),...s,scores:{...s.scores},timeline:{...s.timeline}}));
+    students=sampleStudents.map((s,i)=>({id:'sid_sample_'+(i+1),...s,isAbsent:false,scores:{...s.scores},timeline:{...s.timeline}}));
     saveToStorage();
   }
 }
+
+// 📌 মিড-সেশন নতুন শিক্ষার্থী দ্রুত ইনপুট পাওয়ার জন্য গ্লোবাল ফাংশন
+window.addNewStudentToEvaluation = function(name, roll, parentName = "অভিভাবক", phone = "") {
+  if (!name || !roll) return;
+  const newSt = {
+    id: 'sid_new_' + Date.now(),
+    name: name,
+    roll: parseInt(roll),
+    isAbsent: false,
+    scores: { বাংলা: 0, ইংরেজি: 0, গণিত: 0, বিজ্ঞান: 0, সমাজ: 0 },
+    timeline: { quiz: [0], assignment: [0], oral: [0], practical: [0], attendance: [100], homework: [0] },
+    remarks: 'নতুন ভর্তি হওয়া শিক্ষার্থী।',
+    parentName: parentName,
+    phone: phone
+  };
+  students.push(newSt);
+  saveToStorage();
+  if (typeof renderStudentList === 'function') renderStudentList();
+  if (typeof showToast === 'function') showToast(`নতুন শিক্ষার্থী ${name} (রোল: ${roll}) নিবন্ধিত হয়েছে!`, 'success');
+};
+
+// 📌 পরীক্ষা/মূল্যায়নে অনুপস্থিতি (Absent) ফ্ল্যাগ টগল ফাংশন
+window.toggleStudentAbsentStatus = function(studentId) {
+  const st = students.find(s => s.id === studentId || s.roll == studentId);
+  if (st) {
+    st.isAbsent = !st.isAbsent;
+    if (st.isAbsent) {
+      st.remarks = 'পরীক্ষায় অনুপস্থিত হিসেবে চিহ্নিত।';
+    } else {
+      st.remarks = 'নিয়মিত শিক্ষার্থী।';
+    }
+    saveToStorage();
+    if (typeof renderStudentList === 'function') renderStudentList();
+    if (typeof showToast === 'function') showToast(`${st.name} এর উপস্থিতি স্ট্যাটাস আপডেট করা হয়েছে!`, 'info');
+  }
+};
 function exportData(){
   const blob=new Blob([JSON.stringify({settings,students,assessmentHistory,savedRubrics,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);

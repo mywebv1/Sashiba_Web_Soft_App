@@ -13,6 +13,9 @@
   
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="style.css?v=5.1.8">
+
+  <!-- html2pdf.js Library for Professional PDF Download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="theme-pearl">
 
@@ -95,8 +98,8 @@
 
         <div class="topbar-right" style="display:flex;gap:10px;align-items:center;">
           <button class="icon-btn theme-toggle-btn" onclick="toggleTheme()" title="ডার্ক/লাইট মোড টগল"><i class="fa-solid fa-moon"></i></button>
-          <button class="btn btn-primary btn-sm" onclick="openAddSyllabusModal()"><i class="fa-solid fa-plus"></i> + নতুন সিলেবাস</button>
-          <button class="btn btn-success btn-sm" onclick="switchSection('attendance')"><i class="fa-solid fa-user-check"></i> উপস্থিতি নিন</button>
+          <button class="btn btn-primary btn-sm" id="topbar-btn-syllabus" onclick="openAddSyllabusModal()"><i class="fa-solid fa-plus"></i> + নতুন সিলেবাস</button>
+          <button class="btn btn-success btn-sm" id="topbar-btn-attendance" onclick="switchSection('attendance')"><i class="fa-solid fa-user-check"></i> উপস্থিতি নিন</button>
         </div>
       </header>
 
@@ -365,7 +368,7 @@
             <div class="smart-card" style="border-radius:20px;padding:24px;">
               <h4 class="card-title" style="margin-bottom:16px;"><i class="fa-solid fa-chart-pie text-emerald"></i> ৪. সিলেবাস সারসংক্ষেপ ও অ্যানালিটিক্স (Summary & Analytics)</h4>
               
-              <div class="summary-metrics-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:14px;margin-bottom:18px;">
+              <div class="summary-metrics-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:14px;margin-bottom:18px;">
                 <div class="sm-item" style="padding:16px;background:var(--bg-input);border-radius:14px;">
                   <span class="sm-label">মোট সিলেবাস কভারেজ</span>
                   <span class="sm-val" id="syll-stat-coverage" style="color:var(--primary);font-size:1.3rem;">৬৮%</span>
@@ -408,6 +411,7 @@
 
           </div>
         </section>
+
         <!-- ==================== MENU 3: SMART ROUTINE ==================== -->
         <section class="dashboard-section" id="sec-routine">
           <div class="smart-card">
@@ -426,63 +430,102 @@
           </div>
         </section>
 
-        <!-- ==================== MENU 4: ATTENDANCE & PARTICIPATION ==================== -->
+        <!-- ==================== MENU 4: ATTENDANCE & PARTICIPATION (EXACT MATCH USER SCREENSHOT) ==================== -->
         <section id="sec-attendance" class="dashboard-section">
           
-          <!-- 5 KPI Cards (Matching User Image Reference) -->
-          <div class="attendance-kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px;margin-bottom:20px;">
-            <div class="att-kpi-card purple" style="background:rgba(139,92,246,0.1);border:1.5px solid rgba(139,92,246,0.25);padding:18px;border-radius:18px;">
-              <div style="font-size:0.8rem;color:var(--purple);font-weight:700;">মোট শিক্ষার্থী</div>
-              <strong style="font-size:1.6rem;color:var(--purple);font-weight:900;">৪৮ জন</strong>
+          <!-- Top 5 Metric Cards (Matching Screenshot Exactly) -->
+          <div class="stats-grid" style="display:grid;grid-template-columns:repeat(5, 1fr);gap:16px;margin-bottom:20px;">
+            <div class="stat-card stat-blue" style="background:rgba(59,130,246,0.08);border:1.5px solid rgba(59,130,246,0.2);padding:16px 18px;border-radius:16px;display:flex;align-items:center;gap:12px;">
+              <div class="stat-icon" style="font-size:1.6rem;color:var(--primary);"><i class="fa-solid fa-users"></i></div>
+              <div class="stat-info">
+                <div class="stat-value" id="kpi-total-students" style="font-size:1.5rem;font-weight:900;color:var(--primary);">৫</div>
+                <div class="stat-label" style="font-size:0.78rem;font-weight:800;color:var(--text-muted);">মোট শিক্ষার্থী</div>
+              </div>
             </div>
-            <div class="att-kpi-card green" style="background:rgba(16,185,129,0.1);border:1.5px solid rgba(16,185,129,0.25);padding:18px;border-radius:18px;">
-              <div style="font-size:0.8rem;color:var(--success);font-weight:700;">সেরা পারফরমার (≥৮০%)</div>
-              <strong style="font-size:1.6rem;color:var(--success);font-weight:900;">১৫ জন</strong>
+            <div class="stat-card stat-green" style="background:rgba(16,185,129,0.08);border:1.5px solid rgba(16,185,129,0.2);padding:16px 18px;border-radius:16px;display:flex;align-items:center;gap:12px;">
+              <div class="stat-icon" style="font-size:1.6rem;color:var(--success);"><i class="fa-solid fa-trophy"></i></div>
+              <div class="stat-info">
+                <div class="stat-value" id="kpi-top-performers" style="font-size:1.5rem;font-weight:900;color:var(--success);">২</div>
+                <div class="stat-label" style="font-size:0.78rem;font-weight:800;color:var(--success);">ভালো (≥৮০%)</div>
+              </div>
             </div>
-            <div class="att-kpi-card yellow" style="background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.25);padding:18px;border-radius:18px;">
-              <div style="font-size:0.8rem;color:var(--warning);font-weight:700;">মাঝারি পারফরমার (৫০-৭৯%)</div>
-              <strong style="font-size:1.6rem;color:var(--warning);font-weight:900;">২৪ জন</strong>
+            <div class="stat-card stat-yellow" style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.2);padding:16px 18px;border-radius:16px;display:flex;align-items:center;gap:12px;">
+              <div class="stat-icon" style="font-size:1.6rem;color:var(--warning);"><i class="fa-solid fa-user"></i></div>
+              <div class="stat-info">
+                <div class="stat-value" id="kpi-good-performers" style="font-size:1.5rem;font-weight:900;color:var(--warning);">১</div>
+                <div class="stat-label" style="font-size:0.78rem;font-weight:800;color:var(--warning);">মধ্যম (৫০-৭৯%)</div>
+              </div>
             </div>
-            <div class="att-kpi-card red" style="background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.25);padding:18px;border-radius:18px;">
-              <div style="font-size:0.8rem;color:var(--danger);font-weight:700;">দুর্বল শিক্ষার্থী (<৫০%)</div>
-              <strong style="font-size:1.6rem;color:var(--danger);font-weight:900;">৯ জন</strong>
+            <div class="stat-card stat-red" style="background:rgba(239,68,68,0.08);border:1.5px solid rgba(239,68,68,0.2);padding:16px 18px;border-radius:16px;display:flex;align-items:center;gap:12px;">
+              <div class="stat-icon" style="font-size:1.6rem;color:var(--danger);"><i class="fa-solid fa-circle-exclamation"></i></div>
+              <div class="stat-info">
+                <div class="stat-value" id="kpi-weak-performers" style="font-size:1.5rem;font-weight:900;color:var(--danger);">২</div>
+                <div class="stat-label" style="font-size:0.78rem;font-weight:800;color:var(--danger);">দুর্বল (<৫০%)</div>
+              </div>
             </div>
-            <div class="att-kpi-card blue" style="background:rgba(59,130,246,0.1);border:1.5px solid rgba(59,130,246,0.25);padding:18px;border-radius:18px;">
-              <div style="font-size:0.8rem;color:var(--primary);font-weight:700;">গড় উপস্থিতি হার</div>
-              <strong style="font-size:1.6rem;color:var(--primary);font-weight:900;">৯২.৫%</strong>
+            <div class="stat-card stat-purple" style="background:rgba(139,92,246,0.08);border:1.5px solid rgba(139,92,246,0.2);padding:16px 18px;border-radius:16px;display:flex;align-items:center;gap:12px;">
+              <div class="stat-icon" style="font-size:1.6rem;color:var(--purple);"><i class="fa-solid fa-percent"></i></div>
+              <div class="stat-info">
+                <div class="stat-value" id="kpi-avg-attendance" style="font-size:1.5rem;font-weight:900;color:var(--purple);">৮৩.৮%</div>
+                <div class="stat-label" style="font-size:0.78rem;font-weight:800;color:var(--purple);">গড় উপস্থিতি হার</div>
+              </div>
             </div>
           </div>
 
-          <!-- Student Table Controls -->
-          <div class="smart-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
-              <h4 class="card-title"><i class="fa-solid fa-users text-primary"></i> শিক্ষার্থী উপস্থিতি ও বিষয়াভিত্তিক পারফরম্যান্স গ্যাপ</h4>
-              <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> A4 রিপোর্ট ডাউনলোড</button>
+          <!-- Controls Bar (Search + Dropdowns + Action Buttons) -->
+          <div class="smart-card" style="padding:14px 18px;margin-bottom:20px;border-radius:16px;">
+            <div class="table-controls" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+              
+              <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:280px;">
+                <div style="position:relative;flex:1;">
+                  <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);"></i>
+                  <input type="text" id="att-search-input" placeholder="নাম বা রোল দিয়ে খুঁজুন..." oninput="renderStudentAttendanceTable()" class="form-input" style="padding-left:38px;width:100%;height:38px;border-radius:10px;font-weight:700;background:var(--bg-input);" />
+                </div>
+
+                <select id="att-class-select" class="form-input" style="width:120px;height:38px;padding:0 10px;font-weight:700;border-radius:10px;background:var(--bg-input);" onchange="renderStudentAttendanceTable()">
+                  <option value="all">সকল শ্রেণি</option>
+                  <option value="অষ্টম">অষ্টম শ্রেণি</option>
+                  <option value="নবম">নবম শ্রেণি</option>
+                  <option value="দশম">দশম শ্রেণি</option>
+                </select>
+
+                <select id="att-section-select" class="form-input" style="width:100px;height:38px;padding:0 10px;font-weight:700;border-radius:10px;background:var(--bg-input);" onchange="renderStudentAttendanceTable()">
+                  <option value="all">সব শাখা</option>
+                  <option value="ক">শাখা: ক</option>
+                  <option value="খ">শাখা: খ</option>
+                </select>
+              </div>
+
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <button class="btn btn-warning" onclick="toggleQuickEditMode()" id="quick-edit-toggle-btn" style="font-weight:800;background:rgba(245,158,11,0.18);color:#d97706;border:1.5px solid rgba(245,158,11,0.4);border-radius:10px;height:38px;padding:0 14px;font-size:0.85rem;"><i class="fa-solid fa-pen-to-square"></i> ⚡ কুইক এডিট মোড (চালু/বন্ধ)</button>
+                <button class="btn btn-success" onclick="openA4NewStudentCardModal()" style="font-weight:800;background:#10b981;color:#fff;border-radius:10px;height:38px;padding:0 14px;font-size:0.85rem;"><i class="fa-solid fa-user-plus"></i> ➕ নতুন শিক্ষার্থী যোগ (Row Card)</button>
+                <button class="btn btn-secondary" onclick="openAddNewSubjectColumnModal()" style="font-weight:800;background:rgba(99,102,241,0.12);color:var(--primary);border:1.5px solid rgba(99,102,241,0.3);border-radius:10px;height:38px;padding:0 14px;font-size:0.85rem;"><i class="fa-solid fa-plus"></i> ➕ বিষয়/কলাম যোগ (Column)</button>
+                <button class="btn btn-primary" onclick="exportAttendancePDF()" style="font-weight:800;border-radius:10px;height:38px;padding:0 14px;font-size:0.85rem;background:var(--hero-gradient);"><i class="fa-solid fa-file-pdf"></i> A4 রিপোর্ট ডাউনলোড (PDF)</button>
+              </div>
             </div>
-            <div style="overflow-x:auto;">
-              <table class="syl-table" id="student-attendance-table">
-                <thead>
+
+            <!-- Full Evaluation & Period Table -->
+            <div style="overflow-x:auto;max-height:600px;overflow-y:auto;border-radius:14px;border:1.5px solid var(--border);box-shadow:var(--shadow-sm);margin-top:14px;">
+              <table class="syl-table" id="student-attendance-table" style="border-collapse:separate;border-spacing:0;width:100%;font-size:0.92rem;color:var(--text-main);">
+                <thead style="position:sticky;top:0;z-index:10;background:var(--bg-card);box-shadow:0 3px 10px rgba(0,0,0,0.08);font-size:0.92rem;font-weight:900;">
                   <tr>
-                    <th>রোল</th>
-                    <th>শিক্ষার্থীর নাম</th>
-                    <th>বাংলা</th>
-                    <th>ইংরেজি</th>
-                    <th>গণিত</th>
-                    <th>বিজ্ঞান</th>
-                    <th>সমাজ</th>
-                    <th>আইসিটি</th>
-                    <th>মোট নম্বর</th>
-                    <th>শতকরা (%)</th>
-                    <th>গ্রেড</th>
-                    <th>অবস্থা</th>
-                    <th style="text-align:right;">অ্যাকশন</th>
+                    <th style="width:110px;text-align:center;position:sticky;left:0;z-index:12;background:var(--bg-card);border-right:1.5px solid var(--border);padding:14px 10px;color:var(--primary);">অবস্থান (মেধা) ↓</th>
+                    <th style="width:70px;text-align:center;position:sticky;left:110px;z-index:12;background:var(--bg-card);border-right:1.5px solid var(--border);padding:14px 10px;color:var(--text-main);">#রোল</th>
+                    <th style="position:sticky;left:180px;z-index:12;background:var(--bg-card);border-right:2px solid var(--border);min-width:200px;padding:14px 14px;color:var(--text-main);">শিক্ষার্থীর নাম & ব্যাজ</th>
+                    <th style="text-align:center;padding:14px 12px;color:var(--text-main);">আজকের স্ট্যাটাস</th>
+                    <th style="text-align:center;padding:14px 12px;color:var(--text-main);">বাংলা (পিরিয়ড ১)</th>
+                    <th style="text-align:center;padding:14px 12px;color:var(--text-main);">গণিত (পিরিয়ড ২)</th>
+                    <th style="text-align:center;padding:14px 12px;color:var(--text-main);">বিজ্ঞান (পিরিয়ড ৩)</th>
+                    <th style="text-align:center;padding:14px 12px;color:var(--primary);">মাসিক উপস্থিতি %</th>
+                    <th style="text-align:center;padding:14px 12px;color:var(--text-main);">অংশগ্রহণ (ENGAGEMENT)</th>
+                    <th style="text-align:center;padding:14px 12px;color:var(--text-main);">অভিভাবক নোটিফিকেশন</th>
+                    <th style="text-align:right;padding:14px 14px;color:var(--text-main);">অ্যাকশন</th>
                   </tr>
                 </thead>
-                <tbody id="student-table-body"></tbody>
+                <tbody id="student-table-body" style="font-size:0.9rem;font-weight:700;"></tbody>
               </table>
             </div>
           </div>
-
         </section>
 
         <!-- ==================== MENU 5: LESSON PLAN ==================== -->
@@ -818,6 +861,10 @@
         <button class="btn btn-primary" id="dtl-edit-btn" onclick=""><i class="fa-solid fa-pen-to-square"></i> ✏️ তথ্য এডিট করুন</button>
       </div>
 
+  <!-- A4 RECORD & EXECUTIVE ATTENDANCE CERTIFICATE MODAL (📄 A4 রিপোর্ট & এডিট কার্ড) -->
+  <div class="modal-overlay hidden" id="a4-record-modal-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.75);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;">
+    <div id="a4-record-modal-content" style="background:#ffffff;color:#0f172a;width:100%;max-width:800px;min-height:920px;padding:40px;border-radius:18px;box-shadow:0 25px 70px rgba(0,0,0,0.4);border:2px solid #cbd5e1;position:relative;margin:auto;">
+      <!-- Injected dynamically via JavaScript openA4StudentModal() -->
     </div>
   </div>
 

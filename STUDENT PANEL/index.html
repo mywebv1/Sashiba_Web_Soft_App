@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SashiBa | শিক্ষার্থী বাতায়ন (Student Portal)</title>
+  <title>SashiBa | শিক্ষার্থী বাতায়ন (Student Portal LMS)</title>
   
   <!-- Google Fonts: Outfit & Hind Siliguri -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,17 @@
   <!-- Blue Light Shield Filter Overlay -->
   <div id="blueLightOverlay" class="blue-light-shield"></div>
 
-  <!-- Animated XP Reward Toast Notification -->
+  <!-- Skeleton Loading Screen Overlay for Native View Transition -->
+  <div id="skeletonLoader" class="skeleton-loader-overlay">
+    <div class="skeleton-shimmer-bar"></div>
+    <div class="skeleton-card-grid">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  </div>
+
+  <!-- Animated XP & Coin Reward Toast Notification -->
   <div id="xpRewardToast" class="xp-toast">
     <div class="xp-toast-icon"><i class="fa-solid fa-bolt"></i></div>
     <div class="xp-toast-text">
@@ -42,12 +52,12 @@
           <div class="brand-logo"><i class="fa-solid fa-graduation-cap"></i></div>
           <div class="brand-text">
             <span class="brand-name">SashiBa</span>
-            <span class="brand-sub">শিক্ষার্থী বাতায়ন</span>
+            <span class="brand-sub">শিক্ষার্থী বাতায়ন LMS</span>
           </div>
         </div>
       </div>
 
-      <!-- Academic Class Level Selector Bar -->
+      <!-- Academic Class Level Selector Bar (Touch Scrollable) -->
       <div class="class-level-bar">
         <span class="level-label"><i class="fa-solid fa-layer-group"></i> স্তর:</span>
         <div class="level-pills" id="levelPills">
@@ -97,7 +107,7 @@
     <!-- Main Body Container -->
     <div class="app-body">
 
-      <!-- Navigation Sidebar -->
+      <!-- Navigation Sidebar (Re-organized Clean UX) -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-student-card">
           <div class="student-card-header">
@@ -118,16 +128,17 @@
               <span class="c-lbl">XP</span>
             </div>
             <div class="c-stat">
-              <span class="c-val">🔥 7</span>
-              <span class="c-lbl">স্ট্রিক</span>
+              <span class="c-val" id="sidebarCoins">🪙 1,250</span>
+              <span class="c-lbl">কয়েন</span>
             </div>
           </div>
         </div>
 
         <nav class="nav-menu">
+          <!-- CORE PRIMARY MENU ITEMS -->
           <button class="nav-item active" data-view="home">
             <i class="fa-solid fa-house nav-icon"></i>
-            <span>হোম</span>
+            <span>হোম (Dashboard)</span>
           </button>
 
           <button class="nav-item" data-view="subjects">
@@ -137,7 +148,7 @@
 
           <button class="nav-item" data-view="daily-planner">
             <i class="fa-solid fa-calendar-check nav-icon"></i>
-            <span>আজকের পড়া</span>
+            <span>আজকের পড়া (Planner)</span>
           </button>
 
           <button class="nav-item" data-view="practice">
@@ -150,48 +161,64 @@
             <span>পরীক্ষা প্রস্তুতি</span>
           </button>
 
-          <button class="nav-item" data-view="progress">
-            <i class="fa-solid fa-chart-line nav-icon"></i>
-            <span>আমার অগ্রগতি</span>
-          </button>
-
-          <button class="nav-item" data-view="achievements">
-            <i class="fa-solid fa-trophy nav-icon"></i>
-            <span>অর্জন</span>
-          </button>
-
-          <button class="nav-item" data-view="resources">
-            <i class="fa-solid fa-folder-open nav-icon"></i>
-            <span>রিসোর্স</span>
-          </button>
-
           <button class="nav-item" data-view="ai-assistant">
             <i class="fa-solid fa-robot nav-icon ai-glow"></i>
-            <span>AI সহকারী</span>
+            <span>AI স্টাডি সহকারী</span>
           </button>
 
-          <button class="nav-item special-feature" data-view="study-manager">
-            <i class="fa-solid fa-graduation-cap nav-icon"></i>
-            <span>Smart Study Manager</span>
-            <span class="badge-new">PRO</span>
-          </button>
+          <!-- COLLAPSIBLE "MORE TOOLS" ACCORDION -->
+          <div class="more-tools-accordion">
+            <button class="more-tools-toggle" id="moreToolsToggle">
+              <span><i class="fa-solid fa-cubes text-primary"></i> অন্যান্য টুলস (More Tools)</span>
+              <i class="fa-solid fa-chevron-down accordion-arrow" id="moreToolsArrow"></i>
+            </button>
+            <div class="more-tools-content" id="moreToolsContent">
+              <button class="nav-item sub-nav" data-view="progress">
+                <i class="fa-solid fa-chart-line nav-icon"></i>
+                <span>আমার অগ্রগতি (Analytics)</span>
+              </button>
 
-          <button class="nav-item" data-view="settings">
-            <i class="fa-solid fa-gear nav-icon"></i>
-            <span>সেটিংস</span>
-          </button>
+              <button class="nav-item sub-nav" data-view="achievements">
+                <i class="fa-solid fa-trophy nav-icon text-warning"></i>
+                <span>অর্জন ও রিওয়ার্ড শপ</span>
+              </button>
+
+              <button class="nav-item sub-nav" data-view="resources">
+                <i class="fa-solid fa-folder-open nav-icon"></i>
+                <span>রিসোর্স হাব</span>
+              </button>
+
+              <button class="nav-item sub-nav special-feature" data-view="study-manager">
+                <i class="fa-solid fa-graduation-cap nav-icon"></i>
+                <span>Smart Study Manager</span>
+                <span class="badge-new">PRO</span>
+              </button>
+
+              <button class="nav-item sub-nav" data-view="settings">
+                <i class="fa-solid fa-gear nav-icon"></i>
+                <span>সেটিংস ও আই-কেয়ার</span>
+              </button>
+            </div>
+          </div>
         </nav>
 
         <div class="sidebar-footer">
           <div class="eye-care-status">
             <i class="fa-solid fa-shield-halved"></i>
-            <span>আই-প্রোটেকশন সক্রিয় (Sepia/Dark Available)</span>
+            <span>আই-প্রোটেকশন সক্রিয়</span>
           </div>
         </div>
       </aside>
 
       <!-- Main Content Stage -->
       <main class="content-stage" id="contentStage">
+
+        <!-- DYNAMIC BREADCRUMBS NAVIGATION BAR -->
+        <nav class="breadcrumbs-bar" id="breadcrumbsBar">
+          <span class="bc-item" onclick="switchView('home')"><i class="fa-solid fa-house"></i> হোম</span>
+          <span class="bc-sep"><i class="fa-solid fa-chevron-right"></i></span>
+          <span class="bc-item active" id="bcActiveView">ড্যাশবোর্ড</span>
+        </nav>
 
         <!-- ================= VIEW 1: HOME DASHBOARD ================= -->
         <section class="view-panel active" id="view-home">
@@ -326,7 +353,7 @@
                     <h5>জীববিজ্ঞান অ্যাসাইনমেন্ট ৩</h5>
                     <p>জমা দেওয়ার শেষ সময়: আজ রাত ১১:৫৯ PM</p>
                   </div>
-                  <button class="btn-sm btn-warning" onclick="switchView('subject-inner')">জমা দিন</button>
+                  <button class="btn-sm btn-warning" onclick="switchView('subjects')">জমা দিন</button>
                 </div>
 
                 <div class="task-mini-item">
@@ -393,12 +420,12 @@
           </div>
         </section>
 
-        <!-- ================= VIEW 2: MY SUBJECTS ================= -->
+        <!-- ================= VIEW 2: MY SUBJECTS & CHAPTER OUTLINE ================= -->
         <section class="view-panel" id="view-subjects">
           <div class="section-header">
             <div>
               <h2 class="section-title"><i class="fa-solid fa-book-open"></i> আমার বিষয়সমূহ (My Subjects)</h2>
-              <p class="section-subtitle">আপনার বর্তমান ক্লাসের সকল বিষয়, অগ্রগতি ও লেকচার নোটস</p>
+              <p class="section-subtitle">আপনার বিষয় নির্বাচন করুন এবং সকল অধ্যায়ের তালিকা (Course Outline) দেখুন</p>
             </div>
             <div class="subject-filter-tabs">
               <button class="sub-tab active" data-subcat="all">সব বিষয়</button>
@@ -407,41 +434,41 @@
             </div>
           </div>
 
+          <!-- SUBJECT SELECTION CARDS GRID -->
           <div class="subjects-grid" id="subjectsGrid">
-            <!-- Dynamic Subject Cards injected via JS -->
+            <!-- Injected dynamically via script.js -->
+          </div>
+
+          <!-- COURSE OUTLINE / CHAPTER LISTING OVERVIEW (STEP 1 BEFORE CHAPTER WORKSPACE) -->
+          <div id="subjectCourseOutlineContainer" class="course-outline-container" style="display: none; margin-top: 2rem;">
+            <!-- Dynamically rendered when a subject is clicked -->
           </div>
         </section>
 
-        <!-- ================= VIEW 3: INNER SUBJECT WORKSPACE ================= -->
+        <!-- ================= VIEW 3: INNER CHAPTER WORKSPACE ================= -->
         <section class="view-panel" id="view-subject-inner">
           <div class="subject-inner-topbar">
-            <button class="btn-outline-sm" id="backToSubjectsBtn"><i class="fa-solid fa-arrow-left"></i> সকল বিষয়</button>
+            <button class="btn-outline-sm" id="backToOutlineBtn"><i class="fa-solid fa-arrow-left"></i> অধ্যায় সূচিপত্র (Course Outline)</button>
             <div class="subject-title-meta">
               <h2 id="activeSubjectTitle">পদার্থবিজ্ঞান (Physics)</h2>
               <span id="activeSubjectCode" class="badge-code">কোড: ১৭৪</span>
             </div>
             <div class="subject-progress-pill">
-              <span>অগ্রগতি: </span>
-              <strong id="activeSubjectProgressText">৭৫%</strong>
+              <span>অধ্যায় অগ্রগতি: </span>
+              <strong id="activeSubjectProgressText">৮০%</strong>
             </div>
           </div>
 
           <div class="subject-workspace">
             <aside class="subject-sidebar">
-              <div class="subj-sidebar-title">সূচিপত্র ও নেভিগেশন</div>
+              <div class="subj-sidebar-title">অধ্যায় নেভিগেশন</div>
               <ul class="subj-nav-list" id="subjNavList">
                 <li class="subj-nav-item active" data-tab="overview"><i class="fa-solid fa-house"></i> 🏠 Overview</li>
-                <li class="subj-nav-item" data-tab="lessons"><i class="fa-solid fa-book"></i> 📖 Lesson / অধ্যায়</li>
-                <li class="subj-nav-item" data-tab="outcomes"><i class="fa-solid fa-bullseye"></i> 🎯 Learning Outcomes</li>
-                <li class="subj-nav-item" data-tab="videos"><i class="fa-solid fa-circle-play"></i> 🎥 Video</li>
+                <li class="subj-nav-item" data-tab="videos"><i class="fa-solid fa-circle-play"></i> 🎥 Video Lecture</li>
                 <li class="subj-nav-item" data-tab="notes"><i class="fa-solid fa-file-lines"></i> 📄 Notes</li>
-                <li class="subj-nav-item" data-tab="mindmap"><i class="fa-solid fa-diagram-project"></i> 🧠 Mind Map</li>
-                <li class="subj-nav-item" data-tab="practice"><i class="fa-solid fa-pen-clip"></i> ✍ Practice</li>
+                <li class="subj-nav-item" data-tab="practice"><i class="fa-solid fa-pen-clip"></i> ✍ Practice & Flashcards</li>
                 <li class="subj-nav-item" data-tab="quiz"><i class="fa-solid fa-clipboard-question"></i> 📝 Quiz</li>
-                <li class="subj-nav-item" data-tab="assignment"><i class="fa-solid fa-graduation-cap"></i> 📚 Assignment</li>
-                <li class="subj-nav-item" data-tab="feedback"><i class="fa-solid fa-comment-dots"></i> 💬 Teacher Feedback</li>
-                <li class="subj-nav-item" data-tab="discussion"><i class="fa-solid fa-comments"></i> 💬 Chapter Discussion (চ্যাট)</li>
-                <li class="subj-nav-item" data-tab="progress"><i class="fa-solid fa-chart-pie"></i> 📊 Progress</li>
+                <li class="subj-nav-item" data-tab="discussion"><i class="fa-solid fa-comments"></i> 💬 Chapter Chat (চ্যাট)</li>
               </ul>
             </aside>
 
@@ -452,15 +479,12 @@
                   <span>এই অধ্যায়ের অটো-সাজেস্টেড গুরুত্বপূর্ণ টপিকসমূহ (Exam Focus Areas):</span>
                 </div>
                 <div class="ast-tags" id="autoSuggestedTags">
-                  <span class="ast-tag hot"><i class="fa-solid fa-fire"></i> নিউটনের ২য় গতিসূত্র ($F = ma$)</span>
-                  <span class="ast-tag"><i class="fa-solid fa-star"></i> ভরবেগের সংরক্ষণ সূত্র</span>
-                  <span class="ast-tag"><i class="fa-solid fa-star"></i> ঘর্ষণ বল ও ঘর্ষণ গুণাঙ্ক</span>
-                  <span class="ast-tag"><i class="fa-solid fa-lightbulb"></i> মাত্রা ও একক নির্ণয়</span>
+                  <!-- Injected via JS -->
                 </div>
               </div>
 
               <div id="subjTabContent" class="subj-tab-content">
-                <!-- Content dynamically populated by JS -->
+                <!-- Content dynamically populated by script.js -->
               </div>
             </div>
           </div>
@@ -484,7 +508,7 @@
               <h3>পদার্থবিজ্ঞান: অধ্যায় ৩ - বল (Force) ও নিউটনের সূত্র</h3>
               <p>আপনার অগ্রগতি: ৮০% সম্পন্ন | বাকী ৬ মিনিট</p>
             </div>
-            <button class="btn-primary btn-lg" onclick="openSubjectWorkspace('physics')"><i class="fa-solid fa-play"></i> পড়া চালিয়ে যান (Continue Learning)</button>
+            <button class="btn-primary btn-lg" onclick="openSubjectWorkspace('physics', 3)"><i class="fa-solid fa-play"></i> পড়া চালিয়ে যান (Continue)</button>
           </div>
 
           <div class="planner-grid">
@@ -492,7 +516,7 @@
               <h3><i class="fa-solid fa-video text-primary"></i> আজকের ভিডিও লেকচার</h3>
               <div class="planner-list">
                 <div class="p-item done">
-                  <div class="p-icon"><i class="fa-solid fa-circle-check"></i></div>
+                  <div class="p-icon"><i class="fa-solid fa-circle-check text-success"></i></div>
                   <div class="p-info">
                     <h6>উচ্চতর গণিত: ত্রিকোণমিতি ৭.২</h6>
                     <span>দৈর্ঘ্য: ২৫ মিনিট • সম্পন্ন</span>
@@ -505,7 +529,7 @@
                     <h6>রসায়ন: মোলের ধারণা ও রাসায়নিক গণনা</h6>
                     <span>দৈর্ঘ্য: ৩৫ মিনিট • বাকি</span>
                   </div>
-                  <button class="btn-sm btn-primary">প্লে করুন</button>
+                  <button class="btn-sm btn-primary" onclick="openSubjectWorkspace('chemistry', 4)">প্লে করুন</button>
                 </div>
               </div>
             </div>
@@ -517,7 +541,7 @@
                   <div class="p-icon"><i class="fa-regular fa-circle"></i></div>
                   <div class="p-info">
                     <h6>ICT: HTML ফরম প্র্যাকটিস</h6>
-                    <span>হোমওয়ার্ক জমা দেওয়ার দিন</span>
+                    <span>হোমওয়ার্ক জমা দেওয়ার শেষ সময় আজ</span>
                   </div>
                   <button class="btn-sm btn-outline">জমা দিন</button>
                 </div>
@@ -526,141 +550,115 @@
           </div>
         </section>
 
-        <!-- ================= VIEW 5: PRACTICE ZONE & AI QUIZ GENERATOR ================= -->
+        <!-- ================= VIEW 5: PRACTICE ZONE, AI QUIZ & FLASHCARDS ================= -->
         <section class="view-panel" id="view-practice">
-          
-          <!-- BEAUTIFIED STUDENT-FRIENDLY SECTION HEADER -->
           <div class="practice-hero-header">
             <div class="ph-text">
               <span class="ph-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> AI-Powered Student Practice Lab</span>
-              <h2 class="ph-title">অনুশীলন ও স্মার্ট এআই কুইজ কেন্দ্র 🎯</h2>
-              <p class="ph-desc">যেকোনো ক্লাস, সাবজেক্ট ও অধ্যায়ের ওপর ইচ্ছামতো এআই কুইজ জেনারেট করো এবং তাৎক্ষণিক উত্তর মূল্যায়ন পাও!</p>
+              <h2 class="ph-title">অনুশীলন, এআই কুইজ ও ফ্ল্যাশকার্ডস 🎯</h2>
+              <p class="ph-desc">এআই কুইজ জেনারেট করো, ফ্ল্যাশকার্ড দিয়ে দ্রুত রিভিশন দাও এবং ভুল উত্তরের কারণ জেনে নাও!</p>
+            </div>
+            
+            <!-- TIMED VS CASUAL MODE TOGGLE -->
+            <div class="practice-mode-toggle">
+              <span class="pm-lbl">মোড:</span>
+              <button class="pm-btn active" id="modeTimedBtn"><i class="fa-solid fa-stopwatch"></i> ⏱️ Timed Mode</button>
+              <button class="pm-btn" id="modeCasualBtn"><i class="fa-solid fa-mug-hot"></i> ☕ Casual Mode</button>
             </div>
           </div>
 
-          <!-- GENERATIVE AI QUIZ GENERATOR CONTROL PANEL -->
+          <!-- GENERATIVE AI QUIZ GENERATOR CARD -->
           <div class="ai-quiz-generator-card" id="aiQuizGeneratorCard">
             <div class="card-title">
               <div class="ai-title-wrap">
                 <div class="ai-sparkle-icon"><i class="fa-solid fa-brain"></i></div>
                 <div>
-                  <h3>জেনারেটিভ এআই-ভিত্তিক কুইজ জেনারেটর</h3>
-                  <span class="ai-sub-desc">Gemini AI দ্বারা চালিত ইন্টারেক্টিভ কাস্টম প্রশ্ন তৈরি করুন</span>
+                  <h3>জেনারেটিভ এআই-ভিত্তিক কুইজ ও ফ্ল্যাশকার্ড জেনারেটর</h3>
+                  <span class="ai-sub-desc">Gemini AI দ্বারা চালিত ইন্টারেক্টিভ অ্যাসেসমেন্ট তৈরি করুন</span>
                 </div>
               </div>
               <span class="badge-pill gold-glow"><i class="fa-solid fa-bolt"></i> Gemini Free Version</span>
             </div>
 
             <div class="quiz-gen-form-grid">
-              <!-- Class Select -->
               <div class="form-group">
                 <label><i class="fa-solid fa-graduation-cap text-primary"></i> শ্রেণি (Class / Level):</label>
                 <select id="aiQuizClass" class="form-control">
                   <option value="ssc" selected>SSC (১০ম শ্রেণি)</option>
-                  <option value="hsc">HSC (১১-১২শ শ্রেণি)</option>
+                  <option value="hsc">HSC (১১- ১২শ শ্রেণি)</option>
                   <option value="secondary">মাধ্যমিক (৮ম-৯ম শ্রেণি)</option>
-                  <option value="primary">প্রাথমিক (৫ম-৭ম শ্রেণি)</option>
-                  <option value="admission">বিশ্ববিদ্যালয় ভর্তি (Admission)</option>
                 </select>
               </div>
 
-              <!-- Subject Select -->
               <div class="form-group">
                 <label><i class="fa-solid fa-book-bookmark text-success"></i> বিষয় (Subject):</label>
                 <select id="aiQuizSubject" class="form-control">
                   <option value="physics" selected>পদার্থবিজ্ঞান (Physics)</option>
                   <option value="hmath">উচ্চতর গণিত (Higher Math)</option>
                   <option value="chemistry">রসায়ন (Chemistry)</option>
-                  <option value="biology">জীববিজ্ঞান (Biology)</option>
-                  <option value="ict">ICT (তথ্য ও যোগাযোগ প্রযুক্তি)</option>
-                  <option value="bangla">বাংলা ২য় পত্র (Grammar)</option>
-                  <option value="english">English Grammar & Composition</option>
+                  <option value="ict">ICT (তথ্য প্রযুক্তি)</option>
                 </select>
               </div>
 
-              <!-- Chapter / Topic Text Input -->
               <div class="form-group span-2-form">
                 <label><i class="fa-solid fa-pen-to-square text-warning"></i> অধ্যায় / নির্দিষ্ট টপিক (Topic Prompt):</label>
-                <input type="text" id="aiQuizTopic" class="form-control" value="অধ্যায় ৩: বল (Force) ও নিউটনের গতিসূত্র" placeholder="যেমন: কাজ ও ক্ষমতা, কারক সমাস, ত্রিকোণমিতি ৭.১...">
+                <input type="text" id="aiQuizTopic" class="form-control" value="অধ্যায় ৩: বল (Force) ও নিউটনের গতিসূত্র" placeholder="যেমন: গতিশক্তি, কারক সমাস, ত্রিকোণমিতি...">
               </div>
 
-              <!-- Question Type Select -->
               <div class="form-group">
-                <label><i class="fa-solid fa-list-check text-purple"></i> প্রশ্নের ধরন (Question Type):</label>
+                <label><i class="fa-solid fa-list-check text-purple"></i> প্রশ্নের ধরন (Type):</label>
                 <select id="aiQuizType" class="form-control">
-                  <option value="mcq" selected>🎯 এম.সি.কিউ (MCQ Multiple Choice)</option>
-                  <option value="one-word">✍️ এক কথায় উত্তর (One Word Answer)</option>
+                  <option value="mcq" selected>🎯 এম.সি.কিউ (MCQ)</option>
+                  <option value="flashcards">🎴 ✨ AI ফ্ল্যাশকার্ডস (Flashcards)</option>
+                  <option value="one-word">✍️ এক কথায় উত্তর (One Word)</option>
                   <option value="short">📝 সংক্ষিপ্ত উত্তর (Short Question)</option>
-                  <option value="broad">📚 ব্রড উত্তর (Broad Essay Question)</option>
-                  <option value="explanatory">🧠 ব্যাখ্যা মূলক (Explanatory Concept)</option>
+                  <option value="explanatory">🧠 ব্যাখ্যা মূলক (Explanatory)</option>
                 </select>
               </div>
 
-              <!-- Question Quantity Select -->
               <div class="form-group">
                 <label><i class="fa-solid fa-hashtags text-cyan"></i> প্রশ্নের সংখ্যা:</label>
                 <select id="aiQuizCount" class="form-control">
                   <option value="5" selected>৫টি প্রশ্ন</option>
                   <option value="10">১০টি প্রশ্ন</option>
-                  <option value="15">১৫টি প্রশ্ন</option>
                 </select>
               </div>
             </div>
 
             <div class="quiz-gen-actions">
               <button class="btn-primary btn-lg btn-shimmer" id="generateAiQuizBtn">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> ✨ AI প্রশ্ন জেনারেট করুন (Generate Assessment)
+                <i class="fa-solid fa-wand-magic-sparkles"></i> ✨ AI কুইজ জেনারেট করুন (Generate Assessment)
               </button>
             </div>
           </div>
 
-          <!-- Practice Type Category Submenu Cards -->
+          <!-- PRACTICE CATEGORY SUBMENU PILLS -->
           <div class="practice-category-bar">
             <button class="p-cat-card active" data-ptype="mcq">
               <i class="fa-solid fa-bullseye p-ic"></i>
-              <span>MCQ</span>
+              <span>MCQ কুইজ</span>
             </button>
-            <button class="p-cat-card" data-ptype="cq">
-              <i class="fa-solid fa-pen-ruler p-ic"></i>
-              <span>CQ (সৃজনশীল)</span>
-            </button>
-            <button class="p-cat-card" data-ptype="creative">
-              <i class="fa-solid fa-lightbulb p-ic"></i>
-              <span>Creative</span>
+            <button class="p-cat-card" data-ptype="flashcard">
+              <i class="fa-solid fa-layer-group p-ic"></i>
+              <span>AI ফ্ল্যাশকার্ড</span>
             </button>
             <button class="p-cat-card" data-ptype="short">
               <i class="fa-solid fa-file-pen p-ic"></i>
-              <span>Short Question</span>
+              <span>সংক্ষিপ্ত উত্তর</span>
             </button>
-            <button class="p-cat-card" data-ptype="blanks">
-              <i class="fa-solid fa-spell-check p-ic"></i>
-              <span>Fill in Blank</span>
-            </button>
-            <button class="p-cat-card" data-ptype="matching">
-              <i class="fa-solid fa-diagram-project p-ic"></i>
-              <span>Matching</span>
-            </button>
-            <button class="p-cat-card" data-ptype="tf">
-              <i class="fa-solid fa-circle-half-stroke p-ic"></i>
-              <span>True/False</span>
+            <button class="p-cat-card" data-ptype="cq">
+              <i class="fa-solid fa-pen-ruler p-ic"></i>
+              <span>সৃজনশীল (CQ)</span>
             </button>
             <button class="p-cat-card" data-ptype="math">
               <i class="fa-solid fa-calculator p-ic"></i>
               <span>Math Solver</span>
             </button>
-            <button class="p-cat-card" data-ptype="writing">
-              <i class="fa-solid fa-keyboard p-ic"></i>
-              <span>Writing</span>
-            </button>
-            <button class="p-cat-card" data-ptype="speaking">
-              <i class="fa-solid fa-microphone p-ic"></i>
-              <span>Speaking</span>
-            </button>
           </div>
 
-          <!-- Interactive Question Cards Container -->
+          <!-- INTERACTIVE PRACTICE & FLASHCARDS CONTAINER -->
           <div class="practice-container" id="practiceContainer">
-            <!-- Dynamically populated via script.js -->
+            <!-- Populated via script.js -->
           </div>
         </section>
 
@@ -676,25 +674,22 @@
           <div class="exam-submenu-bar">
             <button class="e-menu-btn active" data-etype="class">Class Test</button>
             <button class="e-menu-btn" data-etype="weekly">Weekly Test</button>
-            <button class="e-menu-btn" data-etype="monthly">Monthly Test</button>
             <button class="e-menu-btn" data-etype="ssc">SSC Model Test</button>
             <button class="e-menu-btn" data-etype="hsc">HSC Model Test</button>
-            <button class="e-menu-btn" data-etype="admission">Admission Model Test</button>
-            <button class="e-menu-btn" data-etype="previous">Previous Year</button>
-            <button class="e-menu-btn" data-etype="timed">Timed Exam</button>
+            <button class="e-menu-btn" data-etype="admission">Admission Test</button>
           </div>
 
           <div class="exams-grid" id="examsGrid">
-            <!-- Exam cards rendered via JS -->
+            <!-- Rendered via script.js -->
           </div>
         </section>
 
-        <!-- ================= VIEW 7: MY PROGRESS ================= -->
+        <!-- ================= VIEW 7: MY PROGRESS ANALYTICS ================= -->
         <section class="view-panel" id="view-progress">
           <div class="section-header">
             <div>
-              <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> আমার অগ্রগতি (My Analytics)</h2>
-              <p class="section-subtitle">পড়াশোনার সময়, বিষয়ভিত্তিক দক্ষতা ও পরীক্ষার ফলাফলের ভিজ্যুয়াল রিপোর্ট</p>
+              <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> আমার অগ্রগতি (Analytics & Reports)</h2>
+              <p class="section-subtitle">অধ্যয়নের সময়, বিষয়ভিত্তিক দক্ষতা ও পরীক্ষার ফলাফলের ভিজ্যুয়াল রিপোর্ট</p>
             </div>
           </div>
 
@@ -763,75 +758,43 @@
           </div>
         </section>
 
-        <!-- ================= VIEW 8: ACHIEVEMENTS ================= -->
+        <!-- ================= VIEW 8: ACHIEVEMENTS, LEADERBOARD & REWARDS SHOP ================= -->
         <section class="view-panel" id="view-achievements">
           <div class="section-header">
             <div>
-              <h2 class="section-title"><i class="fa-solid fa-trophy"></i> অর্জন ও ব্যাজ (Achievements & Leaderboard)</h2>
-              <p class="section-subtitle">আপনার অধ্যয়নের মাইলফলক, অর্জিত ব্যাজ এবং লিডারবোর্ড</p>
+              <h2 class="section-title"><i class="fa-solid fa-trophy"></i> অর্জন, লিডারবোর্ড ও রিওয়ার্ড শপ 🛍️</h2>
+              <p class="section-subtitle">পয়েন্ট ও কয়েন অর্জন করুন, লিডারবোর্ডে উঠে আসুন এবং স্পেশাল রিওয়ার্ড আনলক করুন</p>
             </div>
             <div class="xp-counter-badge">
               <i class="fa-solid fa-coins text-warning"></i> <span id="coinsVal">কয়েন: ১২৫০</span> | <i class="fa-solid fa-bolt text-primary"></i> <span id="xpVal">XP: ২৪৫০</span>
             </div>
           </div>
 
+          <!-- LEADERBOARD TOGGLE SWITCHER (GLOBAL VS SCHOOL FRIENDS) -->
           <div class="podium-section">
-            <h3 class="ach-subhead"><i class="fa-solid fa-crown text-warning"></i> এই সপ্তাহের সেরা ৩ চ্যাম্পিয়ন (Podium)</h3>
-            <div class="podium-cards">
-              <div class="podium-card rank-2">
-                <div class="podium-crown silver"><i class="fa-solid fa-crown"></i></div>
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Rahat">
-                <h4>রাহাত খান (আপনি)</h4>
-                <span class="podium-xp">২,৪৫০ XP</span>
-                <span class="podium-badge silver-bg">২য় স্থান</span>
+            <div class="podium-header-bar">
+              <h3 class="ach-subhead"><i class="fa-solid fa-crown text-warning"></i> চ্যাম্পিয়ন লিডারবোর্ড (Leaderboard)</h3>
+              <div class="leaderboard-tabs">
+                <button class="lb-tab active" id="lbGlobalTab"><i class="fa-solid fa-globe"></i> গ্লোবাল র‍্যাঙ্কিং</button>
+                <button class="lb-tab" id="lbSchoolTab"><i class="fa-solid fa-school"></i> স্কুল সহপাঠী (DRMC)</button>
               </div>
-              <div class="podium-card rank-1">
-                <div class="podium-crown gold"><i class="fa-solid fa-crown"></i></div>
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Sadia">
-                <h4>সাদিয়া সুলতানা</h4>
-                <span class="podium-xp">৩,২০০ XP</span>
-                <span class="podium-badge gold-bg">১ম স্থান (চ্যাম্পিয়ন)</span>
-              </div>
-              <div class="podium-card rank-3">
-                <div class="podium-crown bronze"><i class="fa-solid fa-crown"></i></div>
-                <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80" alt="Arif">
-                <h4>আরিফ আহমেদ</h4>
-                <span class="podium-xp">২,১০০ XP</span>
-                <span class="podium-badge bronze-bg">৩য় স্থান</span>
-              </div>
+            </div>
+
+            <!-- PODIUM CARDS -->
+            <div class="podium-cards" id="podiumCards">
+              <!-- Dynamically populated via script.js -->
             </div>
           </div>
 
-          <div class="achievements-section">
-            <h3 class="ach-subhead"><i class="fa-solid fa-medal"></i> আপনার ব্যাজসমূহ</h3>
-            <div class="badges-grid">
-              <div class="badge-card unlocked">
-                <div class="badge-icon"><i class="fa-solid fa-fire text-warning"></i></div>
-                <h4>৭ দিনের স্ট্রিক মাস্টার</h4>
-                <p>টানা ৭ দিন নিয়মিত ক্লাস ও পড়াশোনা সম্পন্ন করা হয়েছে</p>
-                <span class="badge-date">অর্জিত: ১৫ জুলাই</span>
-              </div>
+          <!-- VIRTUAL REWARDS SHOP SECTION -->
+          <div class="rewards-shop-section" style="margin-top: 2.5rem;">
+            <div class="shop-header">
+              <h3><i class="fa-solid fa-store text-primary"></i> 🛍️ ভার্চুয়াল রিওয়ার্ড শপ (Spend Coins to Unlock)</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">অর্জিত কয়েন খরচ করে নতুন থিম, ক্রাউন ফ্রেম ও VIP AI টিউটর আনলক করুন!</p>
+            </div>
 
-              <div class="badge-card unlocked">
-                <div class="badge-icon"><i class="fa-solid fa-brain text-primary"></i></div>
-                <h4>গণিত উইজার্ড</h4>
-                <p>গণিতে টানা ৩টি মডেল টেস্টে ৯০%+ নম্বর প্রাপ্তি</p>
-                <span class="badge-date">অর্জিত: ২০ জুলাই</span>
-              </div>
-
-              <div class="badge-card locked">
-                <div class="badge-icon"><i class="fa-solid fa-lock"></i></div>
-                <h4>নাইট আউল স্টাডি</h4>
-                <p>রাত ১২টার পর ১ ঘন্টা মনোযোগী পমোদোরো সম্পন্ন করুন</p>
-                <span class="badge-progress">প্রোগ্রেস: ৫০%</span>
-              </div>
-
-              <div class="badge-card locked">
-                <div class="badge-icon"><i class="fa-solid fa-lock"></i></div>
-                <h4>বিজ্ঞান অলিম্পিয়াড</h4>
-                <p>বিজ্ঞান বিভাগের সকল কুইজে ১ম স্থান অর্জন</p>
-                <span class="badge-progress">প্রোগ্রেস: ৮০%</span>
-              </div>
+            <div class="shop-grid" id="shopItemsGrid">
+              <!-- Injected via script.js -->
             </div>
           </div>
         </section>
@@ -852,7 +815,7 @@
                 <h4>পদার্থবিজ্ঞান ১ম ও ২য় পত্রের সকল সূত্রমালা</h4>
                 <p>সাইজ: ৪.৫ MB • আপডেট: ১০ জুলাই</p>
               </div>
-              <button class="btn-outline-sm" onclick="alert('ডাউনলোড হচ্ছে...')"><i class="fa-solid fa-download"></i> ডাউনলোড</button>
+              <button class="btn-outline-sm" onclick="alert('PDF ডাউনলোড হচ্ছে...')"><i class="fa-solid fa-download"></i> ডাউনলোড</button>
             </div>
 
             <div class="res-card">
@@ -914,9 +877,12 @@
           <div class="section-header">
             <div>
               <h2 class="section-title"><i class="fa-solid fa-graduation-cap text-primary"></i> 🎓 Smart Study Manager</h2>
-              <p class="section-subtitle">আপনার দৈনন্দিন পড়াশোনার টাইম ম্যানেজমেন্ট, ফোকাস মোড ও সাউন্ড অ্যানভায়রনমেন্ট</p>
+              <p class="section-subtitle">আপনার দৈনন্দিন পড়াশোনার টাইম ম্যানেজমেন্ট, ফোকাস মোড ও ক্যালেন্ডার সিঙ্ক</p>
             </div>
-            <button class="btn-primary" id="launchFocusModeBtn"><i class="fa-solid fa-expand"></i> Focus Mode চালু করুন</button>
+            <div style="display: flex; gap: 0.75rem;">
+              <button class="btn-outline-sm" onclick="exportStudyScheduleCalendar()"><i class="fa-solid fa-calendar-plus text-primary"></i> 📅 Google Calendar-এ সিঙ্ক করুন</button>
+              <button class="btn-primary" id="launchFocusModeBtn"><i class="fa-solid fa-expand"></i> Focus Mode</button>
+            </div>
           </div>
 
           <div class="study-manager-grid">
@@ -930,7 +896,7 @@
               </div>
               
               <div class="ambient-sound-bar">
-                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);"><i class="fa-solid fa-headphones"></i> পড়াশোনার পরিবেশ ব্যাকগ্রাউন্ড সাউন্ড:</span>
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary);"><i class="fa-solid fa-headphones"></i> ব্যাকগ্রাউন্ড সাউন্ড:</span>
                 <div class="sound-btns">
                   <button class="btn-sound-opt" onclick="toggleAmbientSound('rain', this)"><i class="fa-solid fa-cloud-rain"></i> বৃষ্টি</button>
                   <button class="btn-sound-opt" onclick="toggleAmbientSound('lofi', this)"><i class="fa-solid fa-music"></i> Lo-Fi</button>
@@ -1009,7 +975,7 @@
                 </div>
                 <div class="font-size-controls">
                   <button class="btn-outline-sm" id="fontDecBtn">A-</button>
-                  <span id="fontValDisplay">100%</span>
+                  <span id="fontValDisplay">110%</span>
                   <button class="btn-outline-sm" id="fontIncBtn">A+</button>
                 </div>
               </div>
@@ -1086,6 +1052,8 @@
     </div>
   </div>
 
+  <!-- DATA & LOGIC SCRIPTS -->
+  <script src="data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -1779,3 +1779,88 @@ body:not(.theme-dark) .learning-outcome-box {
   box-shadow: 0 4px 14px rgba(59, 130, 246, 0.2) !important;
   font-weight: 900 !important;
 }
+
+/* ==========================================================================
+   EXECUTIVE PRINT MEDIA STYLES (@media print)
+   ========================================================================== */
+@media print {
+  /* 1. Force Browser to Print Full Vibrant Colors */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 2. Hide sidebars, navigation bars, action buttons, modals and overlays */
+  nav, .sidebar, .no-print, button, .tbl-act-btn, .sidebar-header, .top-header, .header-right, .modal-overlay, #syllabus-details-modal {
+    display: none !important;
+  }
+
+  /* When printing individual modal report card, only display the modal content paper */
+  body.printing-modal #a4-record-modal-overlay {
+    display: block !important;
+    position: static !important;
+    background: transparent !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  body.printing-modal #a4-record-modal-content {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  body.printing-modal .app-container {
+    display: none !important;
+  }
+
+  /* 3. Reset Body Background and Layout Margins */
+  body, html {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 15px !important;
+    font-family: 'Hind Siliguri', sans-serif !important;
+  }
+
+  /* 4. Expand Main Dashboard Content Container & Remove Scroll Limits */
+  .app-container, .main-content, .smart-card, .container, div[style*="overflow"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* 5. Table Layout Optimization with Full Color Badges */
+  table, .syl-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 10.5pt !important;
+    color: #0f172a !important;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 8px 10px !important;
+    text-align: center !important;
+    color: #0f172a !important;
+  }
+
+  thead th {
+    background: #f1f5f9 !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+  }
+
+  /* 6. Prevent Unwanted Row Breaks across Pages */
+  tr {
+    page-break-inside: avoid !important;
+  }
+}

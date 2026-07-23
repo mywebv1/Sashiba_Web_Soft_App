@@ -213,6 +213,8 @@ function openPortal(type) {
     targetSrc = "./question_dashboard/index.html";
   } else if (type === "evaluation") {
     targetSrc = "./evaluation_dashboard/index.html";
+  } else if (type === "report") {
+    targetSrc = "./evaluation_dashboard/index.html#report";
   } else if (type === "classmanager") {
     targetSrc = "./class_manager_dashboard/index.html";
   }

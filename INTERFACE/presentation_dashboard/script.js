@@ -267,8 +267,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ২. একটু সময় দিয়ে (setTimeout) ডিফল্ট ডাটা লোড করুন যাতে সব আইডি খুঁজে পায়
   setTimeout(() => {
-    const clsSel = document.getElementById("class");
-    if (clsSel) clsSel.value = "ষষ্ঠ";
+    // 🚀 ক্লাস ম্যানেজার গ্লোবাল সেশন চেকিং
+    try {
+      const gSessionStr = localStorage.getItem("sashiba_global_active_session");
+      if (gSessionStr) {
+        const gSession = JSON.parse(gSessionStr);
+        if (gSession.schoolName) {
+          const schInput = document.getElementById("schName");
+          if (schInput) schInput.value = gSession.schoolName;
+        }
+        if (gSession.className) {
+          const clsSel = document.getElementById("class");
+          if (clsSel) {
+            let matchedCls = gSession.className;
+            if (matchedCls.includes("অষ্টম") || matchedCls.includes("8")) matchedCls = "অষ্টম";
+            else if (matchedCls.includes("পঞ্চম") || matchedCls.includes("5")) matchedCls = "পঞ্চম";
+            clsSel.value = matchedCls;
+          }
+        }
+      } else {
+        const clsSel = document.getElementById("class");
+        if (clsSel) clsSel.value = "ষষ্ঠ";
+      }
+    } catch(e) {
+      const clsSel = document.getElementById("class");
+      if (clsSel) clsSel.value = "ষষ্ঠ";
+    }
 
     handleClassChange();
     checkAutoImportFromLessonPlan();
@@ -876,7 +900,7 @@ function generateSlidesFromForm(force = false) {
       });
     }
 
-    // ৫. Quiz Slide
+    // ৫. Quiz & 4-Way Logic Analysis Slide (নতুন ও বৈপ্লবিক ৪-মাত্রিক লজিক বিশ্লেষণ)
     if (selectedSeq.length === 0 || selectedSeq.includes("Quiz")) {
       newSlides.push({
         id: "slide_quiz_" + Date.now(),
@@ -889,6 +913,23 @@ function generateSlidesFromForm(force = false) {
         ],
         notes: "শিক্ষার্থীদের হাত তুলতে বলুন এবং উত্তর দেওয়ার সুযোগ দিন।",
         icon: "fa-circle-question"
+      });
+
+      // 4-Way Logic Explanation Slide
+      newSlides.push({
+        id: "slide_logic_" + Date.now(),
+        title: "💡 স্মার্ট প্রশ্ন ও ৪-মাত্রিক অপশন ব্যাখ্যা",
+        type: "Content",
+        layout: "split",
+        bullets: [
+          `📌 মডেল প্রশ্ন: ${subject} বিষয়ের আজকের পাঠে বর্ণিত মূল সূত্রের প্রয়োগ কোনটি?`,
+          `✅ (ঘ) সঠিক উত্তর: এটি পাঠ্যবইয়ের নীতি ও গাণিতিক প্রমাণের সাথে শতভাগ সঙ্গতিপূর্ণ।`,
+          `❌ (ক) ভুল কারণ: এটি ১৭৫৭ সালের ঐতিহাসিক ইভেন্ট সম্পর্কিত, যা এই সূত্রের সাথে অসংলগ্ন।`,
+          `❌ (খ) ভুল কারণ: এতে প্রয়োজনীয় শর্ত অনুপস্থিত ছিল এবং এটি কেবল আংশিক প্রযোজ্য।`,
+          `❌ (গ) ভুল কারণ: এটি সম্পূর্ণ বিপরীত ধারণা প্রকাশ করে।`
+        ],
+        notes: "শিক্ষার্থীদের ব্যাখ্যা করে বুঝিয়ে বলুন কেন প্রতিটি ভুল উত্তর ভুল এবং সঠিক উত্তরটি কেন সঠিক।",
+        icon: "fa-lightbulb"
       });
     }
 
