@@ -217,6 +217,8 @@ function openPortal(type) {
     targetSrc = "./evaluation_dashboard/index.html#report";
   } else if (type === "classmanager") {
     targetSrc = "./class_manager_dashboard/index.html";
+  } else if (type === "academic" || type === "smartacademic") {
+    targetSrc = "./smart_academic_dashboard/index.html";
   }
   
   // আইফ্রেম সোর্স লোড করা
