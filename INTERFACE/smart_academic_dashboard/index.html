@@ -934,21 +934,29 @@
       </section>
 
       <!-- ===================================================================
-           সেকশন ৪: উপস্থিতি ও অংশগ্রহণ (Attendance & Participation)
+           📌 সেকশন ৪: বিষয়ভিত্তিক উপস্থিতি ও পার্টিসিপেশন ট্র্যাকার (Attendance & Participation Tracker)
            =================================================================== -->
       <section class="content-section hidden" id="section-attendance">
         <div class="glass-card panel-box">
+          
+          <!-- 📌 ৪.১ ড্যাশবোর্ড প্যানেল হেডার ও অ্যাকশন বোতামসমূহ (+ বিষয়, - বিষয়, + শিক্ষার্থী) -->
           <div class="panel-header">
             <h3><i class="fa-solid fa-user-check"></i> দৈনিক বিষয়ভিত্তিক উপস্থিতি ও পার্টিসিপেশন ট্র্যাকার</h3>
             <div class="hdr-actions">
-              <button class="btn-primary btn-sm" onclick="openAddSubjectModal()"><i class="fa-solid fa-folder-plus"></i> + বিষয় কলাম যোগ করুন</button>
-              <button class="btn-outline btn-sm text-danger" onclick="openDeleteSubjectModal()"><i class="fa-solid fa-folder-minus"></i> - বিষয় বাদ দিন</button>
-              <button class="btn-green btn-sm" onclick="openAddStudentModal()"><i class="fa-solid fa-user-plus"></i> + নতুন শিক্ষার্থী যোগ করুন</button>
+              <!-- বোতাম ১: নতুন বিষয় কলাম যোগ করার মডাল ওপেন করে -->
+              <button type="button" id="btnOpenAddSubjectModal" class="btn-primary btn-sm" onclick="openAddSubjectModal()"><i class="fa-solid fa-folder-plus"></i> + বিষয় কলাম যোগ করুন</button>
+              
+              <!-- বোতাম ২: সক্রিয় বিষয় কলাম বাদ দেওয়ার মডাল ওপেন করে -->
+              <button type="button" id="btnOpenDeleteSubjectModal" class="btn-outline btn-sm text-danger" onclick="openDeleteSubjectModal()"><i class="fa-solid fa-folder-minus"></i> - বিষয় বাদ দিন</button>
+              
+              <!-- বোতাম ৩: নতুন শিক্ষার্থী রো যোগ করার মডাল ওপেন করে -->
+              <button type="button" id="btnOpenAddStudentModal" class="btn-green btn-sm" onclick="openAddStudentModal()"><i class="fa-solid fa-user-plus"></i> + নতুন শিক্ষার্থী যোগ করুন</button>
             </div>
           </div>
 
-          <!-- Filter & Control Toolbar -->
+          <!-- 📌 ৪.২ টুলবার ফিল্টারিং (বিভাগ, শ্রেণি ১ম-১২দ্বাদশ, শাখা ক-ঙ, লোগো আপলোড ও প্রিন্ট) -->
           <div class="att-filter-toolbar">
+            <!-- বিভাগ ড্রপডাউন -->
             <div class="att-filter-group">
               <label>বিভাগ:</label>
               <select class="custom-select-sm" id="attDeptFilter" onchange="filterAttendanceTable()">
@@ -1030,22 +1038,10 @@
                     <th>রোল</th>
                     <th>ছবি ও নাম</th>
                     <th>শ্রেণি/শাখা</th>
-                    <th class="subj-col col-physics">
-                      <span>⚛️ পদার্থবিজ্ঞান</span>
-                      <span class="col-del-btn no-print" onclick="deleteSubjectColumn(this)" title="কলাম বাদ দিন">✕</span>
-                    </th>
-                    <th class="subj-col col-math">
-                      <span>📐 উচ্চতর গণিত</span>
-                      <span class="col-del-btn no-print" onclick="deleteSubjectColumn(this)" title="কলাম বাদ দিন">✕</span>
-                    </th>
-                    <th class="subj-col col-chem">
-                      <span>🧪 রসায়ন</span>
-                      <span class="col-del-btn no-print" onclick="deleteSubjectColumn(this)" title="কলাম বাদ দিন">✕</span>
-                    </th>
-                    <th class="subj-col col-bio">
-                      <span>🧬 জীববিজ্ঞান</span>
-                      <span class="col-del-btn no-print" onclick="deleteSubjectColumn(this)" title="কলাম বাদ দিন">✕</span>
-                    </th>
+                    <th class="subj-col col-physics">⚛️ পদার্থবিজ্ঞান</th>
+                    <th class="subj-col col-math">📐 উচ্চতর গণিত</th>
+                    <th class="subj-col col-chem">🧪 রসায়ন</th>
+                    <th class="subj-col col-bio">🧬 জীববিজ্ঞান</th>
                     <th>মোট %</th>
                     <th>পার্টিসিপেশন</th>
                     <th>মনোযোগ (স্টার)</th>
@@ -1170,11 +1166,9 @@
               </div>
             </div>
 
-          </div>
-        </div>
-          </div>
-        </div>
-      </section>
+          </div> <!-- printable-area end -->
+        </div> <!-- glass-card panel-box end -->
+      </section> <!-- section-attendance end -->
 
       <!-- ===================================================================
            সেকশন ৫: পরীক্ষার রুটিন (Exam Routine)
@@ -1724,7 +1718,7 @@
     <div class="modal-card glass-card">
       <div class="modal-header">
         <h3><i class="fa-solid fa-folder-plus"></i> নতুন বিষয় কলাম যুক্ত করুন</h3>
-        <button class="btn-icon" onclick="closeAddSubjectModal()"><i class="fa-solid fa-xmark"></i></button>
+        <button class="btn-icon" type="button" onclick="closeAddSubjectModal()"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         <form onsubmit="addNewSubjectColumn(event)">
@@ -1737,12 +1731,17 @@
             <button type="button" class="btn-outline" onclick="closeAddSubjectModal()">বাতিল</button>
             <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> কলাম যুক্ত করুন</button>
           </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Delete Subject Column Modal -->
   <div class="modal-overlay hidden" id="deleteSubjectModal">
     <div class="modal-card glass-card">
       <div class="modal-header">
         <h3><i class="fa-solid fa-folder-minus"></i> বিষয় কলাম বাদ দিন</h3>
-        <button class="btn-icon" onclick="closeDeleteSubjectModal()"><i class="fa-solid fa-xmark"></i></button>
+        <button class="btn-icon" type="button" onclick="closeDeleteSubjectModal()"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         <form onsubmit="confirmDeleteSubjectFromModal(event)">
@@ -1765,7 +1764,7 @@
     <div class="modal-card glass-card">
       <div class="modal-header">
         <h3><i class="fa-solid fa-user-plus"></i> নতুন শিক্ষার্থী রো যুক্ত করুন</h3>
-        <button class="btn-icon" onclick="closeAddStudentModal()"><i class="fa-solid fa-xmark"></i></button>
+        <button class="btn-icon" type="button" onclick="closeAddStudentModal()"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         <form onsubmit="saveNewStudentRow(event)">

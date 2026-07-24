@@ -264,10 +264,18 @@ function changeRole(role) {
   showToast(`রোল পরিবর্তন করা হয়েছে: ${label}`);
 }
 
-// ১১. গাণিতিক বিষয়ভিত্তিক উপস্থিতি ক্যালকুলেশন ইঞ্জিন ও কলাম/রো কন্ট্রোলার
+// ============================================================
+// 📌 ১১. গাণিতিক বিষয়ভিত্তিক উপস্থিতি ক্যালকুলেশন ইঞ্জিন ও কলাম/রো কন্ট্রোলার
+// ============================================================
 let currentEditingRow = null;
 
-// রিয়েল-টাইম অটোমেটিক % ক্যালকুলেশন, পার্টিসিপেশন মার্ক (১-১০) ও স্টার রেটিং (১-৫) জেনারেটর
+/**
+ * 📌 রিয়েল-টাইম অটোমেটিক % ক্যালকুলেশন, পার্টিসিপেশন মার্ক (১-১০) ও স্টার রেটিং (১-৫) জেনারেটর
+ * - প্রতিটি শিক্ষার্থীর সারিতে সক্রিয় মোট বিষয়ের সংখ্যা (N) হিসাব করে।
+ * - ১০০% কে N ভাগে সমভাগে ভাগ করে।
+ * - উপস্থিত (১.০), বিলম্ব (০.৫), ছুটি (১.০), অনুপস্থিত (০.০) পয়েন্ট যোগ করে শতকরা (%) নির্ণয় করে।
+ * - উপস্থিতির % এর ওপর পার্টিসিপেশন (১-১০) ও ৫-স্টার মনোযোগের মান লাইভ আপডেট করে।
+ */
 function recalculateStudentRow(tr) {
   const subChips = tr.querySelectorAll(".sub-chip");
   if (!subChips || subChips.length === 0) return;
@@ -278,14 +286,14 @@ function recalculateStudentRow(tr) {
   subChips.forEach(chip => {
     if (chip.classList.contains("present")) totalScorePoints += 1.0;
     else if (chip.classList.contains("late")) totalScorePoints += 0.5;
-    else if (chip.classList.contains("leave")) totalScorePoints += 1.0; // excused
-    else totalScorePoints += 0.0; // absent
+    else if (chip.classList.contains("leave")) totalScorePoints += 1.0; // ছুটি (excused)
+    else totalScorePoints += 0.0; // অনুপস্থিত
   });
 
   const percentage = Math.round((totalScorePoints / totalSubjects) * 100);
   const partScore = Math.round(percentage / 10);
 
-  // Star Rating Calculation
+  // 📌 ৫-স্টার মনোযোগের মান গণনাকারী
   let starsHtml = "";
   if (percentage >= 100) starsHtml = '<span class="att-level high">⭐⭐⭐⭐⭐ (৫ স্টার)</span>';
   else if (percentage >= 80) starsHtml = '<span class="att-level high">⭐⭐⭐⭐ (৪ স্টার)</span>';
@@ -293,27 +301,32 @@ function recalculateStudentRow(tr) {
   else if (percentage >= 40) starsHtml = '<span class="att-level medium">⭐⭐ (২ স্টার)</span>';
   else starsHtml = '<span class="att-level low">⭐ (১ স্টার ⚠️)</span>';
 
+  // 📌 ইনডেক্স খুঁজে বের করা (ডাইনামিক্যালি)
   const cells = tr.cells;
-  const percentCellIndex = cells.length - 5;
-  const partCellIndex = cells.length - 4;
-  const starCellIndex = cells.length - 3;
-
-  // Status Pill Class & Icon
+  const totalCols = cells.length;
+  
+  // ডাইনামিক ইনডেক্স: (totalCols - 5) % কলাম, (totalCols - 4) পার্টিসিপেশন, (totalCols - 3) স্টার
   let pillClass = "present";
   let pillIcon = '<i class="fa-solid fa-circle-check"></i>';
   if (percentage < 60) { pillClass = "absent"; pillIcon = '<i class="fa-solid fa-circle-xmark"></i>'; }
   else if (percentage < 85) { pillClass = "late"; pillIcon = '<i class="fa-solid fa-clock"></i>'; }
 
-  if (cells[percentCellIndex]) cells[percentCellIndex].innerHTML = `<span class="status-pill ${pillClass}">${pillIcon} ${percentage}%</span>`;
-  if (cells[partCellIndex]) cells[partCellIndex].innerHTML = `<span class="score-badge ${partScore === 0 ? 'zero' : ''}">${partScore} / ১০</span>`;
-  if (cells[starCellIndex]) cells[starCellIndex].innerHTML = starsHtml;
+  if (cells[totalCols - 5]) cells[totalCols - 5].innerHTML = `<span class="status-pill ${pillClass}">${pillIcon} ${percentage}%</span>`;
+  if (cells[totalCols - 4]) cells[totalCols - 4].innerHTML = `<span class="score-badge ${partScore === 0 ? 'zero' : ''}">${partScore} / ১০</span>`;
+  if (cells[totalCols - 3]) cells[totalCols - 3].innerHTML = starsHtml;
 }
 
+/**
+ * 📌 টেবিলে থাকা সকল শিক্ষার্থীর শতকরা পুনর্হিসাবকারী ফাংশন
+ */
 function recalculateAllRows() {
   const bodyRows = document.querySelectorAll("#attendanceTable tbody tr");
   bodyRows.forEach(tr => recalculateStudentRow(tr));
 }
 
+/**
+ * 📌 উপস্থিতি টেবিল ফিল্টারিং (বিভাগ, শ্রেণি, শাখা)
+ */
 function filterAttendanceTable() {
   const dept = document.getElementById("attDeptFilter").value;
   const cls = document.getElementById("attClassFilter").value;
@@ -321,7 +334,9 @@ function filterAttendanceTable() {
   showToast(`উপস্থিতি ফিল্টার: ${dept !== 'all' ? dept : 'সব বিভাগ'} | শ্রেণি ${cls} | শাখা ${sec}`);
 }
 
-// স্কুল লোগো আপলোড হ্যান্ডলার (FileReader)
+/**
+ * 📌 স্কুল লোগো আপলোড হ্যান্ডলার (FileReader API ব্যবহার করে লোগো প্রিভিউ পরিবর্তন)
+ */
 function handleLogoUpload(event) {
   const file = event.target.files[0];
   if (file) {
@@ -337,7 +352,9 @@ function handleLogoUpload(event) {
   }
 }
 
-// ডাইনামিক নতুন বিষয় কলাম যোগ করার মডাল ও লজিক
+/**
+ * 📌 বোতাম ১: নতুন বিষয় কলাম যোগ করার মডাল ওপেন ও সেভ
+ */
 function openAddSubjectModal() {
   document.getElementById("addSubjectModal").classList.remove("hidden");
 }
@@ -357,16 +374,13 @@ function addNewSubjectColumn(event) {
   const totalPercentTh = Array.from(headerRow.children).find(th => th.innerText.includes("মোট %"));
   const targetIndex = totalPercentTh ? totalPercentTh.cellIndex : headerRow.children.length - 5;
 
-  // Create new <th> header cell with Delete Button
+  // 📌 নতুন <th> বিষয় হেডার কলাম তৈরি (পরিচ্ছন্ন টেক্সট, কোনো ক্রস আইকন ছাড়া)
   const newTh = document.createElement("th");
   newTh.className = "subj-col animated-pop";
-  newTh.innerHTML = `
-    <span>${subjectTitle}</span>
-    <span class="col-del-btn no-print" onclick="deleteSubjectColumn(this)" title="কলাম বাদ দিন">✕</span>
-  `;
+  newTh.innerText = subjectTitle;
   headerRow.insertBefore(newTh, headerRow.children[targetIndex]);
 
-  // Append new <td> to all student rows in tbody
+  // 📌 সকল শিক্ষার্থীর সারিতে নতুন বিষয় ঘর (<td>) যুক্ত করা
   const bodyRows = table.querySelectorAll("tbody tr");
   bodyRows.forEach(tr => {
     const newTd = document.createElement("td");
@@ -382,7 +396,9 @@ function addNewSubjectColumn(event) {
   showToast(`নতুন বিষয় কলাম: "${subjectTitle}" যুক্ত করা হয়েছে! সকল শতকরা অটো হিসাব সম্পন্ন। 🎉`);
 }
 
-// ডাইনামিক বিষয় কলাম ডিলিট (বাদ দেওয়া)
+/**
+ * 📌 বোতাম ২: বিষয় কলাম বাদ দেওয়ার (Delete Subject Column) মডাল ও প্রসেসিং
+ */
 function openDeleteSubjectModal() {
   const table = document.getElementById("attendanceTable");
   const subjThs = table.querySelectorAll("thead tr th.subj-col");
@@ -395,7 +411,7 @@ function openDeleteSubjectModal() {
   }
 
   subjThs.forEach(th => {
-    const title = th.querySelector("span") ? th.querySelector("span").innerText.trim() : th.innerText.trim();
+    const title = th.innerText.trim();
     const opt = document.createElement("option");
     opt.value = th.cellIndex;
     opt.innerText = title;
@@ -451,7 +467,9 @@ function deleteSubjectColumn(btn) {
   }
 }
 
-// ✅ ❌ 🕒 📄 কলামের বিষয়ভিত্তিক সাব-চিপ ইন্টারেক্টিভ ক্লিক টগল
+/**
+ * 📌 বিষয়ভিত্তিক স্ট্যাটাস চিপ সাইকেল (✅ উপস্থিত -> ❌ অনুপস্থিত -> 🕒 বিলম্ব -> 📄 ছুটি)
+ */
 function toggleSubChip(chip) {
   if (chip.classList.contains("present")) {
     chip.className = "sub-chip absent animated-pop";
@@ -479,7 +497,9 @@ function toggleModalSubChip(chip) {
   toggleSubChip(chip);
 }
 
-// এক ক্লিকে সবাইকে উপস্থিত মার্ক করা
+/**
+ * 📌 এক ক্লিকে ক্লাসের সকলকে উপস্থিত (১০০%) মার্ক করা
+ */
 function markAllPresent() {
   const subChips = document.querySelectorAll("#attendanceTable tbody .sub-chip");
   subChips.forEach(chip => {
@@ -492,7 +512,9 @@ function markAllPresent() {
   showToast("সকল বিষয়ের শিক্ষার্থীদের ✅ উপস্থিত হিসেবে চিহ্নিত ও ১০০% হিসাব করা হয়েছে!");
 }
 
-// মডালের মাধ্যমে বিস্তারিত সম্পাদনা
+/**
+ * 📌 মডালের মাধ্যমে শিক্ষার্থী ও উপস্থিতি তথ্য সম্পাদনা (Edit Attendance Modal)
+ */
 function openEditAttendanceModal(btn) {
   currentEditingRow = btn.closest("tr");
   const cells = currentEditingRow.cells;
@@ -753,7 +775,30 @@ function showToast(message) {
   }, 3000);
 }
 
-// Initial recalculation on load
+// Initial recalculation on load & Global Window Functions binding
 window.addEventListener('DOMContentLoaded', () => {
   recalculateAllRows();
+
+  // Attach button event listeners as backup
+  const btnAddSub = document.getElementById("btnOpenAddSubjectModal");
+  if (btnAddSub) btnAddSub.onclick = openAddSubjectModal;
+
+  const btnDelSub = document.getElementById("btnOpenDeleteSubjectModal");
+  if (btnDelSub) btnDelSub.onclick = openDeleteSubjectModal;
+
+  const btnAddStu = document.getElementById("btnOpenAddStudentModal");
+  if (btnAddStu) btnAddStu.onclick = openAddStudentModal;
 });
+
+// Explicit window bindings
+window.openAddSubjectModal = openAddSubjectModal;
+window.closeAddSubjectModal = closeAddSubjectModal;
+window.addNewSubjectColumn = addNewSubjectColumn;
+
+window.openDeleteSubjectModal = openDeleteSubjectModal;
+window.closeDeleteSubjectModal = closeDeleteSubjectModal;
+window.confirmDeleteSubjectFromModal = confirmDeleteSubjectFromModal;
+
+window.openAddStudentModal = openAddStudentModal;
+window.closeAddStudentModal = closeAddStudentModal;
+window.saveNewStudentRow = saveNewStudentRow;
