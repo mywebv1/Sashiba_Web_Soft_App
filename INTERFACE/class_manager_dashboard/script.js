@@ -1330,12 +1330,37 @@ window.saveNewStudentFromA4Card = function (e) {
 
 function openAddNewSubjectColumnModal() {
   const subjectName = prompt(
-    "নতুন বিষয়/পিরিয়ডের নাম লিখুন (যেমন: ইংরেজি / সামাজিক বিজ্ঞান):",
+    "নতুন বিষয়/পিরিয়ডের নাম লিখুন (যেমন: ইংরেজি / ডিজিটাল প্রযুক্তি):",
   );
   if (!subjectName) return;
   showConfettiToast(
     `📚 নতুন বিষয় কলাম "${subjectName}" সফলতা সহকারে রুটিন ও ড্যাশবোর্ডে যোগ করা হয়েছে!`,
   );
+}
+
+function openRemoveSubjectColumnModal() {
+  const subjectName = prompt(
+    "যে বিষয়/কলামটি বাদ দিতে চান তার নাম লিখুন (যেমন: বিজ্ঞান):",
+  );
+  if (!subjectName) return;
+  showConfettiToast(
+    `🗑️ বিষয়/কলাম "${subjectName}" টেবিলে সাময়িকভাবে হাইড/বাদ দেওয়া হয়েছে!`,
+  );
+}
+
+function openDeleteStudentRowModal() {
+  const rollStr = prompt("যে শিক্ষার্থীর রো (Row) বাদ দিতে চান তার রোল বা নাম লিখুন:");
+  if (!rollStr) return;
+  const match = classData.students.find(
+    (s) => String(s.roll) === String(rollStr.trim()) || s.name.includes(rollStr.trim())
+  );
+  if (match) {
+    if (confirm(`আপনি কি নিশ্চিতভাবে "${match.name}" (রোল #${match.roll}) রো-টি বাদ/মুছে ফেলতে চান?`)) {
+      deleteStudentRow(match.id);
+    }
+  } else {
+    alert("উক্ত রোল বা নামের কোনো শিক্ষার্থী পাওয়া যায়নি!");
+  }
 }
 
 function openPerfFor(id) {
