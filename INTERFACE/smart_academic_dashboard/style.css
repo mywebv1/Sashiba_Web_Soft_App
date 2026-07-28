@@ -1473,17 +1473,11 @@ input, select, textarea {
   transform: scale(1.2);
 }
 
-/* Compact Table Layout & Precise Subject Alignment */
+/* Compact Table Layout & Higher Font Readability */
 .neat-table th {
-  padding: 10px 8px;
+  padding: 8px 10px;
   font-size: 13px;
   font-weight: 800;
-  vertical-align: middle;
-}
-
-.neat-table th.subj-col {
-  text-align: center;
-  vertical-align: middle;
 }
 
 .neat-table td {
@@ -1496,16 +1490,8 @@ input, select, textarea {
   font-size: 15px;
 }
 
-.neat-table td.text-center {
+.text-center {
   text-align: center;
-  vertical-align: middle;
-}
-
-.neat-table td.text-center .sub-chip {
-  margin: 0 auto;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Action Button Group Side-by-Side */
@@ -1997,68 +1983,74 @@ input, select, textarea {
 .notif-item.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger-red); }
 .notif-item.ai { background: rgba(139, 92, 246, 0.1); color: var(--purple-accent); }
 
-/* 📌 টেবিল কন্টেন্ট সেন্টারিং */
-.neat-table th.subj-col, 
-.neat-table td.text-center {
-    text-align: center !important;
-    vertical-align: middle !important;
-}
-
-.neat-table td.text-center .sub-chip {
-    display: inline-flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    margin: 0 auto !important;
-}
-
 /* ============================================================
-   📌 ৫. A4 পেপার প্রিন্ট স্টাইলসিট (@media print A4 Configuration)
-   - প্রিন্ট করার সময় ওপরের সকল ওয়েবসাইট হেডার, টপবার ও বার সম্পূর্ণ হাইড থাকে।
+   [PRINT STYLESHEET] — A4 Paper Output Configuration
    ============================================================ */
 @media print {
-    body, html {
-        height: auto !important;
-        overflow: visible !important;
-        background: white !important;
-    }
-    .app-container {
-        display: block !important;
-        height: auto !important;
-    }
-    .main-content {
-        overflow: visible !important;
-        display: block !important;
-    }
-    /* প্রিন্টে ড্যাশবোর্ডের অপ্রয়োজনীয় অংশ হাইড */
-    .sidebar, .top-bar, .no-print, .hdr-actions, .att-filter-toolbar, .welcome-banner, #confetti-canvas, .panel-header {
-        display: none !important;
-    }
-    .content-section {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    .glass-card {
-        border: none !important;
-        box-shadow: none !important;
-    }
-    .hidden-screen {
-        display: block !important;
-    }
-    #attendanceTable {
-        width: 100% !important;
-        font-size: 10px !important;
-        table-layout: auto !important;
-        border-collapse: collapse !important;
-    }
-    #attendanceTable th, #attendanceTable td {
-        padding: 4px 3px !important;
-        font-size: 10px !important;
-        word-break: break-word !important;
-    }
-    @page {
-        size: A4 landscape;
-        margin: 8mm;
-    }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .sidebar, .top-bar, .no-print, #confetti-canvas {
+    display: none !important;
+  }
+
+  .app-container {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .main-content {
+    overflow: visible !important;
+  }
+
+  .content-section {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .printable-area, .a4-paper-page {
+    width: 100% !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .hidden-screen {
+    display: block !important;
+  }
+
+  .print-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .print-header h2 { font-size: 20px; color: #0067b7; }
+  .print-header h3 { font-size: 16px; }
+
+  /* Print Table Auto-Fit & Scaling */
+  #attendanceTable {
+    width: 100% !important;
+    font-size: 10px !important;
+    table-layout: auto !important;
+    border-collapse: collapse !important;
+  }
+
+  #attendanceTable th, #attendanceTable td {
+    padding: 4px 3px !important;
+    font-size: 10px !important;
+    word-break: break-word !important;
+  }
+
+  .col-del-btn {
+    display: none !important;
+  }
+
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
 }
 
 /* ── Responsive Mobile Rules ── */
