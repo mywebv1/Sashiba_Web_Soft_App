@@ -433,6 +433,21 @@
         <!-- ==================== MENU 4: ATTENDANCE & PARTICIPATION (EXACT MATCH USER SCREENSHOT) ==================== -->
         <section id="sec-attendance" class="dashboard-section">
           
+          <!-- Header Title & Action Buttons -->
+          <div class="smart-card" style="padding:16px 20px;margin-bottom:16px;border-radius:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+              <h3 style="font-size:1.1rem;font-weight:900;color:var(--text-main);margin:0;"><i class="fa-solid fa-user-check text-primary"></i> দৈনিক বিষয়ভিত্তিক উপস্থিতি ও নোটিফিকেশন ট্র্যাকার</h3>
+              <span style="font-size:0.8rem;color:var(--text-muted);font-weight:700;">দৈনিক বিষয়ভিত্তিক উপস্থিতি ও তথ্য</span>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <button class="btn btn-primary" onclick="openAddNewSubjectColumnModal()" style="font-weight:800;border-radius:10px;height:38px;padding:0 14px;font-size:0.85rem;background:var(--primary);color:#fff;" title="নতুন বিষয় (Column) যোগ করুন"><i class="fa-solid fa-plus"></i> ➕ বিষয় (কলাম) যোগ করুন</button>
+              <button class="btn btn-secondary" onclick="openRemoveSubjectColumnModal()" style="font-weight:800;background:rgba(139,92,246,0.12);color:var(--purple);border:1.5px solid rgba(139,92,246,0.3);border-radius:10px;height:38px;padding:0 14px;font-size:0.85rem;" title="বিষয় (Column) বাদ দিন"><i class="fa-solid fa-minus"></i> ➖ বিষয় বাদ দিন</button>
+              <button class="btn btn-success" onclick="openA4NewStudentCardModal()" style="font-weight:800;background:#10b981;color:#fff;border-radius:10px;height:38px;padding:0 14px;font-size:0.85rem;" title="নতুন শিক্ষার্থী (Row) যুক্ত করুন"><i class="fa-solid fa-user-plus"></i> ➕ নতুন শিক্ষার্থী (রো) যোগ করুন</button>
+              <button class="btn btn-danger" onclick="openDeleteStudentRowModal()" style="font-weight:800;background:rgba(239,68,68,0.15);color:var(--danger);border:1.5px solid rgba(239,68,68,0.4);border-radius:10px;height:38px;padding:0 14px;font-size:0.85rem;" title="শিক্ষার্থী (Row) বাদ দিন"><i class="fa-solid fa-user-minus"></i> ➖ শিক্ষার্থী (রো) বাদ দিন</button>
+            </div>
+          </div>
+
           <!-- Top 5 Metric Cards (Matching Screenshot Exactly) -->
           <div class="stats-grid" style="display:grid;grid-template-columns:repeat(5, 1fr);gap:16px;margin-bottom:20px;">
             <div class="stat-card stat-blue" style="background:rgba(59,130,246,0.08);border:1.5px solid rgba(59,130,246,0.2);padding:16px 18px;border-radius:16px;display:flex;align-items:center;gap:12px;">
